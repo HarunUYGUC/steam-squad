@@ -15,7 +15,7 @@ export class OverlapEngine {
       sizeTier: 'all',          // 'all', 'small' (<5GB)
       hidePlayed: false,        // hide games marked as played
       searchQuery: '',
-      sortBy: 'hours'           // 'hours', 'match', 'name', 'maxPlayers'
+      sortBy: 'hours'           // 'hours', 'name', 'maxPlayers'
     };
   }
 
@@ -170,12 +170,6 @@ export class OverlapEngine {
     // Sort results
     pool.sort((a, b) => {
       if (this.filters.sortBy === 'hours') {
-        return b.totalHours - a.totalHours;
-      }
-      if (this.filters.sortBy === 'match') {
-        if (b.ownerCount !== a.ownerCount) {
-          return b.ownerCount - a.ownerCount;
-        }
         return b.totalHours - a.totalHours;
       }
       if (this.filters.sortBy === 'name') {
