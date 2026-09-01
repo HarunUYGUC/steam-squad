@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SteamSquad — Steam Kütüphane Eşleştirici</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div id="app" class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">🎮</div>
+        <div class="logo-text">
+          <h1>SteamSquad</h1>
+          <span class="subtitle">Kütüphane Eşleştirici</span>
+        </div>
+      </div>
+      <div class="squad-badge" id="squad-badge">
+        <span class="pulse-dot"></span>
+        <span id="active-squad-count">0 Oyuncu</span>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-tab="tab-squad" id="tab-btn-squad">
+        <span class="tab-icon">👥</span>
+        <span class="tab-label">Kadro</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-matches" id="tab-btn-matches">
+        <span class="tab-icon">🎮</span>
+        <span class="tab-label">Oyunlar</span>
+        <span class="badge" id="match-badge-count">0</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-poll" id="tab-btn-poll">
+        <span class="tab-icon">📋</span>
+        <span class="tab-label">Anket</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-roulette" id="tab-btn-roulette">
+        <span class="tab-icon">🎡</span>
+        <span class="tab-label">Çark & Veto</span>
+      </button>
+    </nav>
+
+    <!-- Main Content Panels -->
+    <main class="content-area">
+      <!-- TAB 1: SQUAD MANAGER -->
+      <section id="tab-squad" class="tab-pane active">
+        <!-- Add Member Bar -->
+        <div class="card add-member-card">
+          <label for="member-input" class="section-label">Arkadaş Ekle</label>
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="member-input" 
+              placeholder="Profil linki, kullanıcı adı veya SteamID64..." 
+              autocomplete="off"
+            />
+            <button id="btn-add-member" class="btn btn-primary">
+              <span>+ Ekle</span>
+            </button>
+          </div>
+          <p class="input-hint">Örn: <code>https://steamcommunity.com/id/kullanici_adi</code> veya <code>kullanici_adi</code></p>
+        </div>
+
+        <!-- Steam Web API Key Card (Optional for Full Library) -->
+        <div class="card api-key-card" style="padding: 8px 10px; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" id="toggle-api-key-panel">
+            <span style="font-size: 11px; font-weight: 600; color: #66c0f4;">🔑 Tüm Kütüphaneyi Aç (Steam Web API)</span>
+            <span id="api-key-chevron" style="font-size: 10px; color: #8f98a0;">▼</span>
+          </div>
+          <div id="api-key-content" class="hidden" style="margin-top: 8px; border-top: 1px solid #2a475e; padding-top: 8px;">
+            <p style="font-size: 10px; color: #c7d5e0; margin-bottom: 6px;">
+              Tüm kütüphanedeki yüzlerce oyunu çekmek için ücretsiz Steam API anahtarınızı girebilirsiniz:
+              <a href="https://steamcommunity.com/dev/apikey" target="_blank" style="color: #66c0f4;">steamcommunity.com/dev/apikey</a>
+            </p>
+            <div class="input-group" style="display: flex; gap: 4px;">
+              <input type="password" id="api-key-input" placeholder="Steam Web API Key..." style="font-size: 11px; padding: 5px 8px; flex: 1;" />
+              <button id="btn-save-api-key" class="btn btn-sm btn-primary">Kaydet</button>
+              <button id="btn-delete-api-key" class="btn btn-sm btn-danger-outline" title="Kayıtlı API anahtarını sil">Sil</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Squad Action Shortcuts -->
+        <div class="squad-actions-bar">
+          <button id="btn-create-team" class="btn btn-sm btn-secondary" title="Yeni bir ekip oluştur ve üyelerini seç">
+            ➕ Ekip Oluştur
+          </button>
+          <button id="btn-clear-squad" class="btn btn-sm btn-danger-outline" title="Tüm kadroyu temizle">
+            🗑️ Temizle
+          </button>
+        </div>
+
+        <!-- Presets Bar -->
+        <div class="presets-container" id="presets-container">
+          <span class="presets-label">Kayıtlı Ekipler:</span>
+          <div class="presets-list" id="presets-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Privacy Warning Banner (Hidden by default) -->
+        <div id="privacy-alert" class="alert-banner alert-warning hidden">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-content">
+            <strong>Gizli Profil Uyarısı!</strong>
+            <p id="privacy-alert-text">Bazı oyuncuların oyun detayları gizli. Kütüphanelerinin görünmesi için Steam Gizlilik Ayarlarından "Oyun Detayları: Herkese Açık" yapılmalıdır.</p>
+          </div>
+        </div>
+
+        <!-- Squad Members List -->
+        <div class="squad-list-header">
+          <h3>Kadro Üyeleri (<span id="member-count-label">0/10</span>)</h3>
+          <span class="sub-hint">Seçilen oyuncular eşleştirmeye dahil edilir</span>
+        </div>
+
+        <div id="members-list" class="members-grid">
+          <!-- Dynamically populated member cards -->
+        </div>
+
+        <!-- Empty Squad State -->
+        <div id="empty-squad-state" class="empty-state">
+          <div class="empty-icon">👥</div>
+          <h4>Kadroda Henüz Oyuncu Yok</h4>
+          <p>Yukarıdan Steam profil linki veya kullanıcı adı girerek arkadaşlarınızı ekleyin veya hızlıca <strong>Örnek Kadro Yükle</strong> butonuna tıklayın.</p>
+        </div>
+      </section>
+
+      <!-- TAB 2: OVERLAP MATCHES -->
+      <section id="tab-matches" class="tab-pane">
+        <!-- Matches Summary Bar -->
+        <div class="matches-stats-card" id="matches-stats-card">
+          <div class="stat-item" title="Kadroda seçilen herkesin kütüphanesinde olan oyunlar">
+            <div class="stat-value-wrap">
+              <span class="stat-value" id="stat-full-matches">0</span>
+              <span class="stat-unit">Oyun</span>
+            </div>
+            <span class="stat-label">HERKESTE VAR</span>
+          </div>
+          <div class="stat-item" title="Kadroda sadece 1 kişide eksik olan oyunlar">
+            <div class="stat-value-wrap">
+              <span class="stat-value text-amber" id="stat-n1-matches">0</span>
+              <span class="stat-unit text-amber">Oyun</span>
+            </div>
+            <span class="stat-label">1 KİŞİDE YOK</span>
+          </div>
+          <div class="stat-item" title="Kadroda sadece 2 kişide eksik olan oyunlar">
+            <div class="stat-value-wrap">
+              <span class="stat-value" id="stat-n2-matches" style="color: #e67e22;">0</span>
+              <span class="stat-unit" style="color: #e67e22;">Oyun</span>
+            </div>
+            <span class="stat-label">2 KİŞİDE YOK</span>
+          </div>
+          <div class="stat-item" title="Bu kadroyla oynandı olarak işaretlediğiniz oyunlar">
+            <div class="stat-value-wrap">
+              <span class="stat-value" id="stat-played-count" style="color: #2ecc71;">0</span>
+              <span class="stat-unit" style="color: #2ecc71;">Oyun</span>
+            </div>
+            <span class="stat-label">OYNANDI</span>
+          </div>
+          <div class="stat-item" title="Ekipteki oyuncuların kütüphanelerindeki toplam farklı oyun sayısı">
+            <div class="stat-value-wrap">
+              <span class="stat-value" id="stat-total-games">0</span>
+              <span class="stat-unit">Oyun</span>
+            </div>
+            <span class="stat-label">TOPLAM HAVUZ</span>
+          </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-panel">
+          <!-- Match Mode Tabs -->
+          <div class="filter-group">
+            <div class="segmented-control" id="match-tier-filter">
+              <button class="segment-btn active" data-tier="all_100">Herkeste Var</button>
+              <button class="segment-btn" data-tier="all_with_n1">1 Kişide Yok</button>
+              <button class="segment-btn" data-tier="all_with_n2">2 Kişide Yok</button>
+            </div>
+          </div>
+
+          <!-- Category Tags Filter -->
+          <div class="filter-tags-scroll" id="game-mode-filter">
+            <button class="tag-btn active" data-mode="all">🎮 Tümü</button>
+            <button class="tag-btn" data-mode="coop">🤝 Co-Op / PvE</button>
+            <button class="tag-btn" data-mode="pvp">⚔️ PvP / Rekabetçi</button>
+            <button class="tag-btn" data-mode="party">🎲 Parti / Eğlence</button>
+            <button class="tag-btn" data-mode="survival">🧗 Survival</button>
+          </div>
+
+          <!-- Extra Quick Filters & Search -->
+          <div class="filter-row">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="game-search-input" placeholder="Oyun ara..." />
+            </div>
+
+            <div class="sort-box">
+              <select id="sort-select">
+                <option value="hours">⏱️ En Çok Oynanan</option>
+                <option value="match">🎯 Kesişim Oranı</option>
+                <option value="name">🔤 İsim (A-Z)</option>
+                <option value="maxPlayers">👥 Oyuncu Kapasitesi</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Toggles -->
+          <div class="filter-toggles-row">
+            <label class="toggle-control" title="Sadece 5 GB altındaki hızlı indirilen oyunları göster">
+              <input type="checkbox" id="toggle-quick-download" />
+              <span class="toggle-switch"></span>
+              <span class="toggle-text">⚡ 10 Dk'da İndir (&lt;5 GB)</span>
+            </label>
+
+            <label class="toggle-control" title="Oynandı olarak işaretlenen oyunları listeden gizle">
+              <input type="checkbox" id="toggle-hide-played" />
+              <span class="toggle-switch"></span>
+              <span class="toggle-text" id="hide-played-label">Oynananları Gizle (0)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Games List Grid -->
+        <div id="games-results-list" class="games-grid">
+          <!-- Dynamically populated game cards -->
+        </div>
+
+        <!-- Empty Matches State -->
+        <div id="empty-matches-state" class="empty-state hidden">
+          <div class="empty-icon">🕹️</div>
+          <h4>Eşleşen Oyun Bulunamadı</h4>
+          <p>Filtreleri gevşetebilir veya kadroya daha fazla oyuncu ekleyip kütüphanelerini karşılaştırabilirsiniz.</p>
+        </div>
+      </section>
+
+      <!-- TAB 3: POLL EXPORTER -->
+      <section id="tab-poll" class="tab-pane">
+        <div class="poll-header-card">
+          <div class="poll-header-text">
+            <h3>📋 Anket Oluşturucu</h3>
+            <p>Arkadaşlarınız eklenti kurmadan Discord veya WhatsApp'ta hızlıca oylama yapabilir.</p>
+          </div>
+        </div>
+
+        <!-- Poll Settings -->
+        <div class="poll-config-card">
+          <div class="config-row">
+            <label>Platform Formatı:</label>
+            <div class="segmented-control" id="poll-platform-selector">
+              <button class="segment-btn active" data-platform="discord">💬 Discord</button>
+              <button class="segment-btn" data-platform="whatsapp">📱 WhatsApp</button>
+            </div>
+          </div>
+
+          <div class="config-row">
+            <label>Anket Kapsamı:</label>
+            <div class="segmented-control" id="poll-tier-selector">
+              <button class="segment-btn active" data-tier="all_100">Herkeste Var</button>
+              <button class="segment-btn" data-tier="all_with_n1">1 Kişide Yok</button>
+              <button class="segment-btn" data-tier="all_with_n2">2 Kişide Yok</button>
+            </div>
+          </div>
+
+          <div class="config-row">
+            <label>Oyun Sayısı:</label>
+            <div class="segmented-control" id="poll-limit-selector">
+              <button class="segment-btn" data-limit="3">İlk 3 Oyun</button>
+              <button class="segment-btn active" data-limit="5">İlk 5 Oyun</button>
+              <button class="segment-btn" data-limit="8">İlk 8 Oyun</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Poll Preview Box -->
+        <div class="poll-preview-container">
+          <div class="preview-header">
+            <span class="preview-title">Anket Önizlemesi</span>
+            <span class="preview-platform-badge" id="preview-badge">DISCORD</span>
+          </div>
+          <pre id="poll-preview-text" class="poll-preview-code"></pre>
+        </div>
+
+        <!-- Action Copy Button -->
+        <div class="poll-action-area">
+          <button id="btn-copy-poll" class="btn btn-primary btn-lg btn-block">
+            <span>📋 Panoya Kopyala & Paylaş</span>
+          </button>
+        </div>
+
+        <div class="poll-instructions-card">
+          <h4>💡 Nasıl Kullanılır?</h4>
+          <ol>
+            <li><strong>"Panoya Kopyala"</strong> butonuna basın.</li>
+            <li>Discord sunucunuza veya WhatsApp grubunuza yapıştırın (<code>Ctrl + V</code>).</li>
+            <li>Arkadaşlarınız numaralandırılmış emojilere tıklayarak anında oylarını kullansın!</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- TAB 4: ROULETTE & VETO -->
+      <section id="tab-roulette" class="tab-pane">
+        <!-- Sub Mode Selector -->
+        <div class="submode-selector">
+          <button class="submode-btn active" data-submode="roulette" id="btn-submode-roulette">
+            🎡 Çarkıfelek (Roulette)
+          </button>
+          <button class="submode-btn" data-submode="veto" id="btn-submode-veto">
+            🚫 Veto Eleme Arenası
+          </button>
+        </div>
+
+        <!-- MODE A: ROULETTE WHEEL -->
+        <div id="subview-roulette" class="subview-content active">
+          <!-- Veto Sync Status Bar -->
+          <div id="roulette-veto-sync-bar" class="alert-banner alert-warning hidden" style="margin-bottom: 8px; justify-content: space-between; align-items: center; padding: 6px 10px;">
+            <span style="font-size: 11px;" id="roulette-sync-text">🎯 Veto Arenasında elenen oyunlar çarktan çıkarıldı.</span>
+            <button id="btn-restore-wheel-games" class="btn btn-sm btn-secondary" style="font-size: 10px; padding: 2px 6px;">Tümünü Ekle</button>
+          </div>
+
+          <div class="roulette-container">
+            <div class="roulette-canvas-wrapper">
+              <canvas id="roulette-canvas" width="280" height="280"></canvas>
+            </div>
+
+            <div class="roulette-controls">
+              <button id="btn-spin-wheel" class="btn btn-primary btn-lg btn-glow">
+                <span>🎡 ÇARKI ÇEVİR!</span>
+              </button>
+              <button id="btn-toggle-sound" class="btn btn-icon btn-secondary" title="Sesi Aç/Kapat">
+                🔊
+              </button>
+            </div>
+          </div>
+
+          <!-- Winner Card Overlay / Result -->
+          <div id="roulette-winner-card" class="winner-card hidden">
+            <button id="btn-close-winner-card" class="winner-close-btn" title="Kapat">×</button>
+            <div class="winner-badge">🏆 KAZANAN OYUN!</div>
+            <img id="winner-game-image" class="winner-image" src="" alt="Winner Game" />
+            <h3 id="winner-game-title" class="winner-title">Oyun Adı</h3>
+            <p id="winner-game-info" class="winner-info">Co-Op • 4 Kişilik</p>
+            <div class="winner-actions" style="display: flex; gap: 6px;">
+              <a id="winner-launch-btn" href="#" class="btn btn-accent" style="flex: 1;">
+                🚀 Steam'de Başlat
+              </a>
+              <button id="btn-share-winner" class="btn btn-secondary" style="padding: 8px 14px;">
+                📋 Paylaş
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODE B: VETO ARENA -->
+        <div id="subview-veto" class="subview-content">
+          <div class="veto-header-card">
+            <div class="veto-turn-indicator" id="veto-turn-indicator">
+              <span class="turn-pulse"></span>
+              <span id="veto-current-player-text">Sıra: Harun — İstemediğin 1 oyunu ele!</span>
+            </div>
+            <button id="btn-reset-veto" class="btn btn-sm btn-secondary">
+              🔄 Baştan Başla
+            </button>
+          </div>
+
+          <div class="veto-arena-grid" id="veto-games-grid">
+            <!-- Dynamically populated candidate cards with VETO buttons -->
+          </div>
+
+          <!-- Eliminated Graveyard -->
+          <div class="veto-graveyard" id="veto-graveyard">
+            <span class="graveyard-title">💀 Elenen Oyunlar:</span>
+            <div class="graveyard-list" id="veto-graveyard-list"></div>
+          </div>
+
+          <!-- Veto Final Champion Banner -->
+          <div id="veto-champion-card" class="champion-card hidden">
+            <div class="champion-crown">👑</div>
+            <h3>KADRONUN ŞAMPİYON OYUNU!</h3>
+            <h2 id="veto-champion-title">Lethal Company</h2>
+            <p>Tüm elemelerden başarıyla geçti ve bu akşamın kazananı oldu!</p>
+            <a id="veto-champion-launch-btn" href="#" class="btn btn-primary btn-block">
+              🚀 Steam'de Oyunu Başlat
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>
