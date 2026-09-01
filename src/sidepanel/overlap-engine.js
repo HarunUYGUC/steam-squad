@@ -4,7 +4,7 @@
  */
 
 import { fetchGameStoreDetails } from '../services/steam-service.js';
-import { checkPartySizeCompatibility, SIZE_TIERS, GAME_MODES } from '../services/game-metadata.js';
+import { getGameMetadata, checkPartySizeCompatibility, SIZE_TIERS, GAME_MODES } from '../services/game-metadata.js';
 
 export class OverlapEngine {
   constructor() {
@@ -88,7 +88,7 @@ export class OverlapEngine {
             name: game.name,
             logo: game.logo,
             storeLink: game.storeLink,
-            metadata: game.metadata,
+            metadata: getGameMetadata(game.appId, game.name),
             owners: [],
             missingMembers: [],
             totalHours: 0
