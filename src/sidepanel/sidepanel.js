@@ -640,9 +640,26 @@ class SteamSquadApp {
         missingHtml = `<div class="game-ownership-status ownership-full">✅ Seçilen tüm oyuncuların (${stats.activePlayerCount}/${stats.activePlayerCount}) kütüphanesinde var!</div>`;
       }
 
-      const modeIcon = game.metadata?.mode === 'coop' ? '🤝 Co-Op' : (game.metadata?.mode === 'pvp' ? '⚔️ PvP' : (game.metadata?.mode === 'party' ? '🎲 Parti' : '🧗 Survival'));
-      const maxP = game.metadata?.maxPlayers ? `${game.metadata.maxPlayers} Kişilik` : 'Multiplayer';
-      const sizeTag = game.metadata?.size === 'small' ? '⚡ <5 GB' : (game.metadata?.size === 'medium' ? '💾 5-20 GB' : '📦 >20 GB');
+      const isSolo = game.metadata?.mode === 'solo' || game.metadata?.maxPlayers === 1;
+      const modeIcon = isSolo 
+        ? '👤 Tek Kişilik' 
+        : (game.metadata?.mode === 'coop' 
+            ? '🤝 Co-Op' 
+            : (game.metadata?.mode === 'pvp' 
+                ? '⚔️ PvP' 
+                : (game.metadata?.mode === 'party' 
+                    ? '🎲 Parti' 
+                    : '🧗 Survival')));
+
+      const maxP = isSolo 
+        ? '1 Kişilik (Solo)' 
+        : (game.metadata?.maxPlayers ? `${game.metadata.maxPlayers} Kişilik` : 'Multiplayer');
+
+      const sizeTag = game.metadata?.size === 'small' 
+        ? '⚡ <5 GB' 
+        : (game.metadata?.size === 'large' 
+            ? '📦 >20 GB' 
+            : '💾 5-20 GB');
       const playedBadge = game.isPlayed ? '<span class="game-played-badge">✓ OYNANDI</span>' : '';
 
       card.innerHTML = `
@@ -658,7 +675,7 @@ class SteamSquadApp {
           </div>
           <div class="game-tags-row">
             <span class="pill-tag">${modeIcon}</span>
-            <span class="pill-tag">👥 ${maxP}</span>
+            <span class="pill-tag">${isSolo ? '👤' : '👥'} ${maxP}</span>
             <span class="pill-tag">${sizeTag}</span>
           </div>
           ${missingHtml}
