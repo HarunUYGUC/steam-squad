@@ -88,7 +88,7 @@ export class OverlapEngine {
             name: game.name,
             logo: game.logo,
             storeLink: game.storeLink,
-            metadata: getGameMetadata(game.appId, game.name),
+            metadata: game.metadata,
             owners: [],
             missingMembers: [],
             totalHours: 0
