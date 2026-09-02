@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "SteamSquad — Steam Kütüphane Eşleştirici",
   "version": "1.4.4",
-  "description": "Arkadaş ekibinizin Steam'deki ortak oyunlarını bulun; kişi sayısı filtreleri, canlı indirimler, çarkıfelek ve tek tıkla anketlerle hızlıca oyun seçin.",
+  "description": "Arkadaş ekibinizin Steam ortak oyunlarını bulun; filtreler, canlı indirimler, çarkıfelek ve tek tıkla grup anketleri.",
   "icons": {
     "16": "icons/icon-16.png",
     "48": "icons/icon-48.png",
