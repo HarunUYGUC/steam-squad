@@ -38,8 +38,10 @@
 steam-squad/
 ├── manifest.json              # Manifest V3 (Side Panel, Storage, Steam Host İzinleri)
 ├── CHROMEWEBSTORE.md          # Chrome Web Store mağaza listelemesi ve izin açıklamaları
-├── DATA_ARCHITECTURE.md       # Veri akış ve kütüphane analiz mimarisi dokümanı
 ├── README.md                  # Proje tanıtım ve kurulum kılavuzu
+├── docs/                      # Mimari ve veri akış dokümantasyonları
+│   ├── APP_ARCHITECTURE.md   # Genel uygulama çalışma mimarisi ve modül ilişkileri
+│   └── DATA_ARCHITECTURE.md  # Veri akış ve kütüphane analiz mimarisi dokümanı
 ├── icons/                     # 16, 48, 128px PNG eklenti ikonları
 │   ├── icon-16.png
 │   ├── icon-48.png
