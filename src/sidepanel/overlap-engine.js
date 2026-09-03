@@ -3,7 +3,7 @@
  * Calculates 100% full matches, 1 missing, 2 missing player intersections, played status, and filters.
  */
 
-import { checkPartySizeCompatibility, SIZE_TIERS } from '../services/game-metadata.js';
+import { SIZE_TIERS } from '../services/game-metadata.js';
 
 export class OverlapEngine {
   constructor() {
@@ -120,7 +120,6 @@ export class OverlapEngine {
       game.ownerCount = game.owners.length;
       game.matchPercentage = Math.round((game.ownerCount / totalActive) * 100);
       game.averageHours = game.ownerCount > 0 ? (game.totalHours / game.ownerCount).toFixed(1) : 0;
-      game.partyCheck = checkPartySizeCompatibility(game.metadata, totalActive);
       game.storeDetails = null; // Enriched on-demand in UI
       game.isPlayed = this.playedGames.has(Number(appId));
 

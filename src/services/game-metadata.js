@@ -251,24 +251,3 @@ export function getGameMetadata(appId, gameName = '') {
     isMultiplayer
   };
 }
-
-/**
- * Check if the game accommodates the given squad size
- * @param {object} gameMeta 
- * @param {number} squadSize 
- * @returns {{ compatible: boolean, reason?: string }}
- */
-export function checkPartySizeCompatibility(gameMeta, squadSize) {
-  if (!gameMeta || !gameMeta.maxPlayers) {
-    return { compatible: true };
-  }
-
-  if (gameMeta.maxPlayers < squadSize) {
-    return {
-      compatible: false,
-      reason: `Maksimum ${gameMeta.maxPlayers} kişilik (Seçilen Kadro: ${squadSize} Kişi)`
-    };
-  }
-
-  return { compatible: true };
-}
