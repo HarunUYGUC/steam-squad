@@ -3,8 +3,7 @@
  * Calculates 100% full matches, 1 missing, 2 missing player intersections, played status, and filters.
  */
 
-import { fetchGameStoreDetails } from '../services/steam-service.js';
-import { getGameMetadata, checkPartySizeCompatibility, SIZE_TIERS, GAME_MODES } from '../services/game-metadata.js';
+import { checkPartySizeCompatibility, SIZE_TIERS } from '../services/game-metadata.js';
 
 export class OverlapEngine {
   constructor() {

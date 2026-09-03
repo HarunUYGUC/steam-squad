@@ -4,7 +4,6 @@
  */
 
 import { fetchSteamLibrary } from '../services/steam-service.js';
-import { getGameMetadata } from '../services/game-metadata.js';
 
 const STORAGE_KEYS = {
   SQUAD_MEMBERS: 'steamsquad_members',
