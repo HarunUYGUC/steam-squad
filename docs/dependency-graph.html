@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SteamSquad — Mimari Bağımlılık Grafiği (Dependency Graph)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-paper-2: #ececec;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-soft:    #7a8399;
+      --color-accent:  #eb6c36;
+      --color-link:    #2e5aa8;
+      --color-rule:    rgba(45, 49, 66, 0.12);
+      --font-sans:     'Geist', system-ui, -apple-system, sans-serif;
+      --font-serif:    'Instrument Serif', Georgia, serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 2rem;
+    }
+
+    .frame {
+      max-width: 1140px;
+      width: 100%;
+    }
+
+    .header-area {
+      margin-bottom: 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.8rem, 2.5vw + 1rem, 2.6rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--color-muted);
+      max-width: 720px;
+      line-height: 1.5;
+    }
+
+    .diagram-viewport {
+      background: var(--color-paper);
+      border: 1px solid var(--color-rule);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin-bottom: 2rem;
+    }
+
+    svg {
+      width: 100%;
+      min-width: 1000px;
+      display: block;
+      height: auto;
+    }
+
+    /* Summary cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr 0.95fr;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 860px) {
+      .cards-grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--color-rule);
+      border-radius: 6px;
+      padding: 1.25rem;
+    }
+
+    .card-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-soft);
+      margin-bottom: 0.5rem;
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+    .card-dot.accent { background: var(--color-accent); }
+    .card-dot.ink { background: var(--color-ink); }
+    .card-dot.link { background: var(--color-link); }
+
+    .card h3 {
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-ink);
+    }
+
+    .card p {
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: var(--color-muted);
+    }
+
+    .colophon {
+      border-top: 1px solid var(--color-rule);
+      padding-top: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--color-soft);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <header class="header-area">
+      <p class="eyebrow">MİMARİ &amp; BAĞIMLILIK · DIAGRAM DESIGN</p>
+      <h1>SteamSquad Modül Bağımlılık Grafiği</h1>
+      <p class="subtitle">Eklenti bileşenlerinin içe aktarım (import/export) hiyerarşisi, veri akışı yönü ve modüler izolasyon haritası.</p>
+    </header>
+
+    <div class="diagram-viewport">
+      <svg viewBox="0 0 1100 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="dependency-title dependency-desc">
+        <title id="dependency-title">SteamSquad Modül Bağımlılık Grafiği</title>
+        <desc id="dependency-desc">SteamSquad Chrome eklentisinin 4 katmanlı hiyerarşik bağımlılık grafiği. sidepanel.js ana kontrolcü olarak en tepede durur; alt motorlar ve veri servisleri sıfır döngüsel bağımlılıkla tek yönlü olarak aşağıya doğru bağlanır.</desc>
+
+        <defs>
+          <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap');</style>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/>
+          </marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/>
+          </marker>
+          <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/>
+          </marker>
+        </defs>
+
+        <!-- Arka Plan -->
+        <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+        <!-- Sol Kenar Katman Etiketleri (Rank Labels) -->
+        <text x="40" y="104" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">KATMAN 0 · KONTROLCÜ</text>
+        <text x="40" y="248" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">KATMAN 1 · MOTORLAR</text>
+        <text x="40" y="392" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">KATMAN 2 · SERVİSLER</text>
+        <text x="40" y="536" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">KATMAN 3 · VERİ &amp; DEPO</text>
+
+        <!-- Katman Ayırıcı Kılavuz Çizgileri -->
+        <line x1="40" y1="160" x2="1060" y2="160" stroke="rgba(45,49,66,0.06)" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="40" y1="304" x2="1060" y2="304" stroke="rgba(45,49,66,0.06)" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="40" y1="448" x2="1060" y2="448" stroke="rgba(45,49,66,0.06)" stroke-width="1" stroke-dasharray="4,4"/>
+
+        <!-- ================================================================= -->
+        <!-- BAĞLANTILAR (Kutulardan önce çizilir - Kurallar §6)              -->
+        <!-- ================================================================= -->
+
+        <!-- 1. sidepanel -> squad-manager (Elbow) -->
+        <path d="M 480,128 V 164 Q 480,172 472,172 H 234 Q 226,172 226,180 V 216" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+        <rect x="334" y="162" width="40" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="354" y="171" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">IMPORT</text>
+
+        <!-- 2. sidepanel -> overlap-engine (Elbow) -->
+        <path d="M 516,128 V 180 Q 516,188 508,188 H 474 Q 466,188 466,196 V 216" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+
+        <!-- 3. sidepanel -> roulette (Elbow) -->
+        <path d="M 588,128 V 180 Q 588,188 596,188 H 698 Q 706,188 706,196 V 216" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+
+        <!-- 4. sidepanel -> poll-generator (Elbow) -->
+        <path d="M 624,128 V 164 Q 624,172 632,172 H 938 Q 946,172 946,180 V 216" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+
+        <!-- 5. sidepanel -> steam-service (Mağaza fiyatları için doğrudan geçiş) -->
+        <path d="M 552,128 V 152 Q 552,160 544,160 H 356 Q 348,160 348,168 V 360" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+
+        <!-- 6. squad-manager -> steam-service (Kütüphane Çekme) -->
+        <path d="M 256,272 V 308 Q 256,316 264,316 H 312 Q 320,316 320,324 V 360" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+
+        <!-- 7. squad-manager -> chrome.storage.local (Kalıcı Kadro Kaydı) -->
+        <line x1="160" y1="272" x2="160" y2="504" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+        <rect x="136" y="348" width="48" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="160" y="357" fill="#7a8399" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">PERSIST</text>
+
+        <!-- 8. overlap-engine -> game-metadata (Kategori/Boyut Zenginleştirme) -->
+        <line x1="466" y1="272" x2="466" y2="504" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+
+        <!-- 9. steam-service -> game-metadata (Oyun Metadata Eşleştirme) -->
+        <path d="M 380,416 V 452 Q 380,460 388,460 H 422 Q 430,460 430,468 V 504" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+
+        <!-- 10. steam-service -> chrome.storage.local (Fiyat Önbelleği - 6 Saat) -->
+        <path d="M 260,416 V 452 Q 260,460 252,460 H 228 Q 220,460 220,468 V 504" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+
+        <!-- 11. steam-service -> Steam Web API / Store (HTTP İstekleri) -->
+        <path d="M 340,416 V 444 Q 340,452 348,452 H 742 Q 750,452 750,460 V 504" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+        <rect x="520" y="446" width="60" height="12" rx="2" fill="#f5f5f5"/>
+        <text x="550" y="455" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">HTTPS FETCH</text>
+
+        <!-- ================================================================= -->
+        <!-- DÜĞÜMLER (NODES - Kutular, Rozetler ve Metinler)                  -->
+        <!-- ================================================================= -->
+
+        <!-- KATMAN 0: sidepanel.js (FOKAL DÜĞÜM) -->
+        <rect x="460" y="72" width="180" height="56" rx="6" fill="#f5f5f5"/>
+        <rect x="460" y="72" width="180" height="56" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.2"/>
+        <rect x="468" y="78" width="28" height="12" rx="2" fill="transparent" stroke="rgba(235,108,54,0.40)" stroke-width="0.8"/>
+        <text x="482" y="87" fill="#eb6c36" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">CTRL</text>
+        <rect x="604" y="80" width="28" height="12" rx="2" fill="transparent" stroke="rgba(235,108,54,0.40)" stroke-width="0.8"/>
+        <text x="618" y="89" fill="#eb6c36" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">0 IN</text>
+        <text x="550" y="102" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">sidepanel.js</text>
+        <text x="550" y="118" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">SteamSquadApp (Root)</text>
+
+        <!-- KATMAN 1: squad-manager.js -->
+        <rect x="140" y="216" width="172" height="56" rx="6" fill="#f5f5f5"/>
+        <rect x="140" y="216" width="172" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <rect x="148" y="222" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="162" y="231" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">MOD</text>
+        <rect x="276" y="224" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="290" y="233" fill="#2d3142" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">1 IN</text>
+        <text x="226" y="246" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">squad-manager.js</text>
+        <text x="226" y="262" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">SquadManager (State)</text>
+
+        <!-- KATMAN 1: overlap-engine.js -->
+        <rect x="380" y="216" width="172" height="56" rx="6" fill="#f5f5f5"/>
+        <rect x="380" y="216" width="172" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <rect x="388" y="222" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="402" y="231" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">ENG</text>
+        <rect x="516" y="224" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="530" y="233" fill="#2d3142" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">1 IN</text>
+        <text x="466" y="246" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">overlap-engine.js</text>
+        <text x="466" y="262" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">OverlapEngine (Pure)</text>
+
+        <!-- KATMAN 1: roulette.js (Uç Düğüm / Leaf) -->
+        <rect x="620" y="216" width="172" height="56" rx="6" fill="#f5f5f5"/>
+        <rect x="620" y="216" width="172" height="56" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="0.8"/>
+        <rect x="628" y="222" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="642" y="231" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">UI</text>
+        <rect x="756" y="224" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="770" y="233" fill="#2d3142" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">1 IN</text>
+        <text x="706" y="246" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">roulette.js</text>
+        <text x="706" y="262" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Canvas + VetoArena</text>
+
+        <!-- KATMAN 1: poll-generator.js (Uç Düğüm / Leaf) -->
+        <rect x="860" y="216" width="172" height="56" rx="6" fill="#f5f5f5"/>
+        <rect x="860" y="216" width="172" height="56" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="0.8"/>
+        <rect x="868" y="222" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="882" y="231" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">UTIL</text>
+        <rect x="996" y="224" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="1010" y="233" fill="#2d3142" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">1 IN</text>
+        <text x="946" y="246" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">poll-generator.js</text>
+        <text x="946" y="262" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Discord/WhatsApp</text>
+
+        <!-- KATMAN 2: steam-service.js (En Yüksek Fan-In) -->
+        <rect x="240" y="360" width="180" height="56" rx="6" fill="#f5f5f5"/>
+        <rect x="240" y="360" width="180" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+        <rect x="248" y="366" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="262" y="375" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">SVC</text>
+        <rect x="384" y="368" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="398" y="377" fill="#2d3142" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">2 IN</text>
+        <text x="330" y="390" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">steam-service.js</text>
+        <text x="330" y="406" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">API Client + Cache</text>
+
+        <!-- KATMAN 3: chrome.storage.local (Dış Depo) -->
+        <rect x="140" y="504" width="180" height="56" rx="6" fill="#f5f5f5"/>
+        <rect x="140" y="504" width="180" height="56" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1" stroke-dasharray="4,3"/>
+        <rect x="148" y="510" width="32" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="164" y="519" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">STORE</text>
+        <rect x="284" y="512" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="298" y="521" fill="#2d3142" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">2 IN</text>
+        <text x="230" y="534" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">chrome.storage.local</text>
+        <text x="230" y="550" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Local Storage (Kalıcı)</text>
+
+        <!-- KATMAN 3: game-metadata.js (Uç Bilgi Bankası) -->
+        <rect x="400" y="504" width="180" height="56" rx="6" fill="#f5f5f5"/>
+        <rect x="400" y="504" width="180" height="56" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="0.8"/>
+        <rect x="408" y="510" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="422" y="519" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">DATA</text>
+        <rect x="544" y="512" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="558" y="521" fill="#2d3142" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">2 IN</text>
+        <text x="490" y="534" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">game-metadata.js</text>
+        <text x="490" y="550" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">400+ Oyun Ansiklopedisi</text>
+
+        <!-- KATMAN 3: Steam Web API / Store (Harici Bulut Servisi) -->
+        <rect x="660" y="504" width="180" height="56" rx="6" fill="#f5f5f5"/>
+        <rect x="660" y="504" width="180" height="56" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+        <rect x="668" y="510" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="682" y="519" fill="#2d3142" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">CLOUD</text>
+        <rect x="804" y="512" width="28" height="12" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+        <text x="818" y="521" fill="#2d3142" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">1 IN</text>
+        <text x="750" y="534" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Steam Web &amp; Store API</text>
+        <text x="750" y="550" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">api.steampowered.com</text>
+
+        <!-- ================================================================= -->
+        <!-- LEJANT (LEGEND STRIP - Kurallar §6)                               -->
+        <!-- ================================================================= -->
+        <line x1="40" y1="600" x2="1060" y2="600" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
+        <text x="40" y="624" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEJANT</text>
+
+        <!-- 1. Fokal Kontrolcü -->
+        <rect x="140" y="616" width="12" height="12" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1"/>
+        <text x="160" y="626" fill="#2d3142" font-size="9" font-family="'Geist', sans-serif">Ana Kontrolcü (Fokal)</text>
+
+        <!-- 2. Dahili Modül / Servis -->
+        <rect x="330" y="616" width="12" height="12" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+        <text x="350" y="626" fill="#2d3142" font-size="9" font-family="'Geist', sans-serif">Dahili Modül / Servis</text>
+
+        <!-- 3. Bağımsız Uç Düğüm (Leaf) -->
+        <rect x="520" y="616" width="12" height="12" rx="2" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="0.8"/>
+        <text x="540" y="626" fill="#2d3142" font-size="9" font-family="'Geist', sans-serif">Bağımsız Uç Düğüm (Leaf)</text>
+
+        <!-- 4. Depolama / Harici Bulut -->
+        <rect x="730" y="616" width="12" height="12" rx="2" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="750" y="626" fill="#2d3142" font-size="9" font-family="'Geist', sans-serif">Tarayıcı Deposu / Dış API</text>
+
+        <!-- 5. Ağ Çağrısı Bağlantısı -->
+        <line x1="910" y1="622" x2="934" y2="622" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+        <text x="944" y="626" fill="#2d3142" font-size="9" font-family="'Geist', sans-serif">Ağ Çağrısı (Network)</text>
+      </svg>
+    </div>
+
+    <!-- Editorial Summary Cards -->
+    <div class="cards-grid">
+      <div class="card">
+        <p class="card-eyebrow">HİYERARŞİ &amp; MERKEZİLEŞME</p>
+        <div class="card-title-row">
+          <span class="card-dot accent"></span>
+          <h3>Orkestra Şefi (Single Controller)</h3>
+        </div>
+        <p>Piramidin en tepesinde duran <code>sidepanel.js</code> (Katman 0), altındaki tüm motorları koordine eder. Alt motorlar birbirleriyle doğrudan konuşmaz; bu sayede arayüz mantığı ve hesaplama mantığı birbirinden tamamen izole edilir.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-eyebrow">MİMARİ SAĞLAMLIĞI</p>
+        <div class="card-title-row">
+          <span class="card-dot ink"></span>
+          <h3>Sıfır Döngüsel Bağımlılık (DAG)</h3>
+        </div>
+        <p>Bağımlılık akışı tamamen yukarıdan aşağıya tek yönlüdür. Hiçbir modül kendisini çağıran üst modülü geri içe aktarmaz. Bu durum tarayıcıda bellek kilitlenmelerini ve <code>undefined</code> başlatma hatalarını tamamen ortadan kaldırır.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-eyebrow">ESNEKLİK &amp; İZOLASYON</p>
+        <div class="card-title-row">
+          <span class="card-dot link"></span>
+          <h3>Bağımsız Uç Düğümler (Leaf Nodes)</h3>
+        </div>
+        <p><code>game-metadata.js</code>, <code>poll-generator.js</code> ve <code>roulette.js</code> başka hiçbir iç modüle bağımlı değildir (Leaf). Bu bileşenler bağımsız birim testlerine açıktır ve başka projelere doğrudan taşınabilir.</p>
+      </div>
+    </div>
+
+    <footer class="colophon">
+      <span>SteamSquad Chrome Extension · Dependency Graph v1.0</span>
+      <span>Tasarım Sistemi: Diagram Design (Editorial Skin)</span>
+    </footer>
+  </div>
+</body>
+</html>
