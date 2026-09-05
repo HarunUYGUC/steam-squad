@@ -27,21 +27,21 @@ graph TD
 
     %% Katman 3: Ana Orkestra Şefi (Application Controller)
     subgraph ControllerLayer ["🎮 Ana Yönetici Katmanı"]
-        App["sidepanel.js\n(SteamSquadApp)"]
+        App["sidepanel.js - SteamSquadApp"]
     end
 
     %% Katman 4: Alt Motorlar & Yardımcılar (Engines & Utilities)
     subgraph EngineLayer ["⚙️ İş Mantığı & Hesaplama Motorları"]
-        SquadMgr["squad-manager.js\n(Kadro & Takım Yönetimi)"]
-        Overlap["overlap-engine.js\n(Kütüphane Kesişim Motoru)"]
-        Roulette["roulette.js\n(Çark & Veto Arenası)"]
-        Poll["poll-generator.js\n(Discord/WhatsApp Anket)"]
+        SquadMgr["squad-manager.js - Kadro ve Takım"]
+        Overlap["overlap-engine.js - Kesişim Motoru"]
+        Roulette["roulette.js - Çark ve Veto Arenası"]
+        Poll["poll-generator.js - Anket Üreteci"]
     end
 
     %% Katman 5: Veri ve Servis Katmanı (Services & Data)
     subgraph ServiceLayer ["🔌 Dış Servisler & Veri Bankası"]
-        SteamServ["steam-service.js\n(Steam API & XML Parser)"]
-        GameMeta["game-metadata.js\n(400+ Oyunluk Bilgi Bankası)"]
+        SteamServ["steam-service.js - Steam API Servisi"]
+        GameMeta["game-metadata.js - 400+ Oyun Veritabanı"]
     end
 
     %% Dış Kaynaklar
@@ -56,24 +56,24 @@ graph TD
     Worker -.->|Yan Paneli Açar| HTML
 
     HTML -->|Stiller| CSS
-    HTML -->|Script type=module| App
+    HTML -->|Script type module| App
 
     %% sidepanel.js bağımlılıkları
     App -->|import| SquadMgr
     App -->|import| Overlap
     App -->|import| Roulette
     App -->|import| Poll
-    App -->|import (Mağaza Fiyatı)| SteamServ
+    App -->|import: Mağaza Fiyatı| SteamServ
 
     %% squad-manager.js bağımlılıkları
-    SquadMgr -->|import (Kütüphane Çekme)| SteamServ
-    SquadMgr <-->|Kadro Kaydet/Oku| ChromeStorage
+    SquadMgr -->|import: Kütüphane Çekme| SteamServ
+    SquadMgr <-->|Kadro Kaydet ve Oku| ChromeStorage
 
     %% overlap-engine.js bağımlılıkları
-    Overlap -->|import (SIZE_TIERS)| GameMeta
+    Overlap -->|import: SIZE_TIERS| GameMeta
 
     %% steam-service.js bağımlılıkları
-    SteamServ -->|import (getGameMetadata)| GameMeta
+    SteamServ -->|import: getGameMetadata| GameMeta
     SteamServ <-->|Fiyat Önbelleği| ChromeStorage
     SteamServ <-->|HTTP İstekleri| SteamAPI
 
