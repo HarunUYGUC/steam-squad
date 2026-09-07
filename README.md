@@ -43,8 +43,9 @@ steam-squad/
 │   ├── APP_ARCHITECTURE.md   # Genel uygulama çalışma mimarisi ve modül ilişkileri
 │   ├── DATA_ARCHITECTURE.md  # Veri akış ve kütüphane analiz mimarisi dokümanı
 │   ├── DEPENDENCY_GRAPH.md   # Modül bağımlılık şeması ve import hiyerarşisi
-│   ├── dependency-graph.html # Standalone interaktif ve görsel bağımlılık şeması (Diagram Design)
-│   └── dependency-graph.png  # Bağımlılık grafiğinin görsel PNG formatı
+│   ├── dependency-graph.png  # Bağımlılık grafiğinin görsel PNG formatı
+│   ├── library-overlap-venn.png # Steam kütüphane kesişim ve küme teorisi (Venn Diyagramı)
+│   └── squad-overlap-sequence.png # Kadro ekleme ve kesişim zaman sırası (Sequence Diyagramı)
 ├── icons/                     # 16, 48, 128px PNG eklenti ikonları
 │   ├── icon-16.png
 │   ├── icon-48.png
