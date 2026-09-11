@@ -1,83 +1,86 @@
-# 🎮 SteamSquad — Steam Kütüphane Eşleştirici (Chrome Extension)
+# 🎮 SteamSquad — Steam Library Matcher (Chrome Extension)
 
-> **"Bu akşam hep birlikte ne oynuyoruz?"** kararsızlığına son! Arkadaş gruplarınızın Steam kütüphanelerini saniyeler içinde karşılaştıran, indirimleri yakalayan, anket ve çarkıfelek ile hızlıca oyun seçmenizi sağlayan modern bir Chrome Yan Panel (Side Panel) eklentisi.
+> Put an end to the **"What are we playing tonight?"** debate! A modern Chrome Side Panel extension that compares your gaming squad's Steam libraries in seconds, detects live store discounts, and helps you pick the perfect game with interactive wheels, veto arenas, and instant group polls.
 
+[![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Available-success?logo=googlechrome)](https://chromewebstore.google.com/detail/ipddbahofdhagjeheeolfloklgoeppeo?utm_source=item-share-cb)
 ![Manifest V3](https://img.shields.io/badge/Manifest-V3-brightgreen)
-![Version](https://img.shields.io/badge/version-1.4.2-blue)
+![Version](https://img.shields.io/badge/version-1.4.4-blue)
 ![Privacy First](https://img.shields.io/badge/Privacy-Zero%20Password-blue)
 ![Platform](https://img.shields.io/badge/Chrome-Side%20Panel-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
 
-## 🌟 Temel Özellikler
+## 🌟 Key Features
 
-- 🔒 **Şifresiz & Güvenli Mimari:** Şifre veya hesap girişi gerekmez. Yalnızca açık Steam Profil Linki (`steamcommunity.com/id/kullaniciadi`) veya SteamID64 ile çalışır.
-- 👥 **Dinamik Ekip Yönetimi (Ekipler & Şablonlar):**
-  - **`[👥 Tüm Ekip]`**: Varsayılan ana ekip, eklenen herkesi otomatik olarak dahil eder.
-  - **`[➕ Ekip Oluştur]`**: *"Duo Takımı"*, *"5v5 CS Ekibi"*, *"Hafta Sonu 4'lüsü"* gibi özel alt ekipler oluşturup istediğiniz oyuncuları kolayca işaretleyin.
-- 🎯 **Akıllı Kesişim & Eksik Oyuncu Filtreleri:**
-  - **Herkeste Var:** Kadrodaki herkesin kütüphanesinde olan ortak oyunları anında listeler.
-  - **1 Kişide Yok & 2 Kişide Yok:** Eksik olan oyuncuları ve oyunun güncel Steam Türkiye (MENA-USD) indirimli fiyatını listeler.
-  - **💬 Arkadaşa Davet/Satın Alma Mesajı:** Eksik oyunu olan arkadaşınız için tek tıkla kopyalanabilir kişiselleştirilmiş Steam davet mesajı üretir.
-- ☑️ **"Oynandı" Takibi:**
-  - Daha önce oynadığınız oyunları tek tıkla *"Oynandı"* olarak işaretleyin.
-  - Oynanan oyunlar **Anket Oluşturucu**, **Çarkıfelek** ve **Veto Arenası**'ndan otomatik olarak hariç tutulur.
-- 📋 **Tek Tıkla Discord & WhatsApp Anket Oluşturucu:** Arkadaşlarınızın eklenti kurmasına gerek kalmadan grup içi oylama yapmak için hazır formatlı anket metnini panoya kopyalar.
-- 🎡 **Çarkıfelek & Veto Eleme Arenası:**
-  - Seçtiğiniz filtrelere (`Herkeste Var`, `1 Kişide Yok` vb.) göre dinamik güncellenen 32+ oyun kapasiteli eleme arenası ve ses efektli çarkıfelek.
-- 🔑 **İsteğe Bağlı Steam Web API Key Desteği:**
-  - 100'den fazla oyunu olan dev kütüphaneleri eksiksiz çekmek için ücretsiz API anahtarı desteği (yerel hafızada şifreli saklanır, istendiğinde tek tıkla silinebilir).
-  - Steam Mağaza istek sınırlamalarına karşı dahili kuyruk ve kota koruması (Rate Limiter).
+- 🔒 **Zero-Credential & Privacy-First Architecture:** No passwords, logins, or tokens required. Works solely with public Steam profile URLs (`steamcommunity.com/id/username`) or SteamID64.
+- 👥 **Dynamic Squad & Sub-Teams Management:**
+  - **`[👥 All Squad]`**: Default primary squad that automatically includes all added members.
+  - **`[➕ Create Squad]`**: Create custom sub-teams like *"Duo Team"*, *"5v5 CS Squad"*, or *"Weekend 4"* and toggle specific players with a single click.
+- 🎯 **Smart Library Overlap & Missing Player Detection:**
+  - **All Own (100%):** Instantly lists games owned by every active member in the squad.
+  - **1 Missing & 2 Missing:** Identifies which friends are missing the game and retrieves live Steam Store discount prices.
+  - **💬 1-Click Squad Invite / Nudge:** Generates customized, copyable Steam invite messages tailored for the friend missing the game.
+- ☑️ **"Played" Game Tracking:**
+  - Mark completed or played games with one click.
+  - Played games are automatically excluded from the **Poll Generator**, **Roulette Wheel**, and **Veto Arena**.
+- 📋 **1-Click Discord & WhatsApp Poll Exporter:** Formats and copies ready-to-share emoji voting polls directly to your clipboard so friends without the extension can vote instantly in chat.
+- 🎡 **Roulette Wheel & Veto Elimination Arena:**
+  - Dynamic 32+ game elimination arena and 60 FPS HTML5 Canvas roulette wheel with synthesized Web Audio FX tailored to your active filters (*All Own*, *1 Missing*, etc.).
+- 🔑 **Optional Steam Web API Key Support:**
+  - Free API key support to load complete libraries for profiles with hundreds of games (stored securely in local storage, deletable at any time).
+  - Built-in queue and rate-limiting protection against Steam Store API limits.
 
 ---
 
-## 📂 Proje Dizin Yapısı
+## 📂 Project Structure
 
 ```
 steam-squad/
-├── manifest.json              # Manifest V3 (Side Panel, Storage, Steam Host İzinleri)
-├── CHROMEWEBSTORE.md          # Chrome Web Store mağaza listelemesi ve izin açıklamaları
-├── README.md                  # Proje tanıtım ve kurulum kılavuzu
-├── docs/                      # Mimari ve veri akış dokümantasyonları
-│   ├── APP_ARCHITECTURE.md   # Genel uygulama çalışma mimarisi ve modül ilişkileri
-│   ├── DATA_ARCHITECTURE.md  # Veri akış ve kütüphane analiz mimarisi dokümanı
-│   ├── DEPENDENCY_GRAPH.md   # Modül bağımlılık şeması ve import hiyerarşisi
-│   ├── dependency-graph.png  # Bağımlılık grafiğinin görsel PNG formatı
-│   ├── library-overlap-venn.png # Steam kütüphane kesişim ve küme teorisi (Venn Diyagramı)
-│   └── squad-overlap-sequence.png # Kadro ekleme ve kesişim zaman sırası (Sequence Diyagramı)
-├── icons/                     # 16, 48, 128px PNG eklenti ikonları
+├── manifest.json              # Manifest V3 (Side Panel, Storage, Steam Host Permissions)
+├── CHROMEWEBSTORE.md          # Chrome Web Store listing copy and permission justifications
+├── README.md                  # Project overview and documentation
+├── LICENSE                    # MIT License
+├── PRIVACY.md                 # Privacy Policy documentation
+├── store-assets/              # Store graphics, screenshots, and promo banners
+├── icons/                     # 16, 48, 128px PNG extension icons
 │   ├── icon-16.png
 │   ├── icon-48.png
 │   └── icon-128.png
 └── src/
     ├── background/
-    │   └── service-worker.js  # Yan panel açılış yönetimi ve background servisi
+    │   └── service-worker.js  # Side panel behavior manager and background service
     ├── sidepanel/
-    │   ├── sidepanel.html     # Ana yan panel arayüzü
-    │   ├── sidepanel.css      # Steam estetiğinde koyu tema stilleri
-    │   ├── sidepanel.js       # UI durum yönetimi ve olay koordinasyonu
-    │   ├── squad-manager.js   # Ekip yönetimi, Tüm Ekip / Özel Ekipler mimarisi
-    │   ├── overlap-engine.js  # Kütüphane kesişim ve filtreleme motoru
-    │   ├── poll-generator.js  # Discord / WhatsApp hazır anket üreticisi
-    │   └── roulette.js        # Canvas çarkıfelek, sentezleyici sesler ve Veto arenası
+    │   ├── sidepanel.html     # Main side panel markup
+    │   ├── sidepanel.css      # Dark Steam-themed styles
+    │   ├── sidepanel.js       # UI state controller and event orchestration
+    │   ├── squad-manager.js   # Squad & custom team state management
+    │   ├── overlap-engine.js  # Library overlap calculation and filter engine
+    │   ├── poll-generator.js  # Discord & WhatsApp poll formatter
+    │   └── roulette.js        # Canvas roulette wheel, audio FX, and Veto arena
     └── services/
-        ├── steam-service.js   # Steam API, XML kütüphane ayrıştırıcı ve hız sınırlamalı mağaza servisi
-        └── game-metadata.js   # 400+ oyunluk çok oyunculu mod ve kapasite veritabanı
+        ├── steam-service.js   # Steam API, XML parser, and rate-limited store fetcher
+        └── game-metadata.js   # Multiplayer capacity and game mode database
 ```
 
 ---
 
-## 🛠️ Kurulum & Geliştirici Modunda Yükleme
+## 📦 Installation Guide
 
-1. **Google Chrome** tarayıcınızı açın.
-2. Adres çubuğuna `chrome://extensions` yazın ve Enter'a basın.
-3. Sağ üst köşedeki **"Geliştirici modu" (Developer mode)** anahtarını açık konuma getirin.
-4. Sol üstteki **"Paketlenmemiş öğe yükle" (Load unpacked)** butonuna tıklayın.
-5. Bu proje klasörünü (`steam-squad`) seçin.
-6. Tarayıcının sağ üstündeki Eklentiler menüsünden **SteamSquad** ikonuna tıklayarak Yan Paneli açın!
+### Developer Mode Installation (Manual Setup):
+
+1. Clone or download this repository to your computer:
+   ```bash
+   git clone https://github.com/HarunUYGUC/steam-squad.git
+   ```
+2. Open Google Chrome and navigate to `chrome://extensions` in the address bar.
+3. Enable the **"Developer mode"** toggle in the top right corner.
+4. Click the **"Load unpacked"** button in the top left corner.
+5. Select the `steam-squad` folder where this project is located.
+6. The extension will be installed immediately and added to your Chrome toolbar!
 
 ---
 
-## 📄 Lisans
-MIT License. Steam ve Steam logosu, Valve Corporation'ın tescilli ticari markalarıdır. Bu proje Valve Corporation ile bağlantılı değildir.
+## 📄 License
+
+MIT License. Steam and the Steam logo are registered trademarks of Valve Corporation. This project is not affiliated with Valve Corporation.
