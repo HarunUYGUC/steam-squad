@@ -1,4 +1,4 @@
-# 🎮 SteamSquad — Steam Library Matcher & Overlap Engine
+# 🎮 SteamSquad — Steam Library Matcher
 
 <div align="center">
 
