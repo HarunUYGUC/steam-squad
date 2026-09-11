@@ -148,23 +148,8 @@ steam-squad/
 ├── LICENSE                    # MIT License (Copyright 2026 Harun Uyguç)
 ├── PRIVACY.md                 # Formal privacy policy documentation
 ├── store-assets/              # High-resolution 1280x800 store & README screenshots
-│   ├── screenshot-1-squad.png
-│   ├── screenshot-2-matches.png
-│   ├── screenshot-3-poll.png
-│   ├── screenshot-4-roulette.png
-│   ├── screenshot-5-veto.png
-│   ├── promo-small-440x280.png
-│   └── promo-marquee-1400x560.png
 ├── docs/                      # Technical documentation and architecture diagrams
-│   ├── APP_ARCHITECTURE.md   # System architecture and data flow
-│   ├── DATA_ARCHITECTURE.md  # Library overlap calculation logic
-│   ├── DEPENDENCY_GRAPH.md   # Module dependencies and import hierarchy
-│   ├── library-overlap-venn.png
-│   └── squad-overlap-sequence.png
 ├── icons/                     # 16x16, 48x48, 128x128 high-res PNG extension icons
-│   ├── icon-16.png
-│   ├── icon-48.png
-│   └── icon-128.png
 └── src/
     ├── background/
     │   └── service-worker.js  # Side panel trigger and background extension service
