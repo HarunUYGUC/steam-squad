@@ -8,6 +8,7 @@ import { OverlapEngine } from './overlap-engine.js';
 import { PollGenerator } from './poll-generator.js';
 import { RouletteEngine, VetoArenaEngine } from './roulette.js';
 import { fetchGameStoreDetails } from '../services/steam-service.js';
+import { i18n } from '../services/i18n.js';
 
 function escapeHtml(str) {
   if (!str) return '';
@@ -36,6 +37,10 @@ class SteamSquadApp {
   }
 
   async init() {
+    await i18n.init();
+    this.updateLangToggleButton();
+    i18n.subscribe(() => this.updateLangToggleButton());
+
     this.bindGlobalEvents();
     this.initRouletteAndVeto();
 
@@ -85,6 +90,24 @@ class SteamSquadApp {
     }, duration);
   }
 
+  updateLangToggleButton() {
+    const lang = i18n.getLanguage();
+    const flagEl = document.getElementById('lang-flag');
+    const codeEl = document.getElementById('lang-code');
+    const btn = document.getElementById('btn-toggle-lang');
+    if (flagEl && codeEl) {
+      if (lang === 'en') {
+        flagEl.textContent = '🇬🇧';
+        codeEl.textContent = 'EN';
+        if (btn) btn.title = 'Switch to Turkish / Türkçe\'ye Geç';
+      } else {
+        flagEl.textContent = '🇹🇷';
+        codeEl.textContent = 'TR';
+        if (btn) btn.title = 'Switch to English / İngilizce\'ye Geç';
+      }
+    }
+  }
+
   initRouletteAndVeto() {
     const canvas = document.getElementById('roulette-canvas');
     if (canvas) {
@@ -115,6 +138,13 @@ class SteamSquadApp {
         chrome.storage.local.remove('steamsquad_target_app_id');
         this.focusGame(id);
       }
+    });
+
+    // Language toggle button
+    document.getElementById('btn-toggle-lang')?.addEventListener('click', async () => {
+      const nextLang = await i18n.toggleLanguage();
+      this.updateLangToggleButton();
+      this.showToast(i18n.t('langSwitched'));
     });
 
     // Nav tabs

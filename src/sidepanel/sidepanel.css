@@ -126,6 +126,45 @@ body {
   letter-spacing: 0.8px;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lang-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.lang-toggle-btn:hover {
+  border-color: var(--primary-blue);
+  color: #ffffff;
+  box-shadow: 0 0 8px var(--primary-glow);
+  transform: translateY(-1px);
+}
+
+.lang-flag {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.lang-code {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
 .squad-badge {
   display: flex;
   align-items: center;
