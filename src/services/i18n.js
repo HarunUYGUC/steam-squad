@@ -215,7 +215,8 @@ export const TRANSLATIONS = {
     inpageMissingMultiple: '⚠️ Eksik: {names}',
     inpageMissingMany: '⚠️ {count} kişide kütüphanede yok',
     inpageBtnOpen: 'Yan Paneli Aç',
-    inpageGuideIcon: '👆 Sağ üstteki SteamSquad ikonuna tıklayın'
+    inpageGuideIcon: '👆 Sağ üstteki SteamSquad ikonuna tıklayın',
+    inpageDismissTitle: 'Bu oyun için kapat'
   },
 
   en: {
@@ -427,7 +428,8 @@ export const TRANSLATIONS = {
     inpageMissingMultiple: '⚠️ Missing: {names}',
     inpageMissingMany: '⚠️ Missing for {count} players',
     inpageBtnOpen: 'Open Side Panel',
-    inpageGuideIcon: '👆 Click SteamSquad icon in top toolbar'
+    inpageGuideIcon: '👆 Click SteamSquad icon in top toolbar',
+    inpageDismissTitle: 'Dismiss for this game'
   }
 };
 

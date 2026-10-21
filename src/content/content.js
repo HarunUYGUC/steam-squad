@@ -15,8 +15,45 @@
   const STORAGE_KEYS = {
     MEMBERS: 'steamsquad_members',
     TEAMS: 'steamsquad_teams',
-    ACTIVE_TEAM_ID: 'steamsquad_active_team_id'
+    ACTIVE_TEAM_ID: 'steamsquad_active_team_id',
+    LANGUAGE: 'steamsquad_language'
   };
+
+  const INPAGE_TRANSLATIONS = {
+    tr: {
+      allOwnTitle: 'Ekipteki Herkeste Var! ({owners}/{total})',
+      allOwnSub: 'Bu akşam ekiple hemen oynayabilirsiniz!',
+      partialTitle: '{owners}/{total} Kişide Var',
+      missingOne: '⚠️ Eksik: <strong>{name}</strong>',
+      missingMultiple: '⚠️ Eksik: {names}',
+      missingMany: '⚠️ {count} kişide kütüphanede yok',
+      btnOpen: 'Yan Paneli Aç',
+      guideIcon: '👆 Sağ üstteki SteamSquad ikonuna tıklayın',
+      dismissTitle: 'Bu oyun için kapat'
+    },
+    en: {
+      allOwnTitle: 'All Squad Owns This! ({owners}/{total})',
+      allOwnSub: 'Ready to play together tonight!',
+      partialTitle: 'Owned by {owners}/{total} Players',
+      missingOne: '⚠️ Missing: <strong>{name}</strong>',
+      missingMultiple: '⚠️ Missing: {names}',
+      missingMany: '⚠️ {count} players missing this in library',
+      btnOpen: 'Open Side Panel',
+      guideIcon: '👆 Click SteamSquad icon in top toolbar',
+      dismissTitle: 'Dismiss for this game'
+    }
+  };
+
+  let currentLang = 'tr';
+
+  function t(key, params = {}) {
+    const dict = INPAGE_TRANSLATIONS[currentLang] || INPAGE_TRANSLATIONS.tr;
+    let text = dict[key] || INPAGE_TRANSLATIONS.tr[key] || '';
+    Object.keys(params).forEach(k => {
+      text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), params[k]);
+    });
+    return text;
+  }
 
   let isDismissedForApp = false;
   let currentAppId = null;
@@ -104,9 +141,9 @@
           // If browser security policy requires user to click the toolbar icon directly:
           const btn = document.getElementById('steamsquad-btn-open-panel');
           if (btn) {
-            btn.innerHTML = '<span>👆 Sağ üstteki SteamSquad ikonuna tıklayın</span>';
+            btn.innerHTML = `<span>${t('guideIcon')}</span>`;
             setTimeout(() => {
-              if (btn) btn.innerHTML = '<span>Yan Paneli Aç</span><span class="steamsquad-arrow">➔</span>';
+              if (btn) btn.innerHTML = `<span>${t('btnOpen')}</span><span class="steamsquad-arrow">➔</span>`;
             }, 4500);
           }
         }
@@ -147,6 +184,15 @@
     if (isDismissedForApp) {
       return;
     }
+
+    try {
+      const langData = await chrome.storage.local.get(STORAGE_KEYS.LANGUAGE);
+      if (langData && (langData[STORAGE_KEYS.LANGUAGE] === 'en' || langData[STORAGE_KEYS.LANGUAGE] === 'tr')) {
+        currentLang = langData[STORAGE_KEYS.LANGUAGE];
+      } else {
+        currentLang = 'tr';
+      }
+    } catch {}
 
     const activeMembers = await getActiveSquadMembers();
     if (!activeMembers || activeMembers.length === 0) {
@@ -198,17 +244,17 @@
 
     if (isAllOwn) {
       statusIcon = '🎉';
-      titleText = `Ekipteki Herkeste Var! (${owners.length}/${totalCount})`;
-      subtitleText = 'Bu akşam ekiple hemen oynayabilirsiniz!';
+      titleText = t('allOwnTitle', { owners: owners.length, total: totalCount });
+      subtitleText = t('allOwnSub');
     } else {
       statusIcon = '👥';
-      titleText = `${owners.length}/${totalCount} Kişide Var`;
+      titleText = t('partialTitle', { owners: owners.length, total: totalCount });
       if (missing.length === 1) {
-        subtitleText = `⚠️ Eksik: <strong>${escapeHTML(missing[0].personaName)}</strong>`;
+        subtitleText = t('missingOne', { name: escapeHTML(missing[0].personaName) });
       } else if (missing.length <= 3) {
-        subtitleText = `⚠️ Eksik: ${missing.map(m => escapeHTML(m.personaName)).join(', ')}`;
+        subtitleText = t('missingMultiple', { names: missing.map(m => escapeHTML(m.personaName)).join(', ') });
       } else {
-        subtitleText = `⚠️ ${missing.length} kişide kütüphanede yok`;
+        subtitleText = t('missingMany', { count: missing.length });
       }
     }
 
@@ -232,7 +278,7 @@
           <span class="steamsquad-logo-icon">🎮</span>
           <span class="steamsquad-brand-tag">SteamSquad</span>
         </div>
-        <button class="steamsquad-btn-close" id="steamsquad-btn-dismiss" title="Bu oyun için kapat">✕</button>
+        <button class="steamsquad-btn-close" id="steamsquad-btn-dismiss" title="${t('dismissTitle')}">✕</button>
       </div>
 
       <div class="steamsquad-badge-body">
@@ -252,7 +298,7 @@
 
       <div class="steamsquad-badge-footer">
         <button class="steamsquad-btn-action" id="steamsquad-btn-open-panel">
-          <span>Yan Paneli Aç</span>
+          <span>${t('btnOpen')}</span>
           <span class="steamsquad-arrow">➔</span>
         </button>
       </div>
@@ -296,7 +342,10 @@
   // React to squad storage updates in real-time
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === 'local') {
-      if (changes[STORAGE_KEYS.MEMBERS] || changes[STORAGE_KEYS.ACTIVE_TEAM_ID] || changes[STORAGE_KEYS.TEAMS]) {
+      if (changes[STORAGE_KEYS.MEMBERS] || changes[STORAGE_KEYS.ACTIVE_TEAM_ID] || changes[STORAGE_KEYS.TEAMS] || changes[STORAGE_KEYS.LANGUAGE]) {
+        if (changes[STORAGE_KEYS.LANGUAGE]) {
+          currentLang = changes[STORAGE_KEYS.LANGUAGE].newValue || 'tr';
+        }
         evaluateAndRenderBadge();
       }
     }
