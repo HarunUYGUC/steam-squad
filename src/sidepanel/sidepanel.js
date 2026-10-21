@@ -42,11 +42,13 @@ class SteamSquadApp {
     this.updateStaticNavTexts();
     this.updateSquadTabTranslations();
     this.updateMatchesTabTranslations();
+    this.updatePollTabTranslations();
     i18n.subscribe(() => {
       this.updateLangToggleButton();
       this.updateStaticNavTexts();
       this.updateSquadTabTranslations();
       this.updateMatchesTabTranslations();
+      this.updatePollTabTranslations();
     });
 
     this.bindGlobalEvents();
@@ -301,6 +303,61 @@ class SteamSquadApp {
     }
   }
 
+  updatePollTabTranslations() {
+    const labelTitle = document.getElementById('label-poll-title');
+    if (labelTitle) labelTitle.textContent = i18n.t('pollGeneratorTitle');
+
+    const labelSub = document.getElementById('label-poll-sub');
+    if (labelSub) labelSub.textContent = i18n.t('pollGeneratorSub');
+
+    const labelPlatform = document.getElementById('label-poll-platform');
+    if (labelPlatform) labelPlatform.textContent = i18n.t('pollPlatformLabel');
+
+    const labelScope = document.getElementById('label-poll-scope');
+    if (labelScope) labelScope.textContent = i18n.t('pollScopeLabel');
+
+    const pollTierAll = document.getElementById('poll-tier-all');
+    if (pollTierAll) pollTierAll.textContent = i18n.t('pollScopeAll');
+
+    const pollTierN1 = document.getElementById('poll-tier-n1');
+    if (pollTierN1) pollTierN1.textContent = i18n.t('pollScopeN1');
+
+    const pollTierN2 = document.getElementById('poll-tier-n2');
+    if (pollTierN2) pollTierN2.textContent = i18n.t('pollScopeN2');
+
+    const labelLimit = document.getElementById('label-poll-limit');
+    if (labelLimit) labelLimit.textContent = i18n.t('pollLimitLabel');
+
+    const pollLimit3 = document.getElementById('poll-limit-3');
+    if (pollLimit3) pollLimit3.textContent = i18n.t('pollLimit3');
+
+    const pollLimit5 = document.getElementById('poll-limit-5');
+    if (pollLimit5) pollLimit5.textContent = i18n.t('pollLimit5');
+
+    const pollLimit8 = document.getElementById('poll-limit-8');
+    if (pollLimit8) pollLimit8.textContent = i18n.t('pollLimit8');
+
+    const labelPreviewTitle = document.getElementById('label-poll-preview-title');
+    if (labelPreviewTitle) labelPreviewTitle.textContent = i18n.t('pollPreviewTitle');
+
+    const labelBtnCopy = document.getElementById('label-btn-copy-poll');
+    if (labelBtnCopy) labelBtnCopy.textContent = i18n.t('btnCopyPoll');
+
+    const labelHowTitle = document.getElementById('label-poll-how-title');
+    if (labelHowTitle) labelHowTitle.textContent = i18n.t('pollHowTitle');
+
+    const step1 = document.getElementById('label-poll-step1');
+    if (step1) step1.innerHTML = i18n.t('pollStep1');
+
+    const step2 = document.getElementById('label-poll-step2');
+    if (step2) step2.innerHTML = i18n.t('pollStep2');
+
+    const step3 = document.getElementById('label-poll-step3');
+    if (step3) step3.innerHTML = i18n.t('pollStep3');
+
+    this.renderPoll();
+  }
+
   initRouletteAndVeto() {
     const canvas = document.getElementById('roulette-canvas');
     if (canvas) {
@@ -538,9 +595,9 @@ class SteamSquadApp {
       if (text) {
         const success = await PollGenerator.copyToClipboard(text);
         if (success) {
-          this.showToast('📋 Anket panoya kopyalandı! Discord veya WhatsApp\'a yapıştırabilirsiniz.');
+          this.showToast(i18n.t('pollCopiedToast'));
         } else {
-          this.showToast('Kopyalama başarısız oldu.');
+          this.showToast(i18n.t('pollCopyFailed'));
         }
       }
     });

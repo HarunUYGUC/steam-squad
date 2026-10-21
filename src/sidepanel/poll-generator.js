@@ -3,6 +3,8 @@
  * 1-Click Discord and WhatsApp formatted poll creator for fast squad voting.
  */
 
+import { i18n } from '../services/i18n.js';
+
 const NUMBER_EMOJIS = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'];
 
 export class PollGenerator {
@@ -15,35 +17,42 @@ export class PollGenerator {
    */
   static generateDiscordPoll(games, squadSize, options = {}) {
     if (!games || games.length === 0) {
-      return '🎮 **SteamSquad**: Ortak oyun bulunamadı.';
+      return i18n.t('pollNoGames');
     }
 
     const maxItems = options.limit || Math.min(games.length, 5);
     const selectedGames = games.slice(0, maxItems);
 
-    let text = `🎮 **BU AKŞAM NE OYNUYORUZ?** (${squadSize} Kişi Aktif)\n\n`;
+    let text = `${i18n.t('pollDiscordHeader', { squadSize })}\n\n`;
 
     selectedGames.forEach((game, index) => {
       const emoji = NUMBER_EMOJIS[index] || `🔹`;
       const modeLabel = game.metadata?.mode?.toUpperCase() || 'MULTI';
-      const maxP = game.metadata?.maxPlayers ? `${game.metadata.maxPlayers} Kişilik` : 'Multiplayer';
+      const isSolo = game.metadata?.mode === 'solo' || game.metadata?.maxPlayers === 1;
+      const maxP = isSolo
+        ? i18n.t('tagSoloCapacity')
+        : (game.metadata?.maxPlayers ? i18n.t('tagMultiCapacity', { count: game.metadata.maxPlayers }) : i18n.t('tagMultiplayerGeneral'));
 
-      let statusBadge = '[HERKESTE VAR]';
+      let statusBadge = i18n.t('pollAllOwnBadge');
       if (game.missingMembers && game.missingMembers.length > 0) {
         const missingNames = game.missingMembers.map(m => m.name).join(', ');
         if (game.storeDetails?.hasDiscount && game.storeDetails?.finalFormatted) {
-          statusBadge = `[${missingNames} Hariç — %${game.storeDetails.discountPercent} İndirim: ${game.storeDetails.finalFormatted}]`;
+          statusBadge = i18n.t('pollMissingDiscountBadge', {
+            names: missingNames,
+            discount: game.storeDetails.discountPercent,
+            price: game.storeDetails.finalFormatted
+          });
         } else if (game.storeDetails?.isFree) {
-          statusBadge = `[${missingNames} Hariç — Ücretsiz]`;
+          statusBadge = i18n.t('pollMissingFreeBadge', { names: missingNames });
         } else {
-          statusBadge = `[${missingNames} Hariç]`;
+          statusBadge = i18n.t('pollMissingBadge', { names: missingNames });
         }
       }
 
       text += `${emoji} **${game.name}** — ${statusBadge} (${modeLabel} / ${maxP})\n`;
     });
 
-    text += `\n👇 *Lütfen oynamak istediğiniz seçeneğin reaksiyonuna/emojisine tıklayın!* 🕹️`;
+    text += `\n${i18n.t('pollDiscordFooter')}`;
     return text;
   }
 
@@ -56,35 +65,42 @@ export class PollGenerator {
    */
   static generateWhatsAppPoll(games, squadSize, options = {}) {
     if (!games || games.length === 0) {
-      return '🎮 *SteamSquad*: Ortak oyun bulunamadı.';
+      return i18n.t('pollNoGamesWhatsapp');
     }
 
     const maxItems = options.limit || Math.min(games.length, 5);
     const selectedGames = games.slice(0, maxItems);
 
-    let text = `🎮 *BU AKŞAM NE OYNUYORUZ?* (${squadSize} Kişi Aktif)\n\n`;
+    let text = `${i18n.t('pollWhatsappHeader', { squadSize })}\n\n`;
 
     selectedGames.forEach((game, index) => {
       const emoji = NUMBER_EMOJIS[index] || `🔹`;
       const modeLabel = game.metadata?.mode?.toUpperCase() || 'MULTI';
-      const maxP = game.metadata?.maxPlayers ? `${game.metadata.maxPlayers} Kişilik` : 'Multiplayer';
+      const isSolo = game.metadata?.mode === 'solo' || game.metadata?.maxPlayers === 1;
+      const maxP = isSolo
+        ? i18n.t('tagSoloCapacity')
+        : (game.metadata?.maxPlayers ? i18n.t('tagMultiCapacity', { count: game.metadata.maxPlayers }) : i18n.t('tagMultiplayerGeneral'));
 
-      let statusBadge = '[Hepimizde Var]';
+      let statusBadge = i18n.t('pollWhatsappAllOwnBadge');
       if (game.missingMembers && game.missingMembers.length > 0) {
         const missingNames = game.missingMembers.map(m => m.name).join(', ');
         if (game.storeDetails?.hasDiscount && game.storeDetails?.finalFormatted) {
-          statusBadge = `[${missingNames} Hariç — %${game.storeDetails.discountPercent} İndirim: ${game.storeDetails.finalFormatted}]`;
+          statusBadge = i18n.t('pollMissingDiscountBadge', {
+            names: missingNames,
+            discount: game.storeDetails.discountPercent,
+            price: game.storeDetails.finalFormatted
+          });
         } else if (game.storeDetails?.isFree) {
-          statusBadge = `[${missingNames} Hariç — Ücretsiz]`;
+          statusBadge = i18n.t('pollMissingFreeBadge', { names: missingNames });
         } else {
-          statusBadge = `[${missingNames} Hariç]`;
+          statusBadge = i18n.t('pollMissingBadge', { names: missingNames });
         }
       }
 
       text += `${emoji} *${game.name}* — ${statusBadge} (${modeLabel} / ${maxP})\n`;
     });
 
-    text += `\n👇 *Grupta oy vermek için seçtiğiniz numaranın emojisini veya cevabını gönderin!* 🎯`;
+    text += `\n${i18n.t('pollWhatsappFooter')}`;
     return text;
   }
 

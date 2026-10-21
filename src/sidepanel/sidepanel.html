@@ -245,15 +245,15 @@
       <section id="tab-poll" class="tab-pane">
         <div class="poll-header-card">
           <div class="poll-header-text">
-            <h3>📋 Anket Oluşturucu</h3>
-            <p>Arkadaşlarınız eklenti kurmadan Discord veya WhatsApp'ta hızlıca oylama yapabilir.</p>
+            <h3 id="label-poll-title">📋 Anket Oluşturucu</h3>
+            <p id="label-poll-sub">Arkadaşlarınız eklenti kurmadan Discord veya WhatsApp'ta hızlıca oylama yapabilir.</p>
           </div>
         </div>
 
         <!-- Poll Settings -->
         <div class="poll-config-card">
           <div class="config-row">
-            <label>Platform Formatı:</label>
+            <label id="label-poll-platform">Platform Formatı:</label>
             <div class="segmented-control" id="poll-platform-selector">
               <button class="segment-btn active" data-platform="discord">💬 Discord</button>
               <button class="segment-btn" data-platform="whatsapp">📱 WhatsApp</button>
@@ -261,20 +261,20 @@
           </div>
 
           <div class="config-row">
-            <label>Anket Kapsamı:</label>
+            <label id="label-poll-scope">Anket Kapsamı:</label>
             <div class="segmented-control" id="poll-tier-selector">
-              <button class="segment-btn active" data-tier="all_100">Herkeste Var</button>
-              <button class="segment-btn" data-tier="all_with_n1">1 Kişide Yok</button>
-              <button class="segment-btn" data-tier="all_with_n2">2 Kişide Yok</button>
+              <button class="segment-btn active" data-tier="all_100" id="poll-tier-all">Herkeste Var</button>
+              <button class="segment-btn" data-tier="all_with_n1" id="poll-tier-n1">1 Kişide Yok</button>
+              <button class="segment-btn" data-tier="all_with_n2" id="poll-tier-n2">2 Kişide Yok</button>
             </div>
           </div>
 
           <div class="config-row">
-            <label>Oyun Sayısı:</label>
+            <label id="label-poll-limit">Oyun Sayısı:</label>
             <div class="segmented-control" id="poll-limit-selector">
-              <button class="segment-btn" data-limit="3">İlk 3 Oyun</button>
-              <button class="segment-btn active" data-limit="5">İlk 5 Oyun</button>
-              <button class="segment-btn" data-limit="8">İlk 8 Oyun</button>
+              <button class="segment-btn" data-limit="3" id="poll-limit-3">İlk 3 Oyun</button>
+              <button class="segment-btn active" data-limit="5" id="poll-limit-5">İlk 5 Oyun</button>
+              <button class="segment-btn" data-limit="8" id="poll-limit-8">İlk 8 Oyun</button>
             </div>
           </div>
         </div>
@@ -282,7 +282,7 @@
         <!-- Poll Preview Box -->
         <div class="poll-preview-container">
           <div class="preview-header">
-            <span class="preview-title">Anket Önizlemesi</span>
+            <span class="preview-title" id="label-poll-preview-title">Anket Önizlemesi</span>
             <span class="preview-platform-badge" id="preview-badge">DISCORD</span>
           </div>
           <pre id="poll-preview-text" class="poll-preview-code"></pre>
@@ -291,16 +291,16 @@
         <!-- Action Copy Button -->
         <div class="poll-action-area">
           <button id="btn-copy-poll" class="btn btn-primary btn-lg btn-block">
-            <span>📋 Panoya Kopyala & Paylaş</span>
+            <span id="label-btn-copy-poll">📋 Panoya Kopyala & Paylaş</span>
           </button>
         </div>
 
         <div class="poll-instructions-card">
-          <h4>💡 Nasıl Kullanılır?</h4>
+          <h4 id="label-poll-how-title">💡 Nasıl Kullanılır?</h4>
           <ol>
-            <li><strong>"Panoya Kopyala"</strong> butonuna basın.</li>
-            <li>Discord sunucunuza veya WhatsApp grubunuza yapıştırın (<code>Ctrl + V</code>).</li>
-            <li>Arkadaşlarınız numaralandırılmış emojilere tıklayarak anında oylarını kullansın!</li>
+            <li id="label-poll-step1"><strong>"Panoya Kopyala"</strong> butonuna basın.</li>
+            <li id="label-poll-step2">Discord sunucunuza veya WhatsApp grubunuza yapıştırın (<code>Ctrl + V</code>).</li>
+            <li id="label-poll-step3">Arkadaşlarınız numaralandırılmış emojilere tıklayarak anında oylarını kullansın!</li>
           </ol>
         </div>
       </section>
