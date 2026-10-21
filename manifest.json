@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SteamSquad — Steam Kütüphane Eşleştirici",
-  "version": "1.4.4",
+  "version": "1.5.0",
   "description": "Arkadaş ekibinizin Steam ortak oyunlarını bulun; filtreler, canlı indirimler, çarkıfelek ve tek tıkla grup anketleri.",
   "icons": {
     "16": "icons/icon-16.png",
@@ -22,6 +22,20 @@
   "side_panel": {
     "default_path": "src/sidepanel/sidepanel.html"
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://store.steampowered.com/app/*"
+      ],
+      "js": [
+        "src/content/content.js"
+      ],
+      "css": [
+        "src/content/content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
   "permissions": [
     "sidePanel",
     "storage",

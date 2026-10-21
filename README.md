@@ -3,7 +3,7 @@
 <div align="center">
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-v1.4.4-blue?logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/ipddbahofdhagjeheeolfloklgoeppeo?utm_source=item-share-cb)
-[![Version](https://img.shields.io/badge/version-1.4.4-informational.svg)](manifest.json)
+[![Version](https://img.shields.io/badge/version-1.5.0-informational.svg)](manifest.json)
 [![Manifest](https://img.shields.io/badge/Manifest-V3-success.svg)](manifest.json)
 [![Platform](https://img.shields.io/badge/Platform-Chrome_Side_Panel-orange.svg)](src/sidepanel/sidepanel.html)
 [![Privacy](https://img.shields.io/badge/Privacy-Zero_Password_%7C_Local--Only-a4d007.svg)](PRIVACY.md)
@@ -90,6 +90,11 @@ Every weekend, gaming groups jump on Discord and spend **30 to 45 minutes** in e
 - Click *"Played"* on any game card to track completed games.
 - Played titles are automatically excluded from Polls, Roulette Wheels, and Veto Arenas to keep your recommendations fresh.
 
+### 7. 🏪 In-Page Steam Store Badge (Content Script)
+- **Automatic Store Detection:** While browsing any game on the official Steam Store (`store.steampowered.com/app/*`), a sleek, non-intrusive floating badge informs you if your squad owns the title.
+- **Smart Ownership Highlights:** Displays full-squad matches (`🎉 All Own`), partial ownership (`👥 3/4 Own`), and isolates missing members with avatar tooltips.
+- **1-Click Side Panel Trigger:** Clicking the badge immediately opens the Chrome Side Panel directly to your squad's active dashboard.
+
 ---
 
 ## 🧩 Problems Solved
@@ -153,6 +158,9 @@ steam-squad/
 └── src/
     ├── background/
     │   └── service-worker.js  # Side panel trigger and background extension service
+    ├── content/
+    │   ├── content.js         # In-page Steam store badge controller & SPA observer
+    │   └── content.css        # Steam-themed floating badge glassmorphism styles
     ├── sidepanel/
     │   ├── sidepanel.html     # Main side panel layout and view containers
     │   ├── sidepanel.css      # Steam-themed dark UI styling and animations

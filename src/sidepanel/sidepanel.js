@@ -52,6 +52,20 @@ class SteamSquadApp {
     });
 
     await this.squadManager.init();
+
+    // Check if opened for a specific game target from Steam store badge
+    try {
+      const target = await chrome.storage.local.get('steamsquad_target_app_id');
+      if (target.steamsquad_target_app_id) {
+        const targetId = target.steamsquad_target_app_id;
+        await chrome.storage.local.remove('steamsquad_target_app_id');
+        setTimeout(() => {
+          this.focusGame(targetId);
+        }, 250);
+      }
+    } catch (e) {
+      console.warn('[SteamSquad] Target app check error:', e);
+    }
   }
 
   showToast(message, duration = 3000) {
@@ -88,6 +102,21 @@ class SteamSquadApp {
   }
 
   bindGlobalEvents() {
+    // Listen for live focus requests from content scripts
+    chrome.runtime.onMessage?.addListener((message) => {
+      if (message?.type === 'FOCUS_GAME_IN_SIDEPANEL' && message.appId) {
+        this.focusGame(message.appId);
+      }
+    });
+
+    chrome.storage.onChanged?.addListener((changes, area) => {
+      if (area === 'local' && changes.steamsquad_target_app_id?.newValue) {
+        const id = changes.steamsquad_target_app_id.newValue;
+        chrome.storage.local.remove('steamsquad_target_app_id');
+        this.focusGame(id);
+      }
+    });
+
     // Nav tabs
     document.querySelectorAll('.nav-tab').forEach(tabBtn => {
       tabBtn.addEventListener('click', () => {
@@ -391,6 +420,76 @@ class SteamSquadApp {
     }
   }
 
+  /**
+   * Switches to matches tab, ensures the game is visible by updating filters,
+   * scrolls the game card into view, and highlights it with an animated pulse.
+   * @param {number|string} targetAppId
+   */
+  async focusGame(targetAppId) {
+    if (!targetAppId) return;
+    const numId = Number(targetAppId);
+
+    // Switch to matches tab
+    this.switchTab('tab-matches');
+
+    const activeMembers = this.squadManager.getActiveMembers();
+    if (!this.currentMatches) {
+      this.currentMatches = await this.overlapEngine.computeOverlap(activeMembers);
+    }
+
+    // Determine which match tier the target game belongs to
+    const full = this.currentMatches?.fullMatches || [];
+    const n1 = this.currentMatches?.n1Matches || [];
+    const n2 = this.currentMatches?.n2Matches || [];
+
+    let requiredTier = null;
+    if (full.some(g => Number(g.appId) === numId)) {
+      requiredTier = 'all_100';
+    } else if (n1.some(g => Number(g.appId) === numId)) {
+      requiredTier = 'all_with_n1';
+    } else if (n2.some(g => Number(g.appId) === numId)) {
+      requiredTier = 'all_with_n2';
+    }
+
+    if (requiredTier) {
+      const currentTier = this.overlapEngine.filters.matchTier;
+      if (currentTier !== requiredTier) {
+        document.querySelectorAll('#match-tier-filter .segment-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-tier') === requiredTier);
+        });
+        this.overlapEngine.setFilters({ matchTier: requiredTier });
+      }
+    }
+
+    // Reset game mode tag to 'all' so it is not hidden by genre filter
+    if (this.overlapEngine.filters.gameMode !== 'all') {
+      document.querySelectorAll('#game-mode-filter .tag-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-mode') === 'all');
+      });
+      this.overlapEngine.setFilters({ gameMode: 'all' });
+    }
+
+    // Clear search filter so game is not hidden
+    const searchInput = document.getElementById('game-search-input');
+    if (searchInput && searchInput.value) {
+      searchInput.value = '';
+      this.overlapEngine.setFilters({ searchQuery: '' });
+    }
+
+    // Re-render matches to show target game
+    await this.renderMatches();
+
+    // Scroll to the card and highlight
+    setTimeout(() => {
+      const cardEl = document.getElementById(`game-card-${numId}`);
+      if (cardEl) {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        cardEl.classList.add('card-highlight-pulse');
+        setTimeout(() => cardEl.classList.remove('card-highlight-pulse'), 3500);
+      }
+    }, 150);
+  }
+
   async onSquadUpdated() {
     this.renderSquadList();
     this.renderPresets();
@@ -608,6 +707,8 @@ class SteamSquadApp {
     games.forEach(game => {
       const card = document.createElement('div');
       card.className = `game-card ${game.isPlayed ? 'is-played' : ''}`;
+      card.id = `game-card-${game.appId}`;
+      card.setAttribute('data-app-id', game.appId);
 
       const isFull = game.ownerCount === stats.activePlayerCount;
       const isN1 = game.ownerCount === stats.activePlayerCount - 1;

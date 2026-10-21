@@ -1,6 +1,6 @@
 /**
  * SteamSquad — Service Worker (Manifest V3)
- * Handles side panel behavior and extension lifecycle.
+ * Handles side panel behavior, content script triggers, and extension lifecycle.
  */
 
 chrome.runtime.onInstalled.addListener(async (details) => {
@@ -33,5 +33,46 @@ chrome.action.onClicked.addListener(async (tab) => {
     }
   } catch (error) {
     console.error('[SteamSquad] Error opening side panel on click:', error);
+  }
+});
+
+// Handle messages from content script (e.g. open side panel from in-page badge)
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type === 'OPEN_SIDE_PANEL') {
+    // Save target appId asynchronously without awaiting (so user gesture token does not expire!)
+    if (message.appId) {
+      chrome.storage.local.set({ steamsquad_target_app_id: message.appId });
+    }
+
+    // Call chrome.sidePanel.open() synchronously right inside the message handler
+    if (sender.tab?.id && chrome.sidePanel?.open) {
+      chrome.sidePanel.open({ tabId: sender.tab.id }).then(() => {
+        sendResponse({ success: true });
+      }).catch((err) => {
+        console.warn('[SteamSquad] sidePanel.open(tabId) notice:', err.message);
+        if (sender.tab?.windowId) {
+          chrome.sidePanel.open({ windowId: sender.tab.windowId }).then(() => {
+            sendResponse({ success: true });
+          }).catch((winErr) => {
+            console.warn('[SteamSquad] sidePanel.open(windowId) notice:', winErr.message);
+            sendResponse({ success: false, error: winErr.message });
+          });
+        } else {
+          sendResponse({ success: false, error: err.message });
+        }
+      });
+      return true; // Keep sendResponse channel open for async callback
+    } else if (sender.tab?.windowId && chrome.sidePanel?.open) {
+      chrome.sidePanel.open({ windowId: sender.tab.windowId }).then(() => {
+        sendResponse({ success: true });
+      }).catch((winErr) => {
+        console.warn('[SteamSquad] sidePanel.open(windowId) notice:', winErr.message);
+        sendResponse({ success: false, error: winErr.message });
+      });
+      return true;
+    }
+
+    sendResponse({ success: false, error: 'Side panel API not available' });
+    return false;
   }
 });

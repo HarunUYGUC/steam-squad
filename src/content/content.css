@@ -1,0 +1,261 @@
+/**
+ * SteamSquad — In-Page Steam Store Badge Styles
+ * Isolated with steamsquad- prefix to prevent style conflicts with Steam.
+ */
+
+.steamsquad-badge-container {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 2147483640 !important;
+  width: 310px !important;
+  background: rgba(23, 29, 37, 0.94) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-radius: 12px !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  color: #c6d4df !important;
+  user-select: none !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, opacity 0.25s ease !important;
+  animation: steamsquad-slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.steamsquad-badge-container * {
+  box-sizing: border-box !important;
+  font-family: inherit !important;
+}
+
+/* Partial Match Theme (Steam Cyan Glow) */
+.steamsquad-theme-partial {
+  border: 1px solid rgba(102, 192, 244, 0.4) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(102, 192, 244, 0.15) !important;
+}
+
+.steamsquad-theme-partial:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(102, 192, 244, 0.7) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 28px rgba(102, 192, 244, 0.3) !important;
+}
+
+/* 100% All-Own Match Theme (Steam Green Glow) */
+.steamsquad-theme-all-own {
+  border: 1px solid rgba(164, 208, 7, 0.55) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), 0 0 24px rgba(164, 208, 7, 0.25) !important;
+}
+
+.steamsquad-theme-all-own:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(164, 208, 7, 0.85) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 32px rgba(164, 208, 7, 0.4) !important;
+}
+
+/* Exit animation */
+.steamsquad-closing {
+  transform: translateY(20px) scale(0.95) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+@keyframes steamsquad-slide-in {
+  0% {
+    transform: translateY(35px) scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Header */
+.steamsquad-badge-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 10px 14px 8px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.steamsquad-header-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.steamsquad-logo-icon {
+  font-size: 14px !important;
+  line-height: 1 !important;
+}
+
+.steamsquad-brand-tag {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.8px !important;
+  text-transform: uppercase !important;
+  color: #66c0f4 !important;
+}
+
+.steamsquad-theme-all-own .steamsquad-brand-tag {
+  color: #a4d007 !important;
+}
+
+.steamsquad-btn-close {
+  background: transparent !important;
+  border: none !important;
+  color: #67707b !important;
+  font-size: 12px !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.steamsquad-btn-close:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+/* Body */
+.steamsquad-badge-body {
+  padding: 12px 14px !important;
+}
+
+.steamsquad-status-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+.steamsquad-status-emoji {
+  font-size: 16px !important;
+  line-height: 1 !important;
+}
+
+.steamsquad-status-title {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  line-height: 1.3 !important;
+}
+
+.steamsquad-status-sub {
+  font-size: 11px !important;
+  color: #8f98a0 !important;
+  margin-bottom: 12px !important;
+  line-height: 1.4 !important;
+}
+
+.steamsquad-status-sub strong {
+  color: #e5e5e5 !important;
+}
+
+/* Avatars Row */
+.steamsquad-avatar-cluster {
+  display: flex !important;
+  align-items: center !important;
+  margin-top: 4px !important;
+}
+
+.steamsquad-avatars-row {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.steamsquad-avatar-item {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  border: 2px solid #171d25 !important;
+  margin-right: -8px !important;
+  object-fit: cover !important;
+  transition: transform 0.2s ease, z-index 0.2s ease !important;
+  background: #2a475e !important;
+}
+
+.steamsquad-theme-partial .steamsquad-avatar-item {
+  border-color: #66c0f4 !important;
+}
+
+.steamsquad-theme-all-own .steamsquad-avatar-item {
+  border-color: #a4d007 !important;
+}
+
+.steamsquad-avatar-item:hover {
+  transform: translateY(-3px) scale(1.15) !important;
+  z-index: 10 !important;
+}
+
+.steamsquad-avatar-extra {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  background: #2a475e !important;
+  color: #ffffff !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  border: 2px solid #171d25 !important;
+  margin-left: 2px !important;
+}
+
+/* Footer & Button */
+.steamsquad-badge-footer {
+  padding: 0 14px 12px !important;
+}
+
+.steamsquad-btn-action {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 8px 12px !important;
+  background: linear-gradient(135deg, rgba(102, 192, 244, 0.2) 0%, rgba(42, 71, 94, 0.4) 100%) !important;
+  border: 1px solid rgba(102, 192, 244, 0.4) !important;
+  border-radius: 6px !important;
+  color: #66c0f4 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+}
+
+.steamsquad-theme-all-own .steamsquad-btn-action {
+  background: linear-gradient(135deg, rgba(164, 208, 7, 0.2) 0%, rgba(42, 71, 94, 0.4) 100%) !important;
+  border-color: rgba(164, 208, 7, 0.5) !important;
+  color: #a4d007 !important;
+}
+
+.steamsquad-btn-action:hover {
+  background: linear-gradient(135deg, rgba(102, 192, 244, 0.35) 0%, rgba(42, 71, 94, 0.6) 100%) !important;
+  color: #ffffff !important;
+  border-color: #66c0f4 !important;
+  transform: translateY(-1px) !important;
+}
+
+.steamsquad-theme-all-own .steamsquad-btn-action:hover {
+  background: linear-gradient(135deg, rgba(164, 208, 7, 0.35) 0%, rgba(42, 71, 94, 0.6) 100%) !important;
+  color: #ffffff !important;
+  border-color: #a4d007 !important;
+}
+
+.steamsquad-arrow {
+  font-size: 11px !important;
+  transition: transform 0.2s ease !important;
+}
+
+.steamsquad-btn-action:hover .steamsquad-arrow {
+  transform: translateX(3px) !important;
+}
