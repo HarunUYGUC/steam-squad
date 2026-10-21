@@ -139,40 +139,40 @@
       <section id="tab-matches" class="tab-pane">
         <!-- Matches Summary Bar -->
         <div class="matches-stats-card" id="matches-stats-card">
-          <div class="stat-item" title="Kadroda seçilen herkesin kütüphanesinde olan oyunlar">
+          <div class="stat-item" id="stat-item-full" title="Kadroda seçilen herkesin kütüphanesinde olan oyunlar">
             <div class="stat-value-wrap">
               <span class="stat-value" id="stat-full-matches">0</span>
-              <span class="stat-unit">Oyun</span>
+              <span class="stat-unit" id="stat-unit-full">Oyun</span>
             </div>
-            <span class="stat-label">HERKESTE VAR</span>
+            <span class="stat-label" id="stat-label-full">HERKESTE VAR</span>
           </div>
-          <div class="stat-item" title="Kadroda sadece 1 kişide eksik olan oyunlar">
+          <div class="stat-item" id="stat-item-n1" title="Kadroda sadece 1 kişide eksik olan oyunlar">
             <div class="stat-value-wrap">
               <span class="stat-value text-amber" id="stat-n1-matches">0</span>
-              <span class="stat-unit text-amber">Oyun</span>
+              <span class="stat-unit text-amber" id="stat-unit-n1">Oyun</span>
             </div>
-            <span class="stat-label">1 KİŞİDE YOK</span>
+            <span class="stat-label" id="stat-label-n1">1 KİŞİDE YOK</span>
           </div>
-          <div class="stat-item" title="Kadroda sadece 2 kişide eksik olan oyunlar">
+          <div class="stat-item" id="stat-item-n2" title="Kadroda sadece 2 kişide eksik olan oyunlar">
             <div class="stat-value-wrap">
               <span class="stat-value" id="stat-n2-matches" style="color: #e67e22;">0</span>
-              <span class="stat-unit" style="color: #e67e22;">Oyun</span>
+              <span class="stat-unit" id="stat-unit-n2" style="color: #e67e22;">Oyun</span>
             </div>
-            <span class="stat-label">2 KİŞİDE YOK</span>
+            <span class="stat-label" id="stat-label-n2">2 KİŞİDE YOK</span>
           </div>
-          <div class="stat-item" title="Bu kadroyla oynandı olarak işaretlediğiniz oyunlar">
+          <div class="stat-item" id="stat-item-played" title="Bu kadroyla oynandı olarak işaretlediğiniz oyunlar">
             <div class="stat-value-wrap">
               <span class="stat-value" id="stat-played-count" style="color: #2ecc71;">0</span>
-              <span class="stat-unit" style="color: #2ecc71;">Oyun</span>
+              <span class="stat-unit" id="stat-unit-played" style="color: #2ecc71;">Oyun</span>
             </div>
-            <span class="stat-label">OYNANDI</span>
+            <span class="stat-label" id="stat-label-played">OYNANDI</span>
           </div>
-          <div class="stat-item" title="Ekipteki oyuncuların kütüphanelerindeki toplam farklı oyun sayısı">
+          <div class="stat-item" id="stat-item-total" title="Ekipteki oyuncuların kütüphanelerindeki toplam farklı oyun sayısı">
             <div class="stat-value-wrap">
               <span class="stat-value" id="stat-total-games">0</span>
-              <span class="stat-unit">Oyun</span>
+              <span class="stat-unit" id="stat-unit-total">Oyun</span>
             </div>
-            <span class="stat-label">TOPLAM HAVUZ</span>
+            <span class="stat-label" id="stat-label-total">TOPLAM HAVUZ</span>
           </div>
         </div>
 
@@ -181,19 +181,19 @@
           <!-- Match Mode Tabs -->
           <div class="filter-group">
             <div class="segmented-control" id="match-tier-filter">
-              <button class="segment-btn active" data-tier="all_100">Herkeste Var</button>
-              <button class="segment-btn" data-tier="all_with_n1">1 Kişide Yok</button>
-              <button class="segment-btn" data-tier="all_with_n2">2 Kişide Yok</button>
+              <button class="segment-btn active" data-tier="all_100" id="tier-btn-all">Herkeste Var</button>
+              <button class="segment-btn" data-tier="all_with_n1" id="tier-btn-n1">1 Kişide Yok</button>
+              <button class="segment-btn" data-tier="all_with_n2" id="tier-btn-n2">2 Kişide Yok</button>
             </div>
           </div>
 
           <!-- Category Tags Filter -->
           <div class="filter-tags-scroll" id="game-mode-filter">
-            <button class="tag-btn active" data-mode="all">🎮 Tümü</button>
-            <button class="tag-btn" data-mode="coop">🤝 Co-Op / PvE</button>
-            <button class="tag-btn" data-mode="pvp">⚔️ PvP / Rekabetçi</button>
-            <button class="tag-btn" data-mode="party">🎲 Parti / Eğlence</button>
-            <button class="tag-btn" data-mode="survival">🧗 Survival</button>
+            <button class="tag-btn active" data-mode="all" id="tag-mode-all">🎮 Tümü</button>
+            <button class="tag-btn" data-mode="coop" id="tag-mode-coop">🤝 Co-Op / PvE</button>
+            <button class="tag-btn" data-mode="pvp" id="tag-mode-pvp">⚔️ PvP / Rekabetçi</button>
+            <button class="tag-btn" data-mode="party" id="tag-mode-party">🎲 Parti / Eğlence</button>
+            <button class="tag-btn" data-mode="survival" id="tag-mode-survival">🧗 Survival</button>
           </div>
 
           <!-- Extra Quick Filters & Search -->
@@ -205,22 +205,22 @@
 
             <div class="sort-box">
               <select id="sort-select">
-                <option value="hours">⏱️ En Çok Oynanan</option>
-                <option value="name">🔤 İsim (A-Z)</option>
-                <option value="maxPlayers">👥 Oyuncu Kapasitesi</option>
+                <option value="hours" id="opt-sort-hours">⏱️ En Çok Oynanan</option>
+                <option value="name" id="opt-sort-name">🔤 İsim (A-Z)</option>
+                <option value="maxPlayers" id="opt-sort-maxplayers">👥 Oyuncu Kapasitesi</option>
               </select>
             </div>
           </div>
 
           <!-- Toggles -->
           <div class="filter-toggles-row">
-            <label class="toggle-control" title="Sadece 5 GB altındaki hızlı indirilen oyunları göster">
+            <label class="toggle-control" id="toggle-wrap-quick-download" title="Sadece 5 GB altındaki hızlı indirilen oyunları göster">
               <input type="checkbox" id="toggle-quick-download" />
               <span class="toggle-switch"></span>
-              <span class="toggle-text">⚡ 10 Dk'da İndir (&lt;5 GB)</span>
+              <span class="toggle-text" id="label-quick-download">⚡ 10 Dk'da İndir (&lt;5 GB)</span>
             </label>
 
-            <label class="toggle-control" title="Oynandı olarak işaretlenen oyunları listeden gizle">
+            <label class="toggle-control" id="toggle-wrap-hide-played" title="Oynandı olarak işaretlenen oyunları listeden gizle">
               <input type="checkbox" id="toggle-hide-played" />
               <span class="toggle-switch"></span>
               <span class="toggle-text" id="hide-played-label">Oynananları Gizle (0)</span>
@@ -236,8 +236,8 @@
         <!-- Empty Matches State -->
         <div id="empty-matches-state" class="empty-state hidden">
           <div class="empty-icon">🕹️</div>
-          <h4>Eşleşen Oyun Bulunamadı</h4>
-          <p>Filtreleri gevşetebilir veya kadroya daha fazla oyuncu ekleyip kütüphanelerini karşılaştırabilirsiniz.</p>
+          <h4 id="label-empty-matches-title">Eşleşen Oyun Bulunamadı</h4>
+          <p id="label-empty-matches-sub">Filtreleri gevşetebilir veya kadroya daha fazla oyuncu ekleyip kütüphanelerini karşılaştırabilirsiniz.</p>
         </div>
       </section>
 

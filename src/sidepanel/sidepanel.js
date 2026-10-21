@@ -41,10 +41,12 @@ class SteamSquadApp {
     this.updateLangToggleButton();
     this.updateStaticNavTexts();
     this.updateSquadTabTranslations();
+    this.updateMatchesTabTranslations();
     i18n.subscribe(() => {
       this.updateLangToggleButton();
       this.updateStaticNavTexts();
       this.updateSquadTabTranslations();
+      this.updateMatchesTabTranslations();
     });
 
     this.bindGlobalEvents();
@@ -203,6 +205,100 @@ class SteamSquadApp {
 
     this.renderSquadList();
     this.renderPresets();
+  }
+
+  updateMatchesTabTranslations() {
+    // Stat cards tooltips, units, and labels
+    const statItemFull = document.getElementById('stat-item-full');
+    if (statItemFull) statItemFull.title = i18n.t('statFullTooltip');
+    const statUnitFull = document.getElementById('stat-unit-full');
+    if (statUnitFull) statUnitFull.textContent = i18n.t('statUnitGames');
+    const statLabelFull = document.getElementById('stat-label-full');
+    if (statLabelFull) statLabelFull.textContent = i18n.t('statLabelAllOwn');
+
+    const statItemN1 = document.getElementById('stat-item-n1');
+    if (statItemN1) statItemN1.title = i18n.t('statN1Tooltip');
+    const statUnitN1 = document.getElementById('stat-unit-n1');
+    if (statUnitN1) statUnitN1.textContent = i18n.t('statUnitGames');
+    const statLabelN1 = document.getElementById('stat-label-n1');
+    if (statLabelN1) statLabelN1.textContent = i18n.t('statLabelOneMissing');
+
+    const statItemN2 = document.getElementById('stat-item-n2');
+    if (statItemN2) statItemN2.title = i18n.t('statN2Tooltip');
+    const statUnitN2 = document.getElementById('stat-unit-n2');
+    if (statUnitN2) statUnitN2.textContent = i18n.t('statUnitGames');
+    const statLabelN2 = document.getElementById('stat-label-n2');
+    if (statLabelN2) statLabelN2.textContent = i18n.t('statLabelTwoMissing');
+
+    const statItemPlayed = document.getElementById('stat-item-played');
+    if (statItemPlayed) statItemPlayed.title = i18n.t('statPlayedTooltip');
+    const statUnitPlayed = document.getElementById('stat-unit-played');
+    if (statUnitPlayed) statUnitPlayed.textContent = i18n.t('statUnitGames');
+    const statLabelPlayed = document.getElementById('stat-label-played');
+    if (statLabelPlayed) statLabelPlayed.textContent = i18n.t('statLabelPlayed');
+
+    const statItemTotal = document.getElementById('stat-item-total');
+    if (statItemTotal) statItemTotal.title = i18n.t('statTotalTooltip');
+    const statUnitTotal = document.getElementById('stat-unit-total');
+    if (statUnitTotal) statUnitTotal.textContent = i18n.t('statUnitGames');
+    const statLabelTotal = document.getElementById('stat-label-total');
+    if (statLabelTotal) statLabelTotal.textContent = i18n.t('statLabelTotalPool');
+
+    // Filter tier segmented buttons
+    const tierBtnAll = document.getElementById('tier-btn-all');
+    if (tierBtnAll) tierBtnAll.textContent = i18n.t('tierAllOwn');
+    const tierBtnN1 = document.getElementById('tier-btn-n1');
+    if (tierBtnN1) tierBtnN1.textContent = i18n.t('tierOneMissing');
+    const tierBtnN2 = document.getElementById('tier-btn-n2');
+    if (tierBtnN2) tierBtnN2.textContent = i18n.t('tierTwoMissing');
+
+    // Category tags
+    const tagModeAll = document.getElementById('tag-mode-all');
+    if (tagModeAll) tagModeAll.textContent = i18n.t('tagAllMode');
+    const tagModeCoop = document.getElementById('tag-mode-coop');
+    if (tagModeCoop) tagModeCoop.textContent = i18n.t('tagCoopMode');
+    const tagModePvp = document.getElementById('tag-mode-pvp');
+    if (tagModePvp) tagModePvp.textContent = i18n.t('tagPvpMode');
+    const tagModeParty = document.getElementById('tag-mode-party');
+    if (tagModeParty) tagModeParty.textContent = i18n.t('tagPartyMode');
+    const tagModeSurvival = document.getElementById('tag-mode-survival');
+    if (tagModeSurvival) tagModeSurvival.textContent = i18n.t('tagSurvivalMode');
+
+    // Search input
+    const searchInput = document.getElementById('game-search-input');
+    if (searchInput) searchInput.placeholder = i18n.t('searchPlaceholder');
+
+    // Sort options
+    const optHours = document.getElementById('opt-sort-hours');
+    if (optHours) optHours.textContent = i18n.t('sortMostPlayed');
+    const optName = document.getElementById('opt-sort-name');
+    if (optName) optName.textContent = i18n.t('sortNameAZ');
+    const optMaxPlayers = document.getElementById('opt-sort-maxplayers');
+    if (optMaxPlayers) optMaxPlayers.textContent = i18n.t('sortPlayerCapacity');
+
+    // Toggles
+    const toggleWrapQuick = document.getElementById('toggle-wrap-quick-download');
+    if (toggleWrapQuick) toggleWrapQuick.title = i18n.t('tooltipQuickDownload');
+    const labelQuick = document.getElementById('label-quick-download');
+    if (labelQuick) labelQuick.textContent = i18n.t('labelQuickDownload');
+
+    const toggleWrapHidePlayed = document.getElementById('toggle-wrap-hide-played');
+    if (toggleWrapHidePlayed) toggleWrapHidePlayed.title = i18n.t('tooltipHidePlayed');
+    const hidePlayedLabel = document.getElementById('hide-played-label');
+    if (hidePlayedLabel) {
+      const playedCount = this.currentMatches?.stats?.playedCount || 0;
+      hidePlayedLabel.textContent = i18n.t('hidePlayed', { count: playedCount });
+    }
+
+    // Empty matches state
+    const labelEmptyTitle = document.getElementById('label-empty-matches-title');
+    if (labelEmptyTitle) labelEmptyTitle.textContent = i18n.t('emptyMatchesTitle');
+    const labelEmptySub = document.getElementById('label-empty-matches-sub');
+    if (labelEmptySub) labelEmptySub.textContent = i18n.t('emptyMatchesSub');
+
+    if (this.currentMatches) {
+      this.renderMatches();
+    }
   }
 
   initRouletteAndVeto() {
@@ -815,7 +911,7 @@ class SteamSquadApp {
     if (n2El) n2El.textContent = stats?.n2Count || 0;
     if (playedEl) playedEl.textContent = stats?.playedCount || 0;
     if (totalEl) totalEl.textContent = stats?.totalUniqueGames || 0;
-    if (hidePlayedLabel) hidePlayedLabel.textContent = `Oynananları Gizle (${stats?.playedCount || 0})`;
+    if (hidePlayedLabel) hidePlayedLabel.textContent = i18n.t('hidePlayed', { count: stats?.playedCount || 0 });
 
     const listContainer = document.getElementById('games-results-list');
     const emptyState = document.getElementById('empty-matches-state');
@@ -847,7 +943,11 @@ class SteamSquadApp {
       const isFull = game.ownerCount === stats.activePlayerCount;
       const isN1 = game.ownerCount === stats.activePlayerCount - 1;
       const badgeClass = isFull ? 'badge-100' : (isN1 ? 'badge-n1' : 'badge-n2');
-      const badgeText = isFull ? 'HERKESTE VAR' : (isN1 ? `1 KİŞİDE YOK (${game.ownerCount}/${stats.activePlayerCount})` : `2 KİŞİDE YOK (${game.ownerCount}/${stats.activePlayerCount})`);
+      const badgeText = isFull 
+        ? i18n.t('badgeAllOwn') 
+        : (isN1 
+            ? i18n.t('badgeOneMissing', { count: game.ownerCount, total: stats.activePlayerCount }) 
+            : i18n.t('badgeTwoMissing', { count: game.ownerCount, total: stats.activePlayerCount }));
 
       let missingHtml = '';
       if (!isFull && game.missingMembers.length > 0) {
@@ -856,46 +956,47 @@ class SteamSquadApp {
         if (game.storeDetails?.hasDiscount) {
           initialDiscountHtml = `<span class="discount-pill">-%${game.storeDetails.discountPercent} ${game.storeDetails.finalFormatted}</span>`;
         } else if (game.storeDetails?.isFree) {
-          initialDiscountHtml = `<span class="discount-pill">Ücretsiz</span>`;
+          initialDiscountHtml = `<span class="discount-pill">${i18n.t('badgeFree')}</span>`;
         } else if (game.storeDetails?.finalFormatted) {
           initialDiscountHtml = `<span class="price-pill" style="background-color: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; font-weight: 600;">${game.storeDetails.finalFormatted}</span>`;
         }
         missingHtml = `
           <div class="game-ownership-status ownership-missing">
             <div class="missing-status-left">
-              <span>⚠️ <strong>${names}</strong> hariç herkeste var</span>
+              <span>${i18n.t('ownershipMissing', { names })}</span>
               <span class="discount-container" data-app-id="${game.appId}">${initialDiscountHtml}</span>
             </div>
-            <button class="btn-nudge-share" data-app-id="${game.appId}" title="${names} için özel davet mesajı kopyala">
-              💬 Paylaş
+            <button class="btn-nudge-share" data-app-id="${game.appId}" title="${i18n.t('btnShareNudgeTitle', { names })}">
+              ${i18n.t('btnShareNudge')}
             </button>
           </div>
         `;
       } else {
-        missingHtml = `<div class="game-ownership-status ownership-full">✅ Seçilen tüm oyuncuların (${stats.activePlayerCount}/${stats.activePlayerCount}) kütüphanesinde var!</div>`;
+        missingHtml = `<div class="game-ownership-status ownership-full">${i18n.t('ownershipFull', { count: stats.activePlayerCount, total: stats.activePlayerCount })}</div>`;
       }
 
       const isSolo = game.metadata?.mode === 'solo' || game.metadata?.maxPlayers === 1;
+      const isEn = i18n.getLanguage() === 'en';
       const modeIcon = isSolo 
-        ? '👤 Tek Kişilik' 
+        ? i18n.t('tagSingleplayer') 
         : (game.metadata?.mode === 'coop' 
             ? '🤝 Co-Op' 
             : (game.metadata?.mode === 'pvp' 
                 ? '⚔️ PvP' 
                 : (game.metadata?.mode === 'party' 
-                    ? '🎲 Parti' 
+                    ? (isEn ? '🎲 Party' : '🎲 Parti') 
                     : '🧗 Survival')));
 
       const maxP = isSolo 
-        ? '1 Kişilik (Solo)' 
-        : (game.metadata?.maxPlayers ? `${game.metadata.maxPlayers} Kişilik` : 'Multiplayer');
+        ? i18n.t('tagSoloCapacity') 
+        : (game.metadata?.maxPlayers ? i18n.t('tagMultiCapacity', { count: game.metadata.maxPlayers }) : i18n.t('tagMultiplayerGeneral'));
 
       const sizeTag = game.metadata?.size === 'small' 
         ? '⚡ <5 GB' 
         : (game.metadata?.size === 'large' 
             ? '📦 >20 GB' 
             : '💾 5-20 GB');
-      const playedBadge = game.isPlayed ? '<span class="game-played-badge">✓ OYNANDI</span>' : '';
+      const playedBadge = game.isPlayed ? `<span class="game-played-badge">${i18n.t('badgePlayedGame')}</span>` : '';
 
       card.innerHTML = `
         <div class="game-banner-wrap">
@@ -906,7 +1007,7 @@ class SteamSquadApp {
         <div class="game-content">
           <div class="game-title-row">
             <h4 class="game-title" title="${game.name}">${game.name}</h4>
-            <span class="game-playtime">⏱️ Toplam: ${Math.round(game.totalHours)}s</span>
+            <span class="game-playtime">${i18n.t('totalHours', { hours: Math.round(game.totalHours) })}</span>
           </div>
           <div class="game-tags-row">
             <span class="pill-tag">${modeIcon}</span>
@@ -915,14 +1016,14 @@ class SteamSquadApp {
           </div>
           ${missingHtml}
           <div class="game-footer-actions">
-            <button class="btn btn-sm ${game.isPlayed ? 'btn-success' : 'btn-secondary'} game-played-btn" data-app-id="${game.appId}" title="Bu oyunu oynandı olarak işaretle/kaldır" style="flex: 1.1;">
-              ${game.isPlayed ? '☑️ Oynandı' : '⬜ Oynandı'}
+            <button class="btn btn-sm ${game.isPlayed ? 'btn-success' : 'btn-secondary'} game-played-btn" data-app-id="${game.appId}" title="${i18n.t('btnPlayedTitle')}" style="flex: 1.1;">
+              ${game.isPlayed ? i18n.t('btnPlayedChecked') : i18n.t('btnPlayedUnchecked')}
             </button>
             <a href="${game.storeLink}" target="_blank" class="btn btn-sm btn-secondary" style="flex: 0.9;">
-              🏪 Mağaza
+              ${i18n.t('btnStore')}
             </a>
             <a href="steam://run/${game.appId}" class="btn btn-sm btn-primary" style="flex: 0.9;">
-              🚀 Oyna
+              ${i18n.t('btnPlay')}
             </a>
           </div>
         </div>
@@ -937,7 +1038,9 @@ class SteamSquadApp {
         this.initVetoArena();
         this.renderRoulette();
         if (this.activeTab === 'tab-poll') this.renderPoll();
-        this.showToast(isNowPlayed ? `✅ "${game.name}" oynandı olarak işaretlendi.` : `⬜ "${game.name}" oynandı listesinden çıkarıldı.`);
+        this.showToast(isNowPlayed 
+          ? i18n.t('toastMarkedPlayed', { name: game.name }) 
+          : i18n.t('toastUnmarkedPlayed', { name: game.name }));
       });
 
       // Share / Nudge button click handler for missing games
@@ -945,27 +1048,34 @@ class SteamSquadApp {
         const names = game.missingMembers.map(m => m.name).join(', ');
         let priceContext = '';
         if (game.storeDetails?.hasDiscount && game.storeDetails?.finalFormatted) {
-          priceContext = ` şu an %${game.storeDetails.discountPercent} indirimle **${game.storeDetails.finalFormatted}** fiyata düşmüş!`;
+          priceContext = i18n.t('nudgePriceDiscount', { discount: game.storeDetails.discountPercent, price: game.storeDetails.finalFormatted });
         } else if (game.storeDetails?.isFree) {
-          priceContext = ` tamamen **Ücretsiz**!`;
+          priceContext = i18n.t('nudgePriceFree');
         } else if (game.storeDetails?.finalFormatted) {
-          priceContext = ` şu an **${game.storeDetails.finalFormatted}** fiyatta.`;
+          priceContext = i18n.t('nudgePriceNormal', { price: game.storeDetails.finalFormatted });
         } else {
-          priceContext = `!`;
+          priceContext = '!';
         }
 
         const isPlural = game.missingMembers.length > 1;
         const callToAction = isPlural
-          ? `Ekipçe oynamayı düşünüyoruz, kadroya katılmak için kütüphanenize eklemeyi düşünür müsünüz? 🎮`
-          : `Ekipçe oynamayı düşünüyoruz, kadroya katılmak için almayı düşünür müsün? 🎮`;
+          ? i18n.t('nudgeCtaPlural')
+          : i18n.t('nudgeCtaSingle');
 
-        const msg = `Hey ${names}! 👋 Steam'de **${game.name}** oyunu${priceContext} ${callToAction}\n🔗 Steam Mağazası: ${game.storeLink || `https://store.steampowered.com/app/${game.appId}`}`;
+        const storeLink = game.storeLink || `https://store.steampowered.com/app/${game.appId}`;
+        const msg = i18n.t('nudgeTemplate', {
+          names,
+          name: game.name,
+          priceContext,
+          cta: callToAction,
+          link: storeLink
+        });
 
         const success = await PollGenerator.copyToClipboard(msg);
         if (success) {
-          this.showToast(`💬 ${names} için davet mesajı panoya kopyalandı!`);
+          this.showToast(i18n.t('toastNudgeCopied', { names }));
         } else {
-          this.showToast('Kopyalama başarısız oldu.');
+          this.showToast(i18n.t('pollCopyFailed'));
         }
       });
 
@@ -981,7 +1091,7 @@ class SteamSquadApp {
             if (details.hasDiscount) {
               container.innerHTML = `<span class="discount-pill">-%${details.discountPercent} ${details.finalFormatted}</span>`;
             } else if (details.isFree) {
-              container.innerHTML = `<span class="discount-pill">Ücretsiz</span>`;
+              container.innerHTML = `<span class="discount-pill">${i18n.t('badgeFree')}</span>`;
             } else if (details.finalFormatted) {
               container.innerHTML = `<span class="price-pill" style="background-color: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; font-weight: 600;">${details.finalFormatted}</span>`;
             }
