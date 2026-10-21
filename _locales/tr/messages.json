@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "SteamSquad — Steam Kütüphane Eşleştirici",
+    "description": "The title of the extension."
+  },
+  "appDesc": {
+    "message": "Arkadaş ekibinizin Steam ortak oyunlarını bulun; filtreler, canlı indirimler, çarkıfelek ve tek tıkla grup anketleri.",
+    "description": "The description of the extension."
+  },
+  "actionTitle": {
+    "message": "SteamSquad — Kütüphane Eşleştirici",
+    "description": "The title shown on hover over the toolbar icon."
+  }
+}

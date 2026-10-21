@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "SteamSquad — Steam Library Matcher",
+    "description": "The title of the extension."
+  },
+  "appDesc": {
+    "message": "Find shared Steam games with your squad; overlap filters, live discounts, roulette wheel, and 1-click group polls.",
+    "description": "The description of the extension."
+  },
+  "actionTitle": {
+    "message": "SteamSquad — Library Matcher",
+    "description": "The title shown on hover over the toolbar icon."
+  }
+}
