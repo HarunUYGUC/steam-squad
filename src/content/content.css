@@ -162,7 +162,8 @@
 .steamsquad-avatar-cluster {
   display: flex !important;
   align-items: center !important;
-  margin-top: 4px !important;
+  margin-top: 6px !important;
+  position: relative !important;
 }
 
 .steamsquad-avatars-row {
@@ -170,15 +171,28 @@
   align-items: center !important;
 }
 
+.steamsquad-avatar-wrapper {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  margin-right: -8px !important;
+  cursor: pointer !important;
+  transition: z-index 0.2s ease !important;
+}
+
+.steamsquad-avatar-wrapper:hover {
+  z-index: 50 !important;
+}
+
 .steamsquad-avatar-item {
   width: 28px !important;
   height: 28px !important;
   border-radius: 50% !important;
   border: 2px solid #171d25 !important;
-  margin-right: -8px !important;
   object-fit: cover !important;
-  transition: transform 0.2s ease, z-index 0.2s ease !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease !important;
   background: #2a475e !important;
+  display: block !important;
 }
 
 .steamsquad-theme-partial .steamsquad-avatar-item {
@@ -189,9 +203,9 @@
   border-color: #a4d007 !important;
 }
 
-.steamsquad-avatar-item:hover {
-  transform: translateY(-3px) scale(1.15) !important;
-  z-index: 10 !important;
+.steamsquad-avatar-wrapper:hover .steamsquad-avatar-item {
+  transform: translateY(-3px) scale(1.18) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
 }
 
 .steamsquad-avatar-extra {
@@ -206,7 +220,61 @@
   font-size: 10px !important;
   font-weight: 700 !important;
   border: 2px solid #171d25 !important;
-  margin-left: 2px !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.steamsquad-avatar-wrapper:hover .steamsquad-avatar-extra {
+  transform: translateY(-3px) scale(1.18) !important;
+}
+
+/* Instant Custom Avatar Tooltip */
+.steamsquad-avatar-tooltip {
+  position: absolute !important;
+  bottom: 100% !important;
+  left: 50% !important;
+  transform: translateX(-50%) translateY(-2px) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  background: rgba(23, 29, 37, 0.98) !important;
+  color: #ffffff !important;
+  border: 1px solid #66c0f4 !important;
+  border-radius: 5px !important;
+  padding: 3px 8px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.75), 0 0 10px rgba(102, 192, 244, 0.25) !important;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease !important;
+  z-index: 100 !important;
+}
+
+.steamsquad-theme-all-own .steamsquad-avatar-tooltip {
+  border-color: #a4d007 !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.75), 0 0 10px rgba(164, 208, 7, 0.25) !important;
+}
+
+/* Tooltip Little Arrow */
+.steamsquad-avatar-tooltip::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 100% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  border-width: 4px !important;
+  border-style: solid !important;
+  border-color: #66c0f4 transparent transparent transparent !important;
+}
+
+.steamsquad-theme-all-own .steamsquad-avatar-tooltip::after {
+  border-color: #a4d007 transparent transparent transparent !important;
+}
+
+.steamsquad-avatar-wrapper:hover .steamsquad-avatar-tooltip {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateX(-50%) translateY(-7px) !important;
 }
 
 /* Footer & Button */

@@ -258,18 +258,29 @@
       }
     }
 
-    // Build avatars HTML
+    // Build avatars HTML with instant hover tooltips
     const maxAvatars = 5;
     const displayedOwners = owners.slice(0, maxAvatars);
-    const extraOwnersCount = owners.length - maxAvatars;
+    const extraOwners = owners.slice(maxAvatars);
 
     const avatarsHtml = displayedOwners.map(m => {
       const avatarSrc = m.avatarUrl || 'https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_medium.jpg';
-      return `<img class="steamsquad-avatar-item" src="${avatarSrc}" alt="${escapeHTML(m.personaName)}" title="${escapeHTML(m.personaName)}" />`;
+      const safeName = escapeHTML(m.personaName);
+      return `
+        <div class="steamsquad-avatar-wrapper">
+          <img class="steamsquad-avatar-item" src="${avatarSrc}" alt="${safeName}" />
+          <span class="steamsquad-avatar-tooltip">${safeName}</span>
+        </div>
+      `;
     }).join('');
 
-    const extraBadgeHtml = extraOwnersCount > 0 
-      ? `<span class="steamsquad-avatar-extra">+${extraOwnersCount}</span>` 
+    const extraBadgeHtml = extraOwners.length > 0 
+      ? `
+        <div class="steamsquad-avatar-wrapper">
+          <span class="steamsquad-avatar-extra">+${extraOwners.length}</span>
+          <span class="steamsquad-avatar-tooltip">+${extraOwners.length}: ${escapeHTML(extraOwners.map(m => m.personaName).join(', '))}</span>
+        </div>
+      ` 
       : '';
 
     badge.innerHTML = `
