@@ -93,7 +93,7 @@ Every weekend, gaming groups jump on Discord and spend **30 to 45 minutes** in e
 ### 7. 🏪 In-Page Steam Store Badge (Content Script)
 - **Automatic Store Detection:** While browsing any game on the official Steam Store (`store.steampowered.com/app/*`), a sleek, non-intrusive floating badge informs you if your squad owns the title.
 - **Smart Ownership Highlights:** Displays full-squad matches (`🎉 All Own`), partial ownership (`👥 3/4 Own`), and isolates missing members with avatar tooltips.
-- **1-Click Side Panel Trigger:** Clicking the badge immediately opens the Chrome Side Panel directly to your squad's active dashboard.
+- **Instant Game Focus in Side Panel:** Clicking the badge immediately opens the Side Panel directly to the Matches tab, auto-filtering and highlighting that specific game with an animated glow.
 
 ---
 
