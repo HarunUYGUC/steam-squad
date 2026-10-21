@@ -320,8 +320,9 @@ export async function fetchGameStoreDetails(appId, countryCode = 'tr', language 
   try {
     const cached = await chrome.storage.local.get(cacheKey);
     if (cached[cacheKey] && (Date.now() - cached[cacheKey].timestamp < CACHE_TTL_MS)) {
-      memoryStoreCache.set(cacheKey, cached[cacheKey].data);
-      return cached[cacheKey].data;
+      const data = { ...cached[cacheKey].data, countryCode, language };
+      memoryStoreCache.set(cacheKey, data);
+      return data;
     }
   } catch {}
 
@@ -331,7 +332,9 @@ export async function fetchGameStoreDetails(appId, countryCode = 'tr', language 
     initialFormatted: '',
     finalFormatted: '',
     hasDiscount: false,
-    headerImage: `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`
+    headerImage: `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`,
+    countryCode,
+    language
   };
 
   // If currently in rate-limit backoff, return fallback silently without requesting
@@ -361,9 +364,11 @@ export async function fetchGameStoreDetails(appId, countryCode = 'tr', language 
           isFree,
           discountPercent: priceOverview?.discount_percent || 0,
           initialFormatted: priceOverview?.initial_formatted || '',
-          finalFormatted: priceOverview?.final_formatted || (isFree ? 'Ücretsiz' : ''),
+          finalFormatted: priceOverview?.final_formatted || (isFree ? (language === 'english' ? 'Free' : 'Ücretsiz') : ''),
           hasDiscount: (priceOverview?.discount_percent || 0) > 0,
-          headerImage: data.header_image || `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`
+          headerImage: data.header_image || `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`,
+          countryCode,
+          language
         };
 
         memoryStoreCache.set(cacheKey, result);

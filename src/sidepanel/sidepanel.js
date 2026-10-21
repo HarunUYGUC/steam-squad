@@ -1048,6 +1048,11 @@ class SteamSquadApp {
 
     if (emptyState) emptyState.classList.add('hidden');
 
+    const currentLang = i18n.getLanguage();
+    const isEn = currentLang === 'en';
+    const countryCode = isEn ? 'us' : 'tr';
+    const storeLang = isEn ? 'english' : 'turkish';
+
     games.forEach(game => {
       const card = document.createElement('div');
       card.className = `game-card ${game.isPlayed ? 'is-played' : ''}`;
@@ -1063,16 +1068,20 @@ class SteamSquadApp {
             ? i18n.t('badgeOneMissing', { count: game.ownerCount, total: stats.activePlayerCount }) 
             : i18n.t('badgeTwoMissing', { count: game.ownerCount, total: stats.activePlayerCount }));
 
+      const matchingDetails = (game.storeDetails && (!game.storeDetails.countryCode || game.storeDetails.countryCode === countryCode))
+        ? game.storeDetails
+        : null;
+
       let missingHtml = '';
       if (!isFull && game.missingMembers.length > 0) {
         const names = game.missingMembers.map(m => m.name).join(', ');
         let initialDiscountHtml = '';
-        if (game.storeDetails?.hasDiscount) {
-          initialDiscountHtml = `<span class="discount-pill">-%${game.storeDetails.discountPercent} ${game.storeDetails.finalFormatted}</span>`;
-        } else if (game.storeDetails?.isFree) {
+        if (matchingDetails?.hasDiscount) {
+          initialDiscountHtml = `<span class="discount-pill">-%${matchingDetails.discountPercent} ${matchingDetails.finalFormatted}</span>`;
+        } else if (matchingDetails?.isFree) {
           initialDiscountHtml = `<span class="discount-pill">${i18n.t('badgeFree')}</span>`;
-        } else if (game.storeDetails?.finalFormatted) {
-          initialDiscountHtml = `<span class="price-pill" style="background-color: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; font-weight: 600;">${game.storeDetails.finalFormatted}</span>`;
+        } else if (matchingDetails?.finalFormatted) {
+          initialDiscountHtml = `<span class="price-pill" style="background-color: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; font-weight: 600;">${matchingDetails.finalFormatted}</span>`;
         }
         missingHtml = `
           <div class="game-ownership-status ownership-missing">
@@ -1090,7 +1099,6 @@ class SteamSquadApp {
       }
 
       const isSolo = game.metadata?.mode === 'solo' || game.metadata?.maxPlayers === 1;
-      const isEn = i18n.getLanguage() === 'en';
       const modeIcon = isSolo 
         ? i18n.t('tagSingleplayer') 
         : (game.metadata?.mode === 'coop' 
@@ -1161,12 +1169,15 @@ class SteamSquadApp {
       card.querySelector('.btn-nudge-share')?.addEventListener('click', async () => {
         const names = game.missingMembers.map(m => m.name).join(', ');
         let priceContext = '';
-        if (game.storeDetails?.hasDiscount && game.storeDetails?.finalFormatted) {
-          priceContext = i18n.t('nudgePriceDiscount', { discount: game.storeDetails.discountPercent, price: game.storeDetails.finalFormatted });
-        } else if (game.storeDetails?.isFree) {
+        const currentDetails = (game.storeDetails && (!game.storeDetails.countryCode || game.storeDetails.countryCode === countryCode))
+          ? game.storeDetails
+          : null;
+        if (currentDetails?.hasDiscount && currentDetails?.finalFormatted) {
+          priceContext = i18n.t('nudgePriceDiscount', { discount: currentDetails.discountPercent, price: currentDetails.finalFormatted });
+        } else if (currentDetails?.isFree) {
           priceContext = i18n.t('nudgePriceFree');
-        } else if (game.storeDetails?.finalFormatted) {
-          priceContext = i18n.t('nudgePriceNormal', { price: game.storeDetails.finalFormatted });
+        } else if (currentDetails?.finalFormatted) {
+          priceContext = i18n.t('nudgePriceNormal', { price: currentDetails.finalFormatted });
         } else {
           priceContext = '!';
         }
@@ -1196,21 +1207,23 @@ class SteamSquadApp {
       listContainer.appendChild(card);
 
       // Asynchronously fetch and display live price & discount from Steam Store API
-      if (!isFull && game.missingMembers.length > 0 && !game.storeDetails) {
-        fetchGameStoreDetails(game.appId).then(details => {
-          if (!details) return;
-          game.storeDetails = details;
-          const container = card.querySelector(`.discount-container[data-app-id="${game.appId}"]`);
-          if (container) {
-            if (details.hasDiscount) {
-              container.innerHTML = `<span class="discount-pill">-%${details.discountPercent} ${details.finalFormatted}</span>`;
-            } else if (details.isFree) {
-              container.innerHTML = `<span class="discount-pill">${i18n.t('badgeFree')}</span>`;
-            } else if (details.finalFormatted) {
-              container.innerHTML = `<span class="price-pill" style="background-color: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; font-weight: 600;">${details.finalFormatted}</span>`;
+      if (!isFull && game.missingMembers.length > 0) {
+        if (!game.storeDetails || game.storeDetails.countryCode !== countryCode) {
+          fetchGameStoreDetails(game.appId, countryCode, storeLang).then(details => {
+            if (!details) return;
+            game.storeDetails = details;
+            const container = card.querySelector(`.discount-container[data-app-id="${game.appId}"]`);
+            if (container) {
+              if (details.hasDiscount) {
+                container.innerHTML = `<span class="discount-pill">-%${details.discountPercent} ${details.finalFormatted}</span>`;
+              } else if (details.isFree) {
+                container.innerHTML = `<span class="discount-pill">${i18n.t('badgeFree')}</span>`;
+              } else if (details.finalFormatted) {
+                container.innerHTML = `<span class="price-pill" style="background-color: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; font-weight: 600;">${details.finalFormatted}</span>`;
+              }
             }
-          }
-        }).catch(() => {});
+          }).catch(() => {});
+        }
       }
     });
   }
@@ -1251,6 +1264,28 @@ class SteamSquadApp {
         badgeEl.style.backgroundColor = '#25D366';
       }
       previewEl.textContent = PollGenerator.generateWhatsAppPoll(games, activeMembers.length, { limit: this.pollLimit });
+    }
+
+    // Asynchronously enrich missing games storeDetails if needed for current region
+    const currentPollLang = i18n.getLanguage();
+    const pollCountryCode = currentPollLang === 'en' ? 'us' : 'tr';
+    const pollStoreLang = currentPollLang === 'en' ? 'english' : 'turkish';
+    const candidatesToFetch = games.filter(g => g.missingMembers?.length > 0 && (!g.storeDetails || g.storeDetails.countryCode !== pollCountryCode));
+    if (candidatesToFetch.length > 0) {
+      Promise.all(candidatesToFetch.map(g =>
+        fetchGameStoreDetails(g.appId, pollCountryCode, pollStoreLang).then(d => {
+          if (d) g.storeDetails = d;
+        }).catch(() => {})
+      )).then(() => {
+        if (this.activeTab === 'tab-poll') {
+          const currentPreviewEl = document.getElementById('poll-preview-text');
+          if (currentPreviewEl) {
+            currentPreviewEl.textContent = this.pollPlatform === 'discord'
+              ? PollGenerator.generateDiscordPoll(games, activeMembers.length, { limit: this.pollLimit })
+              : PollGenerator.generateWhatsAppPoll(games, activeMembers.length, { limit: this.pollLimit });
+          }
+        }
+      });
     }
   }
 

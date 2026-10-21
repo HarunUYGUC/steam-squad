@@ -36,13 +36,18 @@ export class PollGenerator {
       let statusBadge = i18n.t('pollAllOwnBadge');
       if (game.missingMembers && game.missingMembers.length > 0) {
         const missingNames = game.missingMembers.map(m => m.name).join(', ');
-        if (game.storeDetails?.hasDiscount && game.storeDetails?.finalFormatted) {
+        const activeCountry = i18n.getLanguage() === 'en' ? 'us' : 'tr';
+        const storeDetails = (game.storeDetails && (!game.storeDetails.countryCode || game.storeDetails.countryCode === activeCountry))
+          ? game.storeDetails
+          : null;
+
+        if (storeDetails?.hasDiscount && storeDetails?.finalFormatted) {
           statusBadge = i18n.t('pollMissingDiscountBadge', {
             names: missingNames,
-            discount: game.storeDetails.discountPercent,
-            price: game.storeDetails.finalFormatted
+            discount: storeDetails.discountPercent,
+            price: storeDetails.finalFormatted
           });
-        } else if (game.storeDetails?.isFree) {
+        } else if (storeDetails?.isFree) {
           statusBadge = i18n.t('pollMissingFreeBadge', { names: missingNames });
         } else {
           statusBadge = i18n.t('pollMissingBadge', { names: missingNames });
@@ -84,13 +89,18 @@ export class PollGenerator {
       let statusBadge = i18n.t('pollWhatsappAllOwnBadge');
       if (game.missingMembers && game.missingMembers.length > 0) {
         const missingNames = game.missingMembers.map(m => m.name).join(', ');
-        if (game.storeDetails?.hasDiscount && game.storeDetails?.finalFormatted) {
+        const activeCountry = i18n.getLanguage() === 'en' ? 'us' : 'tr';
+        const storeDetails = (game.storeDetails && (!game.storeDetails.countryCode || game.storeDetails.countryCode === activeCountry))
+          ? game.storeDetails
+          : null;
+
+        if (storeDetails?.hasDiscount && storeDetails?.finalFormatted) {
           statusBadge = i18n.t('pollMissingDiscountBadge', {
             names: missingNames,
-            discount: game.storeDetails.discountPercent,
-            price: game.storeDetails.finalFormatted
+            discount: storeDetails.discountPercent,
+            price: storeDetails.finalFormatted
           });
-        } else if (game.storeDetails?.isFree) {
+        } else if (storeDetails?.isFree) {
           statusBadge = i18n.t('pollMissingFreeBadge', { names: missingNames });
         } else {
           statusBadge = i18n.t('pollMissingBadge', { names: missingNames });
