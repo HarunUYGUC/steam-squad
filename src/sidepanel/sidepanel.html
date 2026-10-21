@@ -310,10 +310,10 @@
         <!-- Sub Mode Selector -->
         <div class="submode-selector">
           <button class="submode-btn active" data-submode="roulette" id="btn-submode-roulette">
-            🎡 Çarkıfelek (Roulette)
+            <span id="label-submode-roulette">🎡 Çarkıfelek (Roulette)</span>
           </button>
           <button class="submode-btn" data-submode="veto" id="btn-submode-veto">
-            🚫 Veto Eleme Arenası
+            <span id="label-submode-veto">🚫 Veto Eleme Arenası</span>
           </button>
         </div>
 
@@ -322,7 +322,9 @@
           <!-- Veto Sync Status Bar -->
           <div id="roulette-veto-sync-bar" class="alert-banner alert-warning hidden" style="margin-bottom: 8px; justify-content: space-between; align-items: center; padding: 6px 10px;">
             <span style="font-size: 11px;" id="roulette-sync-text">🎯 Veto Arenasında elenen oyunlar çarktan çıkarıldı.</span>
-            <button id="btn-restore-wheel-games" class="btn btn-sm btn-secondary" style="font-size: 10px; padding: 2px 6px;">Tümünü Ekle</button>
+            <button id="btn-restore-wheel-games" class="btn btn-sm btn-secondary" style="font-size: 10px; padding: 2px 6px;">
+              <span id="label-btn-restore-wheel">Tümünü Ekle</span>
+            </button>
           </div>
 
           <div class="roulette-container">
@@ -332,7 +334,7 @@
 
             <div class="roulette-controls">
               <button id="btn-spin-wheel" class="btn btn-primary btn-lg btn-glow">
-                <span>🎡 ÇARKI ÇEVİR!</span>
+                <span id="label-btn-spin-wheel">🎡 ÇARKI ÇEVİR!</span>
               </button>
               <button id="btn-toggle-sound" class="btn btn-icon btn-secondary" title="Sesi Aç/Kapat">
                 🔊
@@ -343,16 +345,16 @@
           <!-- Winner Card Overlay / Result -->
           <div id="roulette-winner-card" class="winner-card hidden">
             <button id="btn-close-winner-card" class="winner-close-btn" title="Kapat">×</button>
-            <div class="winner-badge">🏆 KAZANAN OYUN!</div>
+            <div class="winner-badge" id="label-winner-badge">🏆 KAZANAN OYUN!</div>
             <img id="winner-game-image" class="winner-image" src="" alt="Winner Game" />
             <h3 id="winner-game-title" class="winner-title">Oyun Adı</h3>
             <p id="winner-game-info" class="winner-info">Co-Op • 4 Kişilik</p>
             <div class="winner-actions" style="display: flex; gap: 6px;">
               <a id="winner-launch-btn" href="#" class="btn btn-accent" style="flex: 1;">
-                🚀 Steam'de Başlat
+                <span id="label-winner-launch">🚀 Steam'de Başlat</span>
               </a>
               <button id="btn-share-winner" class="btn btn-secondary" style="padding: 8px 14px;">
-                📋 Paylaş
+                <span id="label-btn-share-winner">📋 Paylaş</span>
               </button>
             </div>
           </div>
@@ -366,7 +368,7 @@
               <span id="veto-current-player-text">Sıra: Harun — İstemediğin 1 oyunu ele!</span>
             </div>
             <button id="btn-reset-veto" class="btn btn-sm btn-secondary">
-              🔄 Baştan Başla
+              <span id="label-btn-reset-veto">🔄 Baştan Başla</span>
             </button>
           </div>
 
@@ -376,18 +378,18 @@
 
           <!-- Eliminated Graveyard -->
           <div class="veto-graveyard" id="veto-graveyard">
-            <span class="graveyard-title">💀 Elenen Oyunlar:</span>
+            <span class="graveyard-title" id="label-veto-graveyard">💀 Elenen Oyunlar:</span>
             <div class="graveyard-list" id="veto-graveyard-list"></div>
           </div>
 
           <!-- Veto Final Champion Banner -->
           <div id="veto-champion-card" class="champion-card hidden">
             <div class="champion-crown">👑</div>
-            <h3>KADRONUN ŞAMPİYON OYUNU!</h3>
+            <h3 id="label-veto-champion-heading">KADRONUN ŞAMPİYON OYUNU!</h3>
             <h2 id="veto-champion-title">Lethal Company</h2>
-            <p>Tüm elemelerden başarıyla geçti ve bu akşamın kazananı oldu!</p>
+            <p id="label-veto-champion-desc">Tüm elemelerden başarıyla geçti ve bu akşamın kazananı oldu!</p>
             <a id="veto-champion-launch-btn" href="#" class="btn btn-primary btn-block">
-              🚀 Steam'de Oyunu Başlat
+              <span id="label-veto-champion-launch">🚀 Steam'de Oyunu Başlat</span>
             </a>
           </div>
         </div>

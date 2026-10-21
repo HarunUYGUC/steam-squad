@@ -3,6 +3,8 @@
  * Interactive Canvas wheel, Web Audio API sound effects, and Turn-based Veto elimination mode.
  */
 
+import { i18n } from '../services/i18n.js';
+
 // Procedural Web Audio Sound Synthesizer (no external audio files needed)
 class SoundFx {
   constructor() {
@@ -169,7 +171,7 @@ export class RouletteEngine {
       this.ctx.font = '13px sans-serif';
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
-      this.ctx.fillText('Oyun Seçilmedi', centerX, centerY);
+      this.ctx.fillText(i18n.t('rouletteNoGames'), centerX, centerY);
       this.ctx.restore();
       return;
     }
@@ -329,7 +331,7 @@ export class VetoArenaEngine {
 
     this.eliminatedGames.push({
       game: vetoedGame,
-      eliminatedBy: player ? player.personaName : 'Bilinmeyen'
+      eliminatedBy: player ? player.personaName : i18n.t('vetoUnknownPlayer')
     });
 
     this.soundFx.playVeto();

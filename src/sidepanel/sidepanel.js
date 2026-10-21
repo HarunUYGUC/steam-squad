@@ -43,12 +43,14 @@ class SteamSquadApp {
     this.updateSquadTabTranslations();
     this.updateMatchesTabTranslations();
     this.updatePollTabTranslations();
+    this.updateRouletteTabTranslations();
     i18n.subscribe(() => {
       this.updateLangToggleButton();
       this.updateStaticNavTexts();
       this.updateSquadTabTranslations();
       this.updateMatchesTabTranslations();
       this.updatePollTabTranslations();
+      this.updateRouletteTabTranslations();
     });
 
     this.bindGlobalEvents();
@@ -358,6 +360,53 @@ class SteamSquadApp {
     this.renderPoll();
   }
 
+  updateRouletteTabTranslations() {
+    const labelSubmodeRoulette = document.getElementById('label-submode-roulette');
+    if (labelSubmodeRoulette) labelSubmodeRoulette.textContent = i18n.t('submodeRoulette');
+
+    const labelSubmodeVeto = document.getElementById('label-submode-veto');
+    if (labelSubmodeVeto) labelSubmodeVeto.textContent = i18n.t('submodeVeto');
+
+    const labelBtnRestore = document.getElementById('label-btn-restore-wheel');
+    if (labelBtnRestore) labelBtnRestore.textContent = i18n.t('btnRestoreWheel');
+
+    const labelBtnSpin = document.getElementById('label-btn-spin-wheel');
+    if (labelBtnSpin) labelBtnSpin.textContent = i18n.t('btnSpinWheel');
+
+    const btnToggleSound = document.getElementById('btn-toggle-sound');
+    if (btnToggleSound) btnToggleSound.title = i18n.t('btnSoundTitle');
+
+    const btnCloseWinner = document.getElementById('btn-close-winner-card');
+    if (btnCloseWinner) btnCloseWinner.title = i18n.t('btnCloseTitle');
+
+    const labelWinnerBadge = document.getElementById('label-winner-badge');
+    if (labelWinnerBadge) labelWinnerBadge.textContent = i18n.t('winnerTitle');
+
+    const labelWinnerLaunch = document.getElementById('label-winner-launch');
+    if (labelWinnerLaunch) labelWinnerLaunch.textContent = i18n.t('btnLaunchSteam');
+
+    const labelBtnShareWinner = document.getElementById('label-btn-share-winner');
+    if (labelBtnShareWinner) labelBtnShareWinner.textContent = i18n.t('btnShareWinner');
+
+    const labelBtnResetVeto = document.getElementById('label-btn-reset-veto');
+    if (labelBtnResetVeto) labelBtnResetVeto.textContent = i18n.t('btnResetVeto');
+
+    const labelVetoGraveyard = document.getElementById('label-veto-graveyard');
+    if (labelVetoGraveyard) labelVetoGraveyard.textContent = i18n.t('eliminatedGamesHeading');
+
+    const labelChampionHeading = document.getElementById('label-veto-champion-heading');
+    if (labelChampionHeading) labelChampionHeading.textContent = i18n.t('vetoChampionHeading');
+
+    const labelChampionDesc = document.getElementById('label-veto-champion-desc');
+    if (labelChampionDesc) labelChampionDesc.textContent = i18n.t('vetoChampionDesc');
+
+    const labelChampionLaunch = document.getElementById('label-veto-champion-launch');
+    if (labelChampionLaunch) labelChampionLaunch.textContent = i18n.t('vetoChampionLaunch');
+
+    this.renderRoulette();
+    this.renderVetoArena();
+  }
+
   initRouletteAndVeto() {
     const canvas = document.getElementById('roulette-canvas');
     if (canvas) {
@@ -633,7 +682,7 @@ class SteamSquadApp {
         this.vetoEngine.reset(games, activeMembers);
       }
       this.renderRoulette();
-      this.showToast('Çark tüm ortak oyunlarla yenilendi.');
+      this.showToast(i18n.t('wheelResetToast'));
     });
 
     // Roulette Spin button
@@ -654,13 +703,21 @@ class SteamSquadApp {
       if (!this.lastRouletteWinner) return;
       const w = this.lastRouletteWinner;
       const mode = w.metadata?.mode?.toUpperCase() || 'COOP';
-      const p = w.metadata?.maxPlayers ? `${w.metadata.maxPlayers} Kişilik` : 'Multiplayer';
-      const text = `🏆 **SteamSquad Çarkı Kararını Verdi!**\n🎮 Bu akşam oynuyoruz: **${w.name}**\n👥 Tür: ${mode} (${p})\n🚀 Steam: https://store.steampowered.com/app/${w.appId}`;
+      const isSolo = w.metadata?.mode === 'solo' || w.metadata?.maxPlayers === 1;
+      const p = isSolo
+        ? i18n.t('tagSoloCapacity')
+        : (w.metadata?.maxPlayers ? i18n.t('tagMultiCapacity', { count: w.metadata.maxPlayers }) : i18n.t('tagMultiplayerGeneral'));
+      const text = i18n.t('winnerShareTemplate', {
+        name: w.name,
+        mode: mode,
+        players: p,
+        link: `https://store.steampowered.com/app/${w.appId}`
+      });
       const success = await PollGenerator.copyToClipboard(text);
       if (success) {
-        this.showToast('📋 Kazanan oyun Discord/WhatsApp formatında panoya kopyalandı!');
+        this.showToast(i18n.t('winnerShareToast'));
       } else {
-        this.showToast('Kopyalama başarısız oldu.');
+        this.showToast(i18n.t('pollCopyFailed'));
       }
     });
 
@@ -676,7 +733,7 @@ class SteamSquadApp {
     document.getElementById('btn-reset-veto')?.addEventListener('click', () => {
       this.initVetoArena();
       this.renderRoulette();
-      this.showToast('Veto Arenası sıfırlandı.');
+      this.showToast(i18n.t('vetoResetToast'));
     });
   }
 
@@ -1219,7 +1276,7 @@ class SteamSquadApp {
     if (this.vetoEngine && this.vetoEngine.eliminatedGames && this.vetoEngine.eliminatedGames.length > 0 && this.vetoEngine.remainingGames && this.vetoEngine.remainingGames.length > 0) {
       games = this.vetoEngine.remainingGames;
       if (syncBar && syncText) {
-        syncText.textContent = `🎯 Veto sonrası kalan ${games.length} oyun çarkta (${this.vetoEngine.eliminatedGames.length} oyun elendi)`;
+        syncText.textContent = i18n.t('rouletteSyncBanner', { remaining: games.length, eliminated: this.vetoEngine.eliminatedGames.length });
         syncBar.classList.remove('hidden');
       }
     } else {
@@ -1248,8 +1305,11 @@ class SteamSquadApp {
       if (imageEl) imageEl.src = winner.logo;
       if (infoEl) {
         const mode = winner.metadata?.mode?.toUpperCase() || 'COOP';
-        const p = winner.metadata?.maxPlayers || 4;
-        infoEl.textContent = `${mode} • ${p} Kişilik • Toplam ${Math.round(winner.totalHours)} Saat Oynandı`;
+        const isSolo = winner.metadata?.mode === 'solo' || winner.metadata?.maxPlayers === 1;
+        const p = isSolo
+          ? i18n.t('tagSoloCapacity')
+          : (winner.metadata?.maxPlayers ? i18n.t('tagMultiCapacity', { count: winner.metadata.maxPlayers }) : i18n.t('tagMultiplayerGeneral'));
+        infoEl.textContent = i18n.t('winnerCardInfo', { mode, players: p, hours: Math.round(winner.totalHours) });
       }
       if (launchBtn) {
         launchBtn.href = `steam://run/${winner.appId}`;
@@ -1283,21 +1343,21 @@ class SteamSquadApp {
 
     if (activeMembers.length === 0 || !this.vetoEngine || this.vetoEngine.remainingGames.length === 0) {
       if (turnIndicator) {
-        turnIndicator.textContent = 'Kadroda aktif oyuncu yok. Lütfen önce kadroya oyuncu ekleyin.';
+        turnIndicator.textContent = i18n.t('vetoNoActivePlayers');
       }
       if (graveyardList) {
-        graveyardList.innerHTML = '<span style="font-size: 11px; color: #8f98a0;">Elenen oyun yok.</span>';
+        graveyardList.innerHTML = `<span style="font-size: 11px; color: #8f98a0;">${i18n.t('vetoNoEliminated')}</span>`;
       }
-      grid.innerHTML = '<div style="text-align: center; padding: 24px 10px; color: #8f98a0;">👥 Kadro boş olduğu için elenecek oyun bulunmuyor.</div>';
+      grid.innerHTML = `<div style="text-align: center; padding: 24px 10px; color: #8f98a0;">${i18n.t('vetoEmptySquadGames')}</div>`;
       return;
     }
 
     const currentPlayer = this.vetoEngine.getCurrentPlayer();
     if (turnIndicator) {
       if (currentPlayer) {
-        turnIndicator.textContent = `🎯 Sıra: ${currentPlayer.personaName} — İstemediğin 1 oyunu tıkla ve ele!`;
+        turnIndicator.textContent = i18n.t('vetoTurnNotice', { name: currentPlayer.personaName });
       } else {
-        turnIndicator.textContent = 'Kadroda aktif oyuncu yok.';
+        turnIndicator.textContent = i18n.t('vetoNoActivePlayers');
       }
     }
 
@@ -1311,7 +1371,7 @@ class SteamSquadApp {
           <span class="veto-card-title">${game.name}</span>
         </div>
         <button class="btn btn-sm btn-danger-outline btn-veto" data-app-id="${game.appId}">
-          VETO ET ❌
+          ${i18n.t('btnVeto')}
         </button>
       `;
 
