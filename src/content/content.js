@@ -234,8 +234,10 @@
       document.body.appendChild(badge);
     }
 
+    const canOpenInPanel = isAllOwn || missing.length <= 2;
+
     // Apply color theme class
-    badge.className = `steamsquad-badge-container ${isAllOwn ? 'steamsquad-theme-all-own' : 'steamsquad-theme-partial'}`;
+    badge.className = `steamsquad-badge-container ${isAllOwn ? 'steamsquad-theme-all-own' : 'steamsquad-theme-partial'}${canOpenInPanel ? '' : ' steamsquad-info-only'}`;
 
     // Status titles and subtitles
     let titleText = '';
@@ -283,6 +285,17 @@
       ` 
       : '';
 
+    const footerHtml = canOpenInPanel 
+      ? `
+        <div class="steamsquad-badge-footer">
+          <button class="steamsquad-btn-action" id="steamsquad-btn-open-panel">
+            <span>${t('btnOpen')}</span>
+            <span class="steamsquad-arrow">➔</span>
+          </button>
+        </div>
+      `
+      : '';
+
     badge.innerHTML = `
       <div class="steamsquad-badge-header">
         <div class="steamsquad-header-left">
@@ -307,37 +320,34 @@
         </div>
       </div>
 
-      <div class="steamsquad-badge-footer">
-        <button class="steamsquad-btn-action" id="steamsquad-btn-open-panel">
-          <span>${t('btnOpen')}</span>
-          <span class="steamsquad-arrow">➔</span>
-        </button>
-      </div>
+      ${footerHtml}
     `;
 
     // Hook click events
     const btnDismiss = badge.querySelector('#steamsquad-btn-dismiss');
     if (btnDismiss) {
-      btnDismiss.addEventListener('click', (e) => {
+      btnDismiss.onclick = (e) => {
         e.stopPropagation();
         isDismissedForApp = true;
         removeBadge();
-      });
+      };
     }
 
     const btnOpen = badge.querySelector('#steamsquad-btn-open-panel');
     if (btnOpen) {
-      btnOpen.addEventListener('click', (e) => {
+      btnOpen.onclick = (e) => {
         e.stopPropagation();
         requestOpenSidePanel();
-      });
+      };
     }
 
-    // Clicking anywhere on the badge body also opens side panel
-    badge.addEventListener('click', (e) => {
+    // Clicking anywhere on the badge body opens side panel ONLY if canOpenInPanel is true
+    badge.onclick = (e) => {
       if (e.target.closest('#steamsquad-btn-dismiss')) return;
-      requestOpenSidePanel();
-    });
+      if (canOpenInPanel) {
+        requestOpenSidePanel();
+      }
+    };
   }
 
   function escapeHTML(str) {

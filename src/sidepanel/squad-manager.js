@@ -73,8 +73,23 @@ export class SquadManager {
         this.activeTeamId = 'team_all';
       }
 
-      // Apply active selection for current team
-      this.applyTeamSelection(this.activeTeamId, false);
+      // If active team is a custom team, ensure member.active matches current team's memberIds
+      if (this.activeTeamId !== 'team_all') {
+        const currentTeam = this.teams.find(t => t.id === this.activeTeamId);
+        if (currentTeam && Array.isArray(currentTeam.memberIds)) {
+          const idSet = new Set(currentTeam.memberIds);
+          this.members.forEach(m => {
+            m.active = idSet.has(m.id);
+          });
+        }
+      } else {
+        // If team_all is active, preserve each member's persisted active flag (never overwrite false to true on startup!)
+        this.members.forEach(m => {
+          if (m.active === undefined) {
+            m.active = true;
+          }
+        });
+      }
 
     } catch (err) {
       console.error('[SteamSquad] Storage initialization error:', err);

@@ -327,3 +327,16 @@
 .steamsquad-btn-action:hover .steamsquad-arrow {
   transform: translateX(3px) !important;
 }
+
+/* Info-Only State (When missing > 2 players and not in side panel matches) */
+.steamsquad-badge-container.steamsquad-info-only {
+  cursor: default !important;
+}
+
+.steamsquad-badge-container.steamsquad-info-only:hover {
+  transform: none !important;
+}
+
+.steamsquad-badge-container.steamsquad-info-only .steamsquad-badge-body {
+  padding-bottom: 16px !important;
+}

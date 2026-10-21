@@ -788,14 +788,17 @@ class SteamSquadApp {
       requiredTier = 'all_with_n2';
     }
 
-    if (requiredTier) {
-      const currentTier = this.overlapEngine.filters.matchTier;
-      if (currentTier !== requiredTier) {
-        document.querySelectorAll('#match-tier-filter .segment-btn').forEach(btn => {
-          btn.classList.toggle('active', btn.getAttribute('data-tier') === requiredTier);
-        });
-        this.overlapEngine.setFilters({ matchTier: requiredTier });
-      }
+    if (!requiredTier) {
+      this.showToast(i18n.t('toastGameNotInPool'));
+      return;
+    }
+
+    const currentTier = this.overlapEngine.filters.matchTier;
+    if (currentTier !== requiredTier) {
+      document.querySelectorAll('#match-tier-filter .segment-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-tier') === requiredTier);
+      });
+      this.overlapEngine.setFilters({ matchTier: requiredTier });
     }
 
     // Reset game mode tag to 'all' so it is not hidden by genre filter
