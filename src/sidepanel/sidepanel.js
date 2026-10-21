@@ -39,7 +39,11 @@ class SteamSquadApp {
   async init() {
     await i18n.init();
     this.updateLangToggleButton();
-    i18n.subscribe(() => this.updateLangToggleButton());
+    this.updateStaticNavTexts();
+    i18n.subscribe(() => {
+      this.updateLangToggleButton();
+      this.updateStaticNavTexts();
+    });
 
     this.bindGlobalEvents();
     this.initRouletteAndVeto();
@@ -106,6 +110,31 @@ class SteamSquadApp {
         if (btn) btn.title = 'Switch to English / İngilizce\'ye Geç';
       }
     }
+  }
+
+  updateStaticNavTexts() {
+    const subtitleEl = document.getElementById('header-subtitle');
+    if (subtitleEl) subtitleEl.textContent = i18n.t('headerSubtitle');
+
+    const tabSquad = document.getElementById('tab-label-squad');
+    if (tabSquad) tabSquad.textContent = i18n.t('tabSquad');
+
+    const tabMatches = document.getElementById('tab-label-matches');
+    if (tabMatches) tabMatches.textContent = i18n.t('tabMatches');
+
+    const tabPoll = document.getElementById('tab-label-poll');
+    if (tabPoll) tabPoll.textContent = i18n.t('tabPoll');
+
+    const tabRoulette = document.getElementById('tab-label-roulette');
+    if (tabRoulette) tabRoulette.textContent = i18n.t('tabRoulette');
+
+    const countBadge = document.getElementById('active-squad-count');
+    if (countBadge) {
+      const activeMembers = this.squadManager ? this.squadManager.getActiveMembers() : [];
+      countBadge.textContent = i18n.t('playersReady', { count: activeMembers.length });
+    }
+
+    document.documentElement.lang = i18n.getLanguage();
   }
 
   initRouletteAndVeto() {
@@ -527,7 +556,7 @@ class SteamSquadApp {
     const activeMembers = this.squadManager.getActiveMembers();
     const countBadge = document.getElementById('active-squad-count');
     if (countBadge) {
-      countBadge.textContent = `${activeMembers.length} Oyuncu Hazır`;
+      countBadge.textContent = i18n.t('playersReady', { count: activeMembers.length });
     }
 
     // Recompute matches
