@@ -40,9 +40,11 @@ class SteamSquadApp {
     await i18n.init();
     this.updateLangToggleButton();
     this.updateStaticNavTexts();
+    this.updateSquadTabTranslations();
     i18n.subscribe(() => {
       this.updateLangToggleButton();
       this.updateStaticNavTexts();
+      this.updateSquadTabTranslations();
     });
 
     this.bindGlobalEvents();
@@ -137,6 +139,72 @@ class SteamSquadApp {
     document.documentElement.lang = i18n.getLanguage();
   }
 
+  updateSquadTabTranslations() {
+    const labelAddFriend = document.getElementById('label-add-friend');
+    if (labelAddFriend) labelAddFriend.textContent = i18n.t('addFriendHeading');
+
+    const memberInput = document.getElementById('member-input');
+    if (memberInput) memberInput.placeholder = i18n.t('inputPlaceholder');
+
+    const labelBtnAdd = document.getElementById('label-btn-add');
+    if (labelBtnAdd) labelBtnAdd.textContent = i18n.t('btnAdd');
+
+    const labelInputHint = document.getElementById('label-input-hint');
+    if (labelInputHint) labelInputHint.innerHTML = i18n.t('inputHint');
+
+    const labelToggleApiKey = document.getElementById('label-toggle-api-key');
+    if (labelToggleApiKey) labelToggleApiKey.textContent = i18n.t('unlockFullLibrary');
+
+    const labelApiKeyDesc = document.getElementById('label-api-key-desc');
+    if (labelApiKeyDesc) labelApiKeyDesc.innerHTML = i18n.t('apiKeyDesc');
+
+    const apiKeyInput = document.getElementById('api-key-input');
+    if (apiKeyInput) apiKeyInput.placeholder = i18n.t('apiKeyPlaceholder');
+
+    const btnSaveApiKey = document.getElementById('btn-save-api-key');
+    if (btnSaveApiKey) btnSaveApiKey.textContent = i18n.t('btnSaveKey');
+
+    const btnDeleteApiKey = document.getElementById('btn-delete-api-key');
+    if (btnDeleteApiKey) {
+      btnDeleteApiKey.textContent = i18n.t('btnDeleteKey');
+      btnDeleteApiKey.title = i18n.t('btnDeleteKeyTitle');
+    }
+
+    const btnCreateTeam = document.getElementById('btn-create-team');
+    const labelBtnCreateTeam = document.getElementById('label-btn-create-team');
+    if (btnCreateTeam) btnCreateTeam.title = i18n.t('btnCreateSquadTitle');
+    if (labelBtnCreateTeam) labelBtnCreateTeam.textContent = i18n.t('btnCreateSquad');
+
+    const btnClearSquad = document.getElementById('btn-clear-squad');
+    const labelBtnClearSquad = document.getElementById('label-btn-clear-squad');
+    if (btnClearSquad) btnClearSquad.title = i18n.t('btnClearTitle');
+    if (labelBtnClearSquad) labelBtnClearSquad.textContent = i18n.t('btnClear');
+
+    const labelPresets = document.getElementById('label-presets');
+    if (labelPresets) labelPresets.textContent = i18n.t('savedSquadsHeading');
+
+    const labelPrivacyTitle = document.getElementById('label-privacy-title');
+    if (labelPrivacyTitle) labelPrivacyTitle.textContent = i18n.t('privacyAlertTitle');
+
+    const privacyAlertText = document.getElementById('privacy-alert-text');
+    if (privacyAlertText) privacyAlertText.textContent = i18n.t('privacyAlertText');
+
+    const labelSquadHeading = document.getElementById('label-squad-heading');
+    if (labelSquadHeading) labelSquadHeading.textContent = i18n.t('squadMembersHeading');
+
+    const labelSquadSubhint = document.getElementById('label-squad-subhint');
+    if (labelSquadSubhint) labelSquadSubhint.textContent = i18n.t('squadSubhint');
+
+    const labelEmptyTitle = document.getElementById('label-empty-squad-title');
+    if (labelEmptyTitle) labelEmptyTitle.textContent = i18n.t('emptySquadTitle');
+
+    const labelEmptySub = document.getElementById('label-empty-squad-sub');
+    if (labelEmptySub) labelEmptySub.textContent = i18n.t('emptySquadSub');
+
+    this.renderSquadList();
+    this.renderPresets();
+  }
+
   initRouletteAndVeto() {
     const canvas = document.getElementById('roulette-canvas');
     if (canvas) {
@@ -194,11 +262,11 @@ class SteamSquadApp {
         if (!value.trim()) return;
 
         addBtn.disabled = true;
-        addBtn.innerHTML = '<span>⏳ Aranıyor...</span>';
+        addBtn.innerHTML = `<span>${i18n.t('btnSearching')}</span>`;
 
         const result = await this.squadManager.addMember(value);
         addBtn.disabled = false;
-        addBtn.innerHTML = '<span>+ Ekle</span>';
+        addBtn.innerHTML = `<span>${i18n.t('btnAdd')}</span>`;
 
         if (result.success) {
           memberInput.value = '';
@@ -217,7 +285,7 @@ class SteamSquadApp {
 
     // Create team
     document.getElementById('btn-create-team')?.addEventListener('click', async () => {
-      const teamName = prompt('Yeni ekip adı girin (Örn: Duo Takımı, 5v5 Ekibi, Hafta Sonu):', 'Duo Takımı');
+      const teamName = prompt(i18n.t('promptNewTeam'), i18n.t('defaultNewTeamName'));
       if (teamName) {
         const res = await this.squadManager.createTeam(teamName);
         this.renderSquadList();
@@ -252,7 +320,7 @@ class SteamSquadApp {
     apiKeySaveBtn?.addEventListener('click', async () => {
       const keyVal = apiKeyInput?.value?.trim() || '';
       await chrome.storage.local.set({ steamsquad_api_key: keyVal });
-      this.showToast(keyVal ? '🔑 Steam Web API Key kaydedildi! Kütüphaneler yenileniyor...' : 'API Key temizlendi.');
+      this.showToast(keyVal ? i18n.t('apiKeySavedRefresh') : i18n.t('apiKeyCleared'));
 
       // Refresh all existing members
       for (const m of this.squadManager.members) {
@@ -264,15 +332,15 @@ class SteamSquadApp {
     apiKeyDeleteBtn?.addEventListener('click', async () => {
       await chrome.storage.local.remove('steamsquad_api_key');
       if (apiKeyInput) apiKeyInput.value = '';
-      this.showToast('🗑️ Steam Web API anahtarı silindi.');
+      this.showToast(i18n.t('apiKeyDeleted'));
     });
 
     // Clear squad
     document.getElementById('btn-clear-squad')?.addEventListener('click', async () => {
-      if (confirm('Tüm kadroyu temizlemek istediğinize emin misiniz?')) {
+      if (confirm(i18n.t('confirmClearSquad'))) {
         await this.squadManager.clearAllMembers();
         this.renderSquadList();
-        this.showToast('Kadro temizlendi.');
+        this.showToast(i18n.t('squadCleared'));
       }
     });
 
@@ -626,7 +694,11 @@ class SteamSquadApp {
       const card = document.createElement('div');
       card.className = `member-card ${member.active ? '' : 'inactive'}`;
 
-      const checkboxTitle = member.active ? 'Kadrodan Çıkarılsın mı?' : 'Kadroya Eklensin mi?';
+      const checkboxTitle = member.active ? i18n.t('removeFromSquad') : i18n.t('addToSquad');
+      const statusTitle = member.isPrivate ? i18n.t('gamesPrivate') : i18n.t('publicProfile');
+      const metaText = member.isPrivate ? i18n.t('gamesHiddenWarning') : i18n.t('gameCount', { count: gameCount });
+      const refreshTitle = i18n.t('refreshLibrary');
+      const removeTitle = i18n.t('removeMember');
 
       card.innerHTML = `
         <div class="member-checkbox-wrap" title="${checkboxTitle}">
@@ -634,17 +706,17 @@ class SteamSquadApp {
         </div>
         <div class="member-avatar-wrap">
           <img src="${safeAvatar}" alt="${safeName}" class="member-avatar" />
-          <span class="member-status-dot ${member.isPrivate ? 'status-private' : 'status-public'}" title="${member.isPrivate ? 'Oyun detayları gizli' : 'Herkese açık profil'}"></span>
+          <span class="member-status-dot ${member.isPrivate ? 'status-private' : 'status-public'}" title="${statusTitle}"></span>
         </div>
         <div class="member-info">
           <div class="member-name">${safeName}</div>
           <div class="member-meta">
-            ${member.isPrivate ? '⚠️ Oyunları Gizli' : `${gameCount} Oyun`}
+            ${metaText}
           </div>
         </div>
         <div class="member-actions">
-          <button class="icon-btn btn-refresh" data-member-id="${member.id}" title="Kütüphaneyi Yenile">🔄</button>
-          <button class="icon-btn btn-remove" data-member-id="${member.id}" title="Kadro'dan Çıkar">❌</button>
+          <button class="icon-btn btn-refresh" data-member-id="${member.id}" title="${refreshTitle}">🔄</button>
+          <button class="icon-btn btn-remove" data-member-id="${member.id}" title="${removeTitle}">❌</button>
         </div>
       `;
 
@@ -662,7 +734,7 @@ class SteamSquadApp {
       // Remove event
       card.querySelector('.btn-remove')?.addEventListener('click', () => {
         this.squadManager.removeMember(member.id);
-        this.showToast(`${member.personaName} çıkarıldı.`);
+        this.showToast(i18n.t('memberRemoved', { name: member.personaName }));
       });
 
       listContainer.appendChild(card);
@@ -686,7 +758,7 @@ class SteamSquadApp {
     const activeTeamId = this.squadManager.activeTeamId || 'team_all';
 
     if (teams.length === 0) {
-      container.innerHTML = '<span style="font-size: 11px; color: #8f98a0;">Kayıtlı ekip yok.</span>';
+      container.innerHTML = `<span style="font-size: 11px; color: #8f98a0;">${i18n.t('noSavedSquads')}</span>`;
       return;
     }
 
@@ -695,12 +767,15 @@ class SteamSquadApp {
       const isActive = team.id === activeTeamId;
       chip.className = `preset-chip ${isActive ? 'active' : ''}`;
       
-      const deleteBtn = !team.isDefault && team.id !== 'team_all'
-        ? `<button class="preset-delete-btn" data-team-id="${team.id}" title="Ekibi sil">×</button>`
+      const isAllTeam = team.isDefault || team.id === 'team_all';
+      const teamDisplayName = isAllTeam ? i18n.t('allSquadPreset') : escapeHtml(team.name);
+
+      const deleteBtn = !isAllTeam
+        ? `<button class="preset-delete-btn" data-team-id="${team.id}" title="${i18n.t('deleteTeamTitle')}">×</button>`
         : '';
 
       chip.innerHTML = `
-        <span class="preset-name">${team.name}</span>
+        <span class="preset-name">${teamDisplayName}</span>
         ${deleteBtn}
       `;
 
@@ -716,7 +791,7 @@ class SteamSquadApp {
         await this.squadManager.applyTeamSelection(team.id, true);
         this.renderSquadList();
         this.renderPresets();
-        this.showToast(`"${team.name}" seçildi.`);
+        this.showToast(i18n.t('teamSelected', { name: teamDisplayName }));
       });
 
       container.appendChild(chip);

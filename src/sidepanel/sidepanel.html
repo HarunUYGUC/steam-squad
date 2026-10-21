@@ -56,7 +56,7 @@
       <section id="tab-squad" class="tab-pane active">
         <!-- Add Member Bar -->
         <div class="card add-member-card">
-          <label for="member-input" class="section-label">Arkadaş Ekle</label>
+          <label for="member-input" class="section-label" id="label-add-friend">Arkadaş Ekle</label>
           <div class="input-group">
             <input 
               type="text" 
@@ -65,20 +65,20 @@
               autocomplete="off"
             />
             <button id="btn-add-member" class="btn btn-primary">
-              <span>+ Ekle</span>
+              <span id="label-btn-add">+ Ekle</span>
             </button>
           </div>
-          <p class="input-hint">Örn: <code>https://steamcommunity.com/id/kullanici_adi</code> veya <code>kullanici_adi</code></p>
+          <p class="input-hint" id="label-input-hint">Örn: <code>https://steamcommunity.com/id/kullanici_adi</code> veya <code>kullanici_adi</code></p>
         </div>
 
         <!-- Steam Web API Key Card (Optional for Full Library) -->
         <div class="card api-key-card" style="padding: 8px 10px; margin-bottom: 10px;">
           <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" id="toggle-api-key-panel">
-            <span style="font-size: 11px; font-weight: 600; color: #66c0f4;">🔑 Tüm Kütüphaneyi Aç (Steam Web API)</span>
+            <span style="font-size: 11px; font-weight: 600; color: #66c0f4;" id="label-toggle-api-key">🔑 Tüm Kütüphaneyi Aç (Steam Web API)</span>
             <span id="api-key-chevron" style="font-size: 10px; color: #8f98a0;">▼</span>
           </div>
           <div id="api-key-content" class="hidden" style="margin-top: 8px; border-top: 1px solid #2a475e; padding-top: 8px;">
-            <p style="font-size: 10px; color: #c7d5e0; margin-bottom: 6px;">
+            <p style="font-size: 10px; color: #c7d5e0; margin-bottom: 6px;" id="label-api-key-desc">
               Tüm kütüphanedeki yüzlerce oyunu çekmek için ücretsiz Steam API anahtarınızı girebilirsiniz:
               <a href="https://steamcommunity.com/dev/apikey" target="_blank" style="color: #66c0f4;">steamcommunity.com/dev/apikey</a>
             </p>
@@ -93,16 +93,16 @@
         <!-- Squad Action Shortcuts -->
         <div class="squad-actions-bar">
           <button id="btn-create-team" class="btn btn-sm btn-secondary" title="Yeni bir ekip oluştur ve üyelerini seç">
-            ➕ Ekip Oluştur
+            <span id="label-btn-create-team">➕ Ekip Oluştur</span>
           </button>
           <button id="btn-clear-squad" class="btn btn-sm btn-danger-outline" title="Tüm kadroyu temizle">
-            🗑️ Temizle
+            <span id="label-btn-clear-squad">🗑️ Temizle</span>
           </button>
         </div>
 
         <!-- Presets Bar -->
         <div class="presets-container" id="presets-container">
-          <span class="presets-label">Kayıtlı Ekipler:</span>
+          <span class="presets-label" id="label-presets">Kayıtlı Ekipler:</span>
           <div class="presets-list" id="presets-list">
             <!-- Dynamically populated -->
           </div>
@@ -112,15 +112,15 @@
         <div id="privacy-alert" class="alert-banner alert-warning hidden">
           <div class="alert-icon">⚠️</div>
           <div class="alert-content">
-            <strong>Gizli Profil Uyarısı!</strong>
+            <strong id="label-privacy-title">Gizli Profil Uyarısı!</strong>
             <p id="privacy-alert-text">Bazı oyuncuların oyun detayları gizli. Kütüphanelerinin görünmesi için Steam Gizlilik Ayarlarından "Oyun Detayları: Herkese Açık" yapılmalıdır.</p>
           </div>
         </div>
 
         <!-- Squad Members List -->
         <div class="squad-list-header">
-          <h3>Kadro Üyeleri (<span id="member-count-label">0/10</span>)</h3>
-          <span class="sub-hint">Seçilen oyuncular eşleştirmeye dahil edilir</span>
+          <h3><span id="label-squad-heading">Kadro Üyeleri</span> (<span id="member-count-label">0/10</span>)</h3>
+          <span class="sub-hint" id="label-squad-subhint">Seçilen oyuncular eşleştirmeye dahil edilir</span>
         </div>
 
         <div id="members-list" class="members-grid">
@@ -130,8 +130,8 @@
         <!-- Empty Squad State -->
         <div id="empty-squad-state" class="empty-state">
           <div class="empty-icon">👥</div>
-          <h4>Kadroda Henüz Oyuncu Yok</h4>
-          <p>Yukarıdan Steam profil linki veya kullanıcı adı girerek arkadaşlarınızı ekleyin veya hızlıca <strong>Örnek Kadro Yükle</strong> butonuna tıklayın.</p>
+          <h4 id="label-empty-squad-title">Kadroda Henüz Oyuncu Yok</h4>
+          <p id="label-empty-squad-sub">Yukarıdan Steam profil linki veya kullanıcı adı girerek arkadaşlarınızı ekleyin.</p>
         </div>
       </section>
 

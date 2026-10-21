@@ -4,6 +4,7 @@
  */
 
 import { fetchSteamLibrary } from '../services/steam-service.js';
+import { i18n } from '../services/i18n.js';
 
 const STORAGE_KEYS = {
   SQUAD_MEMBERS: 'steamsquad_members',
@@ -145,7 +146,7 @@ export class SquadManager {
    */
   async createTeam(teamName) {
     if (!teamName || !teamName.trim()) {
-      return { success: false, message: 'Lütfen ekip için bir isim girin.' };
+      return { success: false, message: i18n.t('enterTeamName') };
     }
 
     const newTeam = {
@@ -168,7 +169,7 @@ export class SquadManager {
 
     return {
       success: true,
-      message: `"${teamName}" ekibi oluşturuldu! Dahil etmek istediğiniz oyuncuları işaretleyin.`,
+      message: i18n.t('teamCreatedInstruction', { name: teamName }),
       team: newTeam
     };
   }
@@ -179,7 +180,7 @@ export class SquadManager {
    */
   async deleteTeam(teamId) {
     if (teamId === 'team_all') {
-      return { success: false, message: '"Tüm Ekip" ana ekibi silinemez.' };
+      return { success: false, message: i18n.t('cannotDeleteAllTeam') };
     }
 
     const team = this.teams.find(t => t.id === teamId);
@@ -194,7 +195,7 @@ export class SquadManager {
       this.notifyStateChange();
     }
 
-    return { success: true, message: `"${teamName}" silindi.` };
+    return { success: true, message: i18n.t('teamDeleted', { name: teamName }) };
   }
 
   /**
@@ -236,16 +237,16 @@ export class SquadManager {
    */
   async addMember(input) {
     if (!input || !input.trim()) {
-      return { success: false, message: 'Lütfen bir Steam profil linki veya kullanıcı adı girin.' };
+      return { success: false, message: i18n.t('enterValidProfile') };
     }
 
     if (this.members.length >= 10) {
-      return { success: false, message: 'Bir kadroya en fazla 10 oyuncu ekleyebilirsiniz.' };
+      return { success: false, message: i18n.t('maxMembersReached') };
     }
 
     const fetchResult = await fetchSteamLibrary(input);
     if (!fetchResult.success) {
-      return { success: false, message: fetchResult.error || 'Profil bilgisi alınamadı.' };
+      return { success: false, message: fetchResult.error || i18n.t('profileFetchFailed') };
     }
 
     const memberId = fetchResult.steamId64 || input.trim();
@@ -267,7 +268,7 @@ export class SquadManager {
       this.notifyStateChange();
       return {
         success: true,
-        message: `${fetchResult.personaName} kütüphanesi güncellendi.`,
+        message: i18n.t('memberUpdated', { name: fetchResult.personaName }),
         member: this.members[existingIndex]
       };
     }
@@ -295,8 +296,8 @@ export class SquadManager {
 
     const gameCount = newMember.games.length;
     const msg = gameCount > 0 
-      ? `${fetchResult.personaName} (${gameCount} oyun) kadroya eklendi!` 
-      : `${fetchResult.personaName} eklendi (Oyun detayları gizli ayarlanmış).`;
+      ? i18n.t('memberAdded', { name: fetchResult.personaName, count: gameCount })
+      : i18n.t('memberAddedPrivate', { name: fetchResult.personaName });
 
     return {
       success: true,
@@ -328,7 +329,7 @@ export class SquadManager {
    */
   async refreshMember(memberId) {
     const member = this.members.find(m => m.id === memberId);
-    if (!member) return { success: false, message: 'Oyuncu bulunamadı.' };
+    if (!member) return { success: false, message: i18n.t('playerNotFound') };
 
     const result = await fetchSteamLibrary(member.input || member.id);
     if (!result.success) {
@@ -344,7 +345,7 @@ export class SquadManager {
     await this.persistMembers();
     this.notifyStateChange();
 
-    return { success: true, message: `${member.personaName} kütüphanesi yenilendi!` };
+    return { success: true, message: i18n.t('memberLibraryRefreshed', { name: member.personaName }) };
   }
 
   /**
