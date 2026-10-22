@@ -20,6 +20,22 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+function sanitizeHttpUrl(url, fallback = '') {
+  if (!url || typeof url !== 'string') return fallback;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+      return escapeHtml(parsed.href);
+    }
+  } catch {}
+  return fallback;
+}
+
+function getSteamRunUrl(appId) {
+  const num = parseInt(appId, 10);
+  return (Number.isSafeInteger(num) && num > 0) ? `steam://run/${num}` : '#';
+}
+
 class SteamSquadApp {
   constructor() {
     this.squadManager = new SquadManager();
@@ -764,7 +780,8 @@ class SteamSquadApp {
    */
   async focusGame(targetAppId) {
     if (!targetAppId) return;
-    const numId = Number(targetAppId);
+    const numId = parseInt(targetAppId, 10);
+    if (!Number.isSafeInteger(numId) || numId <= 0) return;
 
     // Switch to matches tab
     this.switchTab('tab-matches');
@@ -901,21 +918,22 @@ class SteamSquadApp {
       if (member.isPrivate) hasPrivate = true;
 
       const safeName = escapeHtml(member.personaName || member.input);
-      const safeAvatar = member.avatarUrl || 'https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg';
+      const safeId = escapeHtml(member.id);
+      const safeAvatar = sanitizeHttpUrl(member.avatarUrl, 'https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg');
       const gameCount = Array.isArray(member.games) ? member.games.length : 0;
 
       const card = document.createElement('div');
       card.className = `member-card ${member.active ? '' : 'inactive'}`;
 
-      const checkboxTitle = member.active ? i18n.t('removeFromSquad') : i18n.t('addToSquad');
-      const statusTitle = member.isPrivate ? i18n.t('gamesPrivate') : i18n.t('publicProfile');
+      const checkboxTitle = escapeHtml(member.active ? i18n.t('removeFromSquad') : i18n.t('addToSquad'));
+      const statusTitle = escapeHtml(member.isPrivate ? i18n.t('gamesPrivate') : i18n.t('publicProfile'));
       const metaText = member.isPrivate ? i18n.t('gamesHiddenWarning') : i18n.t('gameCount', { count: gameCount });
-      const refreshTitle = i18n.t('refreshLibrary');
-      const removeTitle = i18n.t('removeMember');
+      const refreshTitle = escapeHtml(i18n.t('refreshLibrary'));
+      const removeTitle = escapeHtml(i18n.t('removeMember'));
 
       card.innerHTML = `
         <div class="member-checkbox-wrap" title="${checkboxTitle}">
-          <input type="checkbox" ${member.active ? 'checked' : ''} data-member-id="${member.id}" class="member-checkbox" title="${checkboxTitle}" />
+          <input type="checkbox" ${member.active ? 'checked' : ''} data-member-id="${safeId}" class="member-checkbox" title="${checkboxTitle}" />
         </div>
         <div class="member-avatar-wrap">
           <img src="${safeAvatar}" alt="${safeName}" class="member-avatar" />
@@ -928,8 +946,8 @@ class SteamSquadApp {
           </div>
         </div>
         <div class="member-actions">
-          <button class="icon-btn btn-refresh" data-member-id="${member.id}" title="${refreshTitle}">🔄</button>
-          <button class="icon-btn btn-remove" data-member-id="${member.id}" title="${removeTitle}">❌</button>
+          <button class="icon-btn btn-refresh" data-member-id="${safeId}" title="${refreshTitle}">🔄</button>
+          <button class="icon-btn btn-remove" data-member-id="${safeId}" title="${removeTitle}">❌</button>
         </div>
       `;
 
@@ -1057,10 +1075,16 @@ class SteamSquadApp {
     const storeLang = isEn ? 'english' : 'turkish';
 
     games.forEach(game => {
+      const safeAppId = parseInt(game.appId, 10) || 0;
+      const safeName = escapeHtml(game.name);
+      const safeLogo = sanitizeHttpUrl(game.logo, `https://cdn.akamai.steamstatic.com/steam/apps/${safeAppId}/header.jpg`);
+      const safeStoreLink = sanitizeHttpUrl(game.storeLink, `https://store.steampowered.com/app/${safeAppId}`);
+      const safeRunUrl = getSteamRunUrl(safeAppId);
+
       const card = document.createElement('div');
       card.className = `game-card ${game.isPlayed ? 'is-played' : ''}`;
-      card.id = `game-card-${game.appId}`;
-      card.setAttribute('data-app-id', game.appId);
+      card.id = `game-card-${safeAppId}`;
+      card.setAttribute('data-app-id', String(safeAppId));
 
       const isFull = game.ownerCount === stats.activePlayerCount;
       const isN1 = game.ownerCount === stats.activePlayerCount - 1;
@@ -1077,22 +1101,24 @@ class SteamSquadApp {
 
       let missingHtml = '';
       if (!isFull && game.missingMembers.length > 0) {
-        const names = game.missingMembers.map(m => m.name).join(', ');
+        const safeNames = game.missingMembers.map(m => escapeHtml(m.name)).join(', ');
+        const rawNames = game.missingMembers.map(m => m.name).join(', ');
+        const nudgeTitle = escapeHtml(i18n.t('btnShareNudgeTitle', { names: rawNames }));
         let initialDiscountHtml = '';
         if (matchingDetails?.hasDiscount) {
-          initialDiscountHtml = `<span class="discount-pill">-%${matchingDetails.discountPercent} ${matchingDetails.finalFormatted}</span>`;
+          initialDiscountHtml = `<span class="discount-pill">-%${matchingDetails.discountPercent} ${escapeHtml(matchingDetails.finalFormatted)}</span>`;
         } else if (matchingDetails?.isFree) {
-          initialDiscountHtml = `<span class="discount-pill">${i18n.t('badgeFree')}</span>`;
+          initialDiscountHtml = `<span class="discount-pill">${escapeHtml(i18n.t('badgeFree'))}</span>`;
         } else if (matchingDetails?.finalFormatted) {
-          initialDiscountHtml = `<span class="price-pill" style="background-color: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; font-weight: 600;">${matchingDetails.finalFormatted}</span>`;
+          initialDiscountHtml = `<span class="price-pill" style="background-color: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; font-weight: 600;">${escapeHtml(matchingDetails.finalFormatted)}</span>`;
         }
         missingHtml = `
           <div class="game-ownership-status ownership-missing">
             <div class="missing-status-left">
-              <span>${i18n.t('ownershipMissing', { names })}</span>
-              <span class="discount-container" data-app-id="${game.appId}">${initialDiscountHtml}</span>
+              <span>${i18n.t('ownershipMissing', { names: safeNames })}</span>
+              <span class="discount-container" data-app-id="${safeAppId}">${initialDiscountHtml}</span>
             </div>
-            <button class="btn-nudge-share" data-app-id="${game.appId}" title="${i18n.t('btnShareNudgeTitle', { names })}">
+            <button class="btn-nudge-share" data-app-id="${safeAppId}" title="${nudgeTitle}">
               ${i18n.t('btnShareNudge')}
             </button>
           </div>
@@ -1125,13 +1151,13 @@ class SteamSquadApp {
 
       card.innerHTML = `
         <div class="game-banner-wrap">
-          <img src="${game.logo}" alt="${game.name}" class="game-banner" loading="lazy" />
+          <img src="${safeLogo}" alt="${safeName}" class="game-banner" loading="lazy" />
           ${playedBadge}
           <span class="game-match-badge ${badgeClass}">${badgeText}</span>
         </div>
         <div class="game-content">
           <div class="game-title-row">
-            <h4 class="game-title" title="${game.name}">${game.name}</h4>
+            <h4 class="game-title" title="${safeName}">${safeName}</h4>
             <span class="game-playtime">${i18n.t('totalHours', { hours: Math.round(game.totalHours) })}</span>
           </div>
           <div class="game-tags-row">
@@ -1141,13 +1167,13 @@ class SteamSquadApp {
           </div>
           ${missingHtml}
           <div class="game-footer-actions">
-            <button class="btn btn-sm ${game.isPlayed ? 'btn-success' : 'btn-secondary'} game-played-btn" data-app-id="${game.appId}" title="${i18n.t('btnPlayedTitle')}" style="flex: 1.1;">
+            <button class="btn btn-sm ${game.isPlayed ? 'btn-success' : 'btn-secondary'} game-played-btn" data-app-id="${safeAppId}" title="${escapeHtml(i18n.t('btnPlayedTitle'))}" style="flex: 1.1;">
               ${game.isPlayed ? i18n.t('btnPlayedChecked') : i18n.t('btnPlayedUnchecked')}
             </button>
-            <a href="${game.storeLink}" target="_blank" class="btn btn-sm btn-secondary" style="flex: 0.9;">
+            <a href="${safeStoreLink}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-secondary" style="flex: 0.9;">
               ${i18n.t('btnStore')}
             </a>
-            <a href="steam://run/${game.appId}" class="btn btn-sm btn-primary" style="flex: 0.9;">
+            <a href="${safeRunUrl}" class="btn btn-sm btn-primary" style="flex: 0.9;">
               ${i18n.t('btnPlay')}
             </a>
           </div>
@@ -1218,11 +1244,11 @@ class SteamSquadApp {
             const container = card.querySelector(`.discount-container[data-app-id="${game.appId}"]`);
             if (container) {
               if (details.hasDiscount) {
-                container.innerHTML = `<span class="discount-pill">-%${details.discountPercent} ${details.finalFormatted}</span>`;
+                container.innerHTML = `<span class="discount-pill">-%${details.discountPercent} ${escapeHtml(details.finalFormatted)}</span>`;
               } else if (details.isFree) {
-                container.innerHTML = `<span class="discount-pill">${i18n.t('badgeFree')}</span>`;
+                container.innerHTML = `<span class="discount-pill">${escapeHtml(i18n.t('badgeFree'))}</span>`;
               } else if (details.finalFormatted) {
-                container.innerHTML = `<span class="price-pill" style="background-color: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; font-weight: 600;">${details.finalFormatted}</span>`;
+                container.innerHTML = `<span class="price-pill" style="background-color: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; font-weight: 600;">${escapeHtml(details.finalFormatted)}</span>`;
               }
             }
           }).catch(() => {});
@@ -1340,7 +1366,7 @@ class SteamSquadApp {
 
     if (winnerCard && titleEl) {
       titleEl.textContent = winner.name;
-      if (imageEl) imageEl.src = winner.logo;
+      if (imageEl) imageEl.src = sanitizeHttpUrl(winner.logo, '');
       if (infoEl) {
         const mode = winner.metadata?.mode?.toUpperCase() || 'COOP';
         const isSolo = winner.metadata?.mode === 'solo' || winner.metadata?.maxPlayers === 1;
@@ -1350,7 +1376,7 @@ class SteamSquadApp {
         infoEl.textContent = i18n.t('winnerCardInfo', { mode, players: p, hours: Math.round(winner.totalHours) });
       }
       if (launchBtn) {
-        launchBtn.href = `steam://run/${winner.appId}`;
+        launchBtn.href = getSteamRunUrl(winner.appId);
       }
       winnerCard.classList.remove('hidden');
     }
@@ -1401,20 +1427,24 @@ class SteamSquadApp {
 
     // Render candidate games
     this.vetoEngine.remainingGames.forEach(game => {
+      const safeAppId = parseInt(game.appId, 10) || 0;
+      const safeName = escapeHtml(game.name);
+      const safeLogo = sanitizeHttpUrl(game.logo, `https://cdn.akamai.steamstatic.com/steam/apps/${safeAppId}/header.jpg`);
+
       const card = document.createElement('div');
       card.className = 'veto-card';
       card.innerHTML = `
         <div class="veto-card-info">
-          <img src="${game.logo}" alt="${game.name}" class="veto-card-thumb" />
-          <span class="veto-card-title">${game.name}</span>
+          <img src="${safeLogo}" alt="${safeName}" class="veto-card-thumb" />
+          <span class="veto-card-title">${safeName}</span>
         </div>
-        <button class="btn btn-sm btn-danger-outline btn-veto" data-app-id="${game.appId}">
+        <button class="btn btn-sm btn-danger-outline btn-veto" data-app-id="${safeAppId}">
           ${i18n.t('btnVeto')}
         </button>
       `;
 
       card.querySelector('.btn-veto')?.addEventListener('click', () => {
-        this.vetoEngine.vetoGame(game.appId);
+        this.vetoEngine.vetoGame(safeAppId);
         this.renderRoulette();
       });
 
@@ -1443,7 +1473,7 @@ class SteamSquadApp {
     if (championCard && championTitle) {
       championTitle.textContent = winner.name;
       if (launchBtn) {
-        launchBtn.href = `steam://run/${winner.appId}`;
+        launchBtn.href = getSteamRunUrl(winner.appId);
       }
       championCard.classList.remove('hidden');
     }

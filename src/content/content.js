@@ -64,7 +64,9 @@
    */
   function getAppIdFromUrl() {
     const match = window.location.pathname.match(/\/app\/(\d+)/i);
-    return match ? parseInt(match[1], 10) : null;
+    if (!match) return null;
+    const id = parseInt(match[1], 10);
+    return (Number.isSafeInteger(id) && id > 0) ? id : null;
   }
 
   /**
@@ -133,23 +135,37 @@
    */
   function requestOpenSidePanel() {
     try {
-      if (currentAppId) {
-        chrome.storage.local.set({ steamsquad_target_app_id: currentAppId });
+      const cleanAppId = parseInt(currentAppId, 10);
+      const validAppId = (Number.isSafeInteger(cleanAppId) && cleanAppId > 0) ? cleanAppId : null;
+
+      if (validAppId) {
+        chrome.storage.local.set({ steamsquad_target_app_id: validAppId });
       }
-      chrome.runtime.sendMessage({ type: 'OPEN_SIDE_PANEL', appId: currentAppId }, (res) => {
+      chrome.runtime.sendMessage({ type: 'OPEN_SIDE_PANEL', appId: validAppId }, (res) => {
         if (chrome.runtime.lastError || res?.success === false) {
           // If browser security policy requires user to click the toolbar icon directly:
           const btn = document.getElementById('steamsquad-btn-open-panel');
           if (btn) {
-            btn.innerHTML = `<span>${t('guideIcon')}</span>`;
+            btn.textContent = t('guideIcon');
             setTimeout(() => {
-              if (btn) btn.innerHTML = `<span>${t('btnOpen')}</span><span class="steamsquad-arrow">➔</span>`;
+              if (btn) {
+                btn.textContent = '';
+                const spanText = document.createElement('span');
+                spanText.textContent = t('btnOpen');
+                const spanArrow = document.createElement('span');
+                spanArrow.className = 'steamsquad-arrow';
+                spanArrow.textContent = '➔';
+                btn.appendChild(spanText);
+                btn.appendChild(spanArrow);
+              }
             }, 4500);
           }
         }
       });
       // Also broadcast directly to sidepanel in case it is already open
-      chrome.runtime.sendMessage({ type: 'FOCUS_GAME_IN_SIDEPANEL', appId: currentAppId });
+      if (validAppId) {
+        chrome.runtime.sendMessage({ type: 'FOCUS_GAME_IN_SIDEPANEL', appId: validAppId });
+      }
     } catch (e) {
       console.error('[SteamSquad] Failed to message background:', e);
     }
@@ -266,7 +282,7 @@
     const extraOwners = owners.slice(maxAvatars);
 
     const avatarsHtml = displayedOwners.map(m => {
-      const avatarSrc = m.avatarUrl || 'https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_medium.jpg';
+      const avatarSrc = sanitizeHttpUrl(m.avatarUrl, 'https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_medium.jpg');
       const safeName = escapeHTML(m.personaName);
       return `
         <div class="steamsquad-avatar-wrapper">
@@ -358,6 +374,17 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  function sanitizeHttpUrl(url, fallback = '') {
+    if (!url || typeof url !== 'string') return fallback;
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+        return escapeHTML(parsed.href);
+      }
+    } catch {}
+    return fallback;
   }
 
   // React to squad storage updates in real-time

@@ -19,7 +19,8 @@ export function parseSteamInput(input) {
   // Pattern: https://steamcommunity.com/id/vanityname/...
   const idMatch = trimmed.match(/steamcommunity\.com\/id\/([^/?#]+)/i);
   if (idMatch) {
-    return { type: 'id', value: idMatch[1], cleanInput: trimmed };
+    const val = idMatch[1].replace(/[^a-zA-Z0-9_-]/g, '');
+    return { type: 'id', value: val, cleanInput: trimmed };
   }
 
   // Pattern: https://steamcommunity.com/profiles/76561198.../...
@@ -35,7 +36,7 @@ export function parseSteamInput(input) {
 
   // Otherwise assume custom vanity URL identifier
   const sanitized = trimmed.replace(/[^a-zA-Z0-9_-]/g, '');
-  return { type: 'id', value: sanitized || trimmed, cleanInput: trimmed };
+  return { type: 'id', value: sanitized, cleanInput: trimmed };
 }
 
 /**
@@ -44,7 +45,7 @@ export function parseSteamInput(input) {
 async function resolveVanityUrl(vanity, apiKey) {
   if (!vanity || !apiKey) return null;
   try {
-    const res = await fetch(`https://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${apiKey}&vanityurl=${vanity}`);
+    const res = await fetch(`https://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${encodeURIComponent(apiKey)}&vanityurl=${encodeURIComponent(vanity)}`);
     if (res.ok) {
       const json = await res.json();
       if (json.response?.success === 1 && json.response?.steamid) {
@@ -63,7 +64,7 @@ async function resolveVanityUrl(vanity, apiKey) {
 async function fetchOwnedGamesApi(steamId64, apiKey) {
   if (!steamId64 || !apiKey) return null;
   try {
-    const res = await fetch(`https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${apiKey}&steamid=${steamId64}&include_appinfo=1&include_played_free_games=1&format=json`);
+    const res = await fetch(`https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${encodeURIComponent(apiKey)}&steamid=${encodeURIComponent(steamId64)}&include_appinfo=1&include_played_free_games=1&format=json`);
     if (res.ok) {
       const json = await res.json();
       if (json.response && Array.isArray(json.response.games)) {
@@ -118,7 +119,8 @@ export async function fetchSteamLibrary(input) {
     apiKey = storageData.steamsquad_api_key || '';
   } catch {}
 
-  const profileXmlUrl = `https://steamcommunity.com/${parsed.type}/${parsed.value}/?xml=1`;
+  const safeType = parsed.type === 'profiles' ? 'profiles' : 'id';
+  const profileXmlUrl = `https://steamcommunity.com/${safeType}/${encodeURIComponent(parsed.value)}/?xml=1`;
 
   try {
     // 1. Fetch Profile XML to get basic info (avatar, display name, steamID64)
@@ -137,6 +139,15 @@ export async function fetchSteamLibrary(input) {
     const profileXmlText = await profileResponse.text();
     const parser = new DOMParser();
     const profileDoc = parser.parseFromString(profileXmlText, 'text/xml');
+
+    // Check XML parser error
+    const parserError = profileDoc.querySelector('parsererror');
+    if (parserError) {
+      return {
+        success: false,
+        error: 'Steam profil yanıtı geçersiz veya ayrıştırılamadı.'
+      };
+    }
 
     // Check Steam error tag
     const errorNode = profileDoc.querySelector('error');
@@ -210,7 +221,7 @@ export async function fetchSteamLibrary(input) {
     // 4. Try parsing Games XML or HTML session if available
     if (gamesMap.size <= 5) {
       try {
-        const gamesXmlUrl = `https://steamcommunity.com/${parsed.type}/${parsed.value}/games?tab=all&xml=1`;
+        const gamesXmlUrl = `https://steamcommunity.com/${safeType}/${encodeURIComponent(parsed.value)}/games?tab=all&xml=1`;
         const gamesResponse = await fetch(gamesXmlUrl, {
           method: 'GET',
           headers: { 'Accept': 'text/xml, application/xml' }
@@ -309,7 +320,26 @@ function queueStoreRequest(task) {
  * @returns {Promise<{ isFree: boolean, discountPercent: number, initialFormatted: string, finalFormatted: string, hasDiscount: boolean, headerImage: string }>}
  */
 export async function fetchGameStoreDetails(appId, countryCode = 'tr', language = 'turkish') {
-  const cacheKey = `store_cache_${appId}_${countryCode}_${language}`;
+  const safeAppId = parseInt(appId, 10);
+  const cleanCc = encodeURIComponent(String(countryCode).toLowerCase().replace(/[^a-z]/g, '').slice(0, 2) || 'tr');
+  const cleanLang = encodeURIComponent(String(language).toLowerCase().replace(/[^a-z]/g, '').slice(0, 16) || 'turkish');
+
+  const fallback = {
+    isFree: false,
+    discountPercent: 0,
+    initialFormatted: '',
+    finalFormatted: '',
+    hasDiscount: false,
+    headerImage: (!isNaN(safeAppId) && safeAppId > 0) ? `https://cdn.akamai.steamstatic.com/steam/apps/${safeAppId}/header.jpg` : '',
+    countryCode: cleanCc,
+    language: cleanLang
+  };
+
+  if (isNaN(safeAppId) || safeAppId <= 0) {
+    return fallback;
+  }
+
+  const cacheKey = `store_cache_${safeAppId}_${cleanCc}_${cleanLang}`;
 
   // Check memory cache first
   if (memoryStoreCache.has(cacheKey)) {
@@ -320,22 +350,11 @@ export async function fetchGameStoreDetails(appId, countryCode = 'tr', language 
   try {
     const cached = await chrome.storage.local.get(cacheKey);
     if (cached[cacheKey] && (Date.now() - cached[cacheKey].timestamp < CACHE_TTL_MS)) {
-      const data = { ...cached[cacheKey].data, countryCode, language };
+      const data = { ...cached[cacheKey].data, countryCode: cleanCc, language: cleanLang };
       memoryStoreCache.set(cacheKey, data);
       return data;
     }
   } catch {}
-
-  const fallback = {
-    isFree: false,
-    discountPercent: 0,
-    initialFormatted: '',
-    finalFormatted: '',
-    hasDiscount: false,
-    headerImage: `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`,
-    countryCode,
-    language
-  };
 
   // If currently in rate-limit backoff, return fallback silently without requesting
   if (Date.now() < rateLimitBackoffUntil) {
@@ -344,7 +363,7 @@ export async function fetchGameStoreDetails(appId, countryCode = 'tr', language 
 
   return queueStoreRequest(async () => {
     try {
-      const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${appId}&cc=${countryCode}&l=${language}`);
+      const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${safeAppId}&cc=${cleanCc}&l=${cleanLang}`);
       
       if (res.status === 429) {
         // Rate limited by Steam: set a 1-minute backoff
@@ -355,8 +374,8 @@ export async function fetchGameStoreDetails(appId, countryCode = 'tr', language 
       if (!res.ok) return fallback;
 
       const json = await res.json();
-      if (json[appId]?.success && json[appId]?.data) {
-        const data = json[appId].data;
+      if (json[safeAppId]?.success && json[safeAppId]?.data) {
+        const data = json[safeAppId].data;
         const isFree = Boolean(data.is_free);
         const priceOverview = data.price_overview;
 
@@ -364,11 +383,11 @@ export async function fetchGameStoreDetails(appId, countryCode = 'tr', language 
           isFree,
           discountPercent: priceOverview?.discount_percent || 0,
           initialFormatted: priceOverview?.initial_formatted || '',
-          finalFormatted: priceOverview?.final_formatted || (isFree ? (language === 'english' ? 'Free' : 'Ücretsiz') : ''),
+          finalFormatted: priceOverview?.final_formatted || (isFree ? (cleanLang === 'english' ? 'Free' : 'Ücretsiz') : ''),
           hasDiscount: (priceOverview?.discount_percent || 0) > 0,
-          headerImage: data.header_image || `https://cdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`,
-          countryCode,
-          language
+          headerImage: data.header_image || `https://cdn.akamai.steamstatic.com/steam/apps/${safeAppId}/header.jpg`,
+          countryCode: cleanCc,
+          language: cleanLang
         };
 
         memoryStoreCache.set(cacheKey, result);

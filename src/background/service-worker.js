@@ -39,9 +39,12 @@ chrome.action.onClicked.addListener(async (tab) => {
 // Handle messages from content script (e.g. open side panel from in-page badge)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === 'OPEN_SIDE_PANEL') {
-    // Save target appId asynchronously without awaiting (so user gesture token does not expire!)
+    // Validate and save target appId asynchronously without awaiting (so user gesture token does not expire!)
     if (message.appId) {
-      chrome.storage.local.set({ steamsquad_target_app_id: message.appId });
+      const cleanAppId = parseInt(message.appId, 10);
+      if (Number.isSafeInteger(cleanAppId) && cleanAppId > 0) {
+        chrome.storage.local.set({ steamsquad_target_app_id: cleanAppId });
+      }
     }
 
     // Call chrome.sidePanel.open() synchronously right inside the message handler
