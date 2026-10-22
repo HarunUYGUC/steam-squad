@@ -12,54 +12,152 @@ Eklentinin tüm üretim kodları ve ikonları mağaza standartlarına uygun olar
 
 ## 📋 1. Mağaza Listeleme Bilgileri (Store Listing)
 
-### 🏷️ Temel Bilgiler
-- **Eklenti Adı (Extension Name):**  
-  `SteamSquad — Steam Kütüphane Eşleştirici` *(veya `SteamSquad — Steam Library Matcher`)*
-- **Kısa Açıklama (Summary / Short Description - Max 132 Karakter):**  
-  `Arkadaş ekibinizin Steam ortak oyunlarını bulun; indirimler, çarkıfelek, veto modu ve tek tıkla Discord/WhatsApp anketleri.`
-  *(İngilizce alternatif: `Find shared Steam games with squad filters, live discounts, roulette wheel, veto arena, and 1-click Discord polls.`)*
+### 🏷️ Temel Bilgiler (Basic Info)
+- **Eklenti Adı (Extension Name):**
+  - **Türkçe:** `SteamSquad — Steam Kütüphane Eşleştirici`
+  - **English:** `SteamSquad — Steam Library Matcher`
+- **Kısa Açıklama (Summary / Short Description - Max 132 Karakter):**
+  - **Türkçe (127 Karakter):**  
+    `Arkadaş ekibinizin Steam ortak oyunlarını bulun; canlı indirimler, çarkıfelek, veto modu ve tek tıkla Discord/WhatsApp anketi.`
+  - **English (120 Characters):**  
+    `Find shared Steam games with your squad; live discounts, spin roulette, veto arena, and 1-click Discord/WhatsApp polls.`
 - **Kategori (Category):**  
   `Sosyal ve İletişim` (Social & Communication) veya `Eğlence` (Entertainment)
 - **Birincil Dil (Default Language):**  
-  `Türkçe` veya `İngilizce (English)`
+  `Türkçe` (Turkish) — *(İkinci listeleme dili: English)*
 
 ---
 
-### 📄 Detaylı Açıklama (Detailed Description)
+### 🇹🇷 Türkçe Detaylı Açıklama (Chrome Web Store İçin Hazır Metin)
+*(Chrome Web Store paneline doğrudan kopyalayıp yapıştırabilirsiniz)*
 
-```markdown
+```text
 🎮 "Bu akşam hep birlikte ne oynuyoruz?" kararsızlığına son!
 
-SteamSquad; 2 ila 10 kişilik arkadaş gruplarınızın Steam kütüphanelerini saniyeler içinde karşılaştıran, indirimleri yakalayan, anket ve çarkıfelek ile hızlıca oyun seçmenizi sağlayan modern bir Chrome Yan Panel (Side Panel) eklentisidir.
+SteamSquad; 2 ila 10 kişilik arkadaş grubunuzun Steam kütüphanelerini saniyeler içinde karşılaştıran, ortak oyunları bulan, indirimleri yakalayan, anket ve çarkıfelek ile saniyeler içinde oyuna başlamanızı sağlayan modern bir Chrome Yan Panel (Side Panel) eklentisidir.
 
-🌟 ÖNE ÇIKAN ÖZELLİKLER:
+Arkadaşlarınızın hiçbir şey yüklemesine gerek yok! Yalnızca Steam profil linklerini ekleyin, gerisini SteamSquad halletsin.
 
-👥 Dinamik Ekip & Alt Ekip Yönetimi:
-- Tüm Ekip veya özel alt gruplar (Örn: "Hafta Sonu 4'lüsü", "Duo Takımı", "5v5 CS Ekibi") oluşturun.
-- Kadro havuzundaki oyuncuları tek tıkla dahil edip çıkarın.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌟 ÖNE ÇIKAN ÖZELLİKLER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🎯 Akıllı Kesişim & Eksik Oyuncu Filtreleri:
-- %100 Herkeste Var: Kadrodaki herkesin kütüphanesinde olan ortak oyunları anında görün.
-- 1 Kişide & 2 Kişide Yok Modu: Eksik olan arkadaşınızı ve oyunun güncel Steam indirimli fiyatını anında tespit edin.
-- 💬 Tek Tıkla Arkadaşa Davet Mesajı: Eksik oyunu olan arkadaşınız için kopyalanabilir kişiselleştirilmiş davet mesajı üretin.
+👥 DİNAMİK KADRO & ALT EKİP YÖNETİMİ
+• 2 ila 10 kişilik arkadaş grubu desteği.
+• Özel ekipler oluşturun: "Duo Takımı", "Hafta Sonu 4'lüsü", "5v5 CS Ekibi".
+• O akşam kimler varsa tek tıkla aktif/pasif yapın; sonuçlar anında güncellensin.
 
-☑️ "Oynandı" Takibi:
-- Daha önce bitirdiğiniz veya oynadığınız oyunları tek tıkla işaretleyin.
-- Oynanan oyunlar Anket, Çarkıfelek ve Veto Arenası'ndan otomatik olarak hariç tutulur.
+🎯 AKILLI KÜTÜPHANE KESİŞİMİ
+• %100 Herkeste Var: Kadrodaki herkesin kütüphanesinde olan ortak oyunları tek bakışta görün.
+• 1 Kişide & 2 Kişide Yok: Sadece 1 veya 2 kişide eksik olan oyunları tespit edin.
+• Canlı Bölgesel Fiyat & İndirim: Eksik oyunların güncel Steam indirim oranını ve fiyatını (MENA-USD / US-USD) anında görün.
+• 💬 1-Tıkla Arkadaşı Dürt (Nudge): Eksik oyunu olan arkadaşınıza Steam indirim linkini içeren kişiselleştirilmiş hazır mesaj kopyalayın.
 
-📋 Tek Tıkla Discord & WhatsApp Anket Oluşturucu:
-- Arkadaşlarınızın eklenti kurmasına gerek kalmadan grup içi oylama yapmak için emojili, hazır formatlı anket metnini panoya kopyalayın.
+🏷️ STEAM MAĞAZASINDA CANLI ROZET
+• Steam mağazasında herhangi bir oyun sayfasına girdiğinizde sağ altta akıllı bir rozet belirir.
+• "Ekipteki 4/5 kişide var!" bilgisini ve sahip olanların avatarlarını anında görün.
+• Tek tıkla yan paneli açıp eksik arkadaşları inceleyin.
 
-🎡 Çarkıfelek & Veto Eleme Arenası:
-- Discord ekran paylaşımında dönebilen ses efektli çarkıfelek.
-- Sıra tabanlı Veto Eleme Arenası ile istemediğiniz oyunları eleyin, sona kalan şampiyonu oynayın!
+☑️ "OYNANDI" LİSTESİ & GELİŞMİŞ FİLTRELER
+• Daha önce ekiple bitirdiğiniz veya oynadığınız oyunları tek tıkla işaretleyin.
+• Tür Filtreleri: Co-Op / PvE, PvP / Rekabetçi, Parti / Eğlence, Hayatta Kalma.
+• "Hemen İndir Başla" Filtresi: 5 GB'tan küçük hızlı indirilebilen oyunları öne çıkarın.
+• Oynanma süresine, ada veya oyuncu kapasitesine göre akıllı sıralama.
 
-🔒 ŞİFRESİZ & %100 GÜVENLİ MİMARİ:
-- Şifre, API anahtarı zorunluluğu veya hesap girişi gerekmez.
-- Yalnızca açık Steam Profil Linki veya SteamID64 ile tamamen yerel tarayıcınız üzerinde çalışır.
+📋 1-TIKLA DISCORD & WHATSAPP ANKETİ
+• Eklenti kullanmayan arkadaşlarınızla grup içi oylama yapmak artık çok kolay!
+• Emojili, şık ve hazır anket metnini tek tıkla panoya kopyalayın, Discord veya WhatsApp grubunuza yapıştırın.
 
-💡 DESTEK & AÇIK KAYNAK:
-Sorularınız ve geri bildirimleriniz için GitHub: https://github.com/HarunUYGUC/steam-squad
+🎡 SES EFEKTLİ ÇARKIFELEK (ROULETTE)
+• Seçim yapamadığınızda kararı şansa bırakın!
+• Discord ekran paylaşımında dönebilen, ses efektli şık çarkıfelek.
+• Oynandı olarak işaretlenen oyunlar çarka otomatik olarak dahil edilmez.
+
+⚔️ VETO ELEME ARENASI (TURN-BASED VETO)
+• Sıra tabanlı eleme modu: Kadrodaki her oyuncu sırayla istemediği 1 oyunu eler.
+• Tüm elemelerden başarıyla geçen son oyun "Gecenin Şampiyonu" ilan edilir!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔒 %100 GÜVENLİ & YEREL MİMARİ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ Steam şifresi veya hesap girişi ASLA istenmez.
+✓ Tam Kütüphane Desteği (Önerilen): Kütüphanenizdeki yüzlerce oyunun tamamını (%100) eksiksiz çekebilmek için ücretsiz Steam Web API anahtarınızı ekleyebilirsiniz. Girdiğiniz API anahtarı ASLA harici bir sunucuya gönderilmez; yalnızca kendi tarayıcınızda (yerel olarak) saklanır.
+✓ Sıfır Veri Toplama: Hiçbir kişisel bilginiz toplanmaz, izlenmez veya kaydedilmez.
+✓ Tamamen yerel tarayıcınız üzerinde ve herkese açık Steam verileriyle çalışır.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 NASIL KULLANILIR?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Eklentiyi kurun ve tarayıcınızın sağ üstündeki SteamSquad ikonuna tıklayın (Yan Panel açılır).
+2. Arkadaşlarınızın Steam profil linklerini veya kullanıcı adlarını kadroya ekleyin.
+3. "Oyunlar" sekmesine geçin ve ekibinizle hemen oynamaya başlayın!
+```
+
+---
+
+### 🇬🇧 English Detailed Description (Ready for Chrome Web Store)
+*(Copy and paste directly into the English Store Listing tab)*
+
+```text
+🎮 Say goodbye to "What are we playing tonight?" indecision!
+
+SteamSquad is a modern, privacy-first Chrome Side Panel extension that compares your group's Steam libraries in seconds, identifies shared multiplayer games, tracks live Steam discounts, and helps your squad pick games via interactive polls, roulette wheel, and veto arena.
+
+Your friends don't need to install anything! Simply paste their public Steam profile links, and SteamSquad does the rest.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌟 KEY FEATURES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👥 DYNAMIC SQUAD & TEAM PRESETS
+• Supports 2 to 10 player squads.
+• Create custom team presets: "Duo Squad", "Weekend Four", "5v5 Competitive Crew".
+• Toggle players on and off with one click; overlap results update instantly.
+
+🎯 SMART LIBRARY OVERLAP MATCHING
+• 100% All Squad Owns: Instantly view games that everyone in your active squad already owns.
+• Missing 1 & Missing 2 Players: Discover games where only 1 or 2 friends need a copy.
+• Live Regional Prices & Discounts: See real-time Steam sale discounts and prices (MENA-USD & US-USD).
+• 💬 1-Click Friend Nudge: Copy personalized invitation messages with direct Steam store links for friends missing the game.
+
+🏷️ IN-PAGE STEAM STORE SQUAD BADGE
+• Browse Steam store pages normally — a floating badge appears on any game page!
+• See at a glance: "4/5 Squad members own this game" with player avatar tooltips.
+• One click opens the Side Panel to inspect your squad status.
+
+☑️ "PLAYED" TRACKER & ADVANCED FILTERS
+• Mark games you've already beaten or played with one click.
+• Game Mode Filters: Co-Op / PvE, PvP / Competitive, Party / Casual, Survival.
+• "Quick Download" Filter: Highlight games under 5 GB for instant gaming sessions.
+• Sort by squad playtime hours, title, or multiplayer player capacity.
+
+📋 1-CLICK DISCORD & WHATSAPP POLL GENERATOR
+• Group voting made effortless for friends on Discord or mobile!
+• Generate beautifully formatted, emoji-numbered voting polls and copy to clipboard in 1 click.
+
+🎡 SOUND-SYNTHESIZED ROULETTE WHEEL
+• Can't agree on what to play? Let the wheel decide!
+• High-performance animated canvas wheel with procedural sound effects, perfect for Discord screen sharing.
+• Games marked as "Played" are automatically excluded.
+
+⚔️ TURN-BASED VETO ARENA
+• Tactical elimination mode: Squad members take turns banning games they don't want to play tonight.
+• The last standing game is crowned the "Squad Champion"!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔒 100% PRIVATE & LOCAL ARCHITECTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ NO Steam passwords, credentials, or login required.
+✓ Full Library Support (Recommended): To fetch 100% of all games across large libraries, you can add your free Steam Web API key. Your API key is stored strictly locally in your browser and is NEVER transmitted to external servers.
+✓ ZERO personal data collection, telemetry, or third-party tracking.
+✓ Operates 100% locally in your browser using public Steam community data.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 HOW TO GET STARTED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Install SteamSquad and click the extension icon in Chrome's top toolbar to open the Side Panel.
+2. Add your friends' Steam profile URLs or vanity names.
+3. Switch to the "Matches" tab and jump straight into your squad's next game!
 ```
 
 ---
