@@ -93,13 +93,19 @@ Google Chrome Web Store inceleme ekibi için kopyalayıp yapıştırabileceğini
 
 ## 🖼️ 4. Mağaza Görselleri (Store Visuals)
 
-| Görsel Türü | Boyutlar | Durum |
-|---|---|---|
-| **Store Icon** | 128×128 PNG | ✅ `icons/icon-128.png` hazır |
-| **Ekran Görüntüsü 1 (Kadro)** | 1280×800 PNG | Yan panel kadro sekmesinin ekran görüntüsü |
-| **Ekran Görüntüsü 2 (Oyunlar & İndirimler)** | 1280×800 PNG | Ortak oyunlar ve indirimlerin ekran görüntüsü |
-| **Ekran Görüntüsü 3 (Anket & Çark)** | 1280×800 PNG | Çarkıfelek ve anket sekmesinin ekran görüntüsü |
-| **Küçük Tanıtım Kartı (Promo Tile)** | 440×280 PNG | İsteğe bağlı mağaza vitrin görseli |
+Tüm mağaza görselleri hem **Türkçe (`store-assets/tr/`)** hem de **İngilizce (`store-assets/en/`)** olarak Chrome Web Store standartlarında eksiksiz hazırlanmıştır:
+
+| Görsel Türü | Boyutlar | Dosya Konumu | Açıklama |
+|---|---|---|---|
+| **Store Icon** | 128×128 PNG | `icons/icon-128.png` | Resmi mağaza eklenti ikonu |
+| **Küçük Tanıtım Kartı (Small Promo Tile)** | 440×280 PNG | `store-assets/{lang}/promo-small-440x280.png` | Mağaza vitrin kartı |
+| **Büyük Marquee Banner (Marquee Promo)** | 1400×560 PNG | `store-assets/{lang}/promo-marquee-1400x560.png` | Mağaza üst vitrin banner'ı |
+| **Ekran Görüntüsü 1 (Kadro & Alt Ekipler)** | 1280×800 PNG | `store-assets/{lang}/screenshot-1-squad.png` | Şifresiz kadro ve alt ekip yönetimi |
+| **Ekran Görüntüsü 2 (Ortak Oyunlar & İndirim)** | 1280×800 PNG | `store-assets/{lang}/screenshot-2-matches.png` | 100% ortak oyunlar & canlı indirimler |
+| **Ekran Görüntüsü 3 (Anket Oluşturucu)** | 1280×800 PNG | `store-assets/{lang}/screenshot-3-poll.png` | 1-tıkla Discord & WhatsApp anketleri |
+| **Ekran Görüntüsü 4 (Çarkıfelek)** | 1280×800 PNG | `store-assets/{lang}/screenshot-4-roulette.png` | Ses efektli HTML5 karar çarkı |
+| **Ekran Görüntüsü 5 (Veto Arenası)** | 1280×800 PNG | `store-assets/{lang}/screenshot-5-veto.png` | Sıra tabanlı oyun eleme arenası |
+| **Ekran Görüntüsü 6 (Mağaza Rozeti)** | 1280×800 PNG | `store-assets/{lang}/screenshot-6-badge.png` | Steam mağazasında canlı yüzen rozet |
 
 ---
 

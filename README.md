@@ -24,23 +24,18 @@
 ## 📸 Screenshots
 
 <div align="center">
-  <img src="store-assets/screenshot-1-squad.png" alt="SteamSquad Squad Management & Presets" width="85%">
-  <p><em>Zero-credential squad manager: add friends via public links and toggle custom sub-teams with one click.</em></p>
+  <img src="store-assets/en/screenshot-1-squad.png" alt="SteamSquad Squad Management & Presets" width="85%">
+  <p><em>Zero-credential squad manager: add friends via public Steam profile links and toggle custom sub-teams with one click.</em></p>
   
   <br>
 
-  <img src="store-assets/screenshot-2-matches.png" alt="SteamSquad Match Engine & Live Discounts" width="85%">
-  <p><em>Smart overlap engine: reveals 100% shared games, missing players, live Steam discounts, and 1-click invite copy.</em></p>
+  <img src="store-assets/en/screenshot-2-matches.png" alt="SteamSquad Match Engine & Live Discounts" width="85%">
+  <p><em>Smart overlap engine: reveals 100% shared games, missing players, live regional Steam discounts, and 1-click invite copy.</em></p>
 
   <br>
 
-  <img src="store-assets/screenshot-4-roulette.png" alt="SteamSquad Decision Wheel Roulette" width="85%">
-  <p><em>Interactive 60 FPS HTML5 Canvas roulette wheel with Web Audio FX and direct Steam launch links.</em></p>
-
-  <br>
-
-  <img src="store-assets/screenshot-5-veto.png" alt="SteamSquad Veto Elimination Arena" width="85%">
-  <p><em>Turn-based Veto Elimination Arena: each player eliminates unwanted games until one champion remains.</em></p>
+  <img src="store-assets/en/screenshot-4-roulette.png" alt="SteamSquad Decision Wheel Roulette" width="85%">
+  <p><em>Interactive 60 FPS HTML5 Canvas roulette wheel with Web Audio sound effects and direct Steam launch links.</em></p>
 </div>
 
 ---
@@ -73,9 +68,10 @@ Every weekend, gaming groups jump on Discord and spend **30 to 45 minutes** in e
 - **Player Capacity Awareness:** Filters games based on active squad size (e.g., automatically flags 4-player co-op limits when 5 friends are active).
 - **Genre & Speed Filters:** Filter by Co-Op (PvE), PvP / Competitive, Party / Casual, Survival, or **"Quick Download (<5 GB)"** for spontaneous gaming sessions.
 
-### 3. 🏷️ Live Steam Store Pricing & Discount Integration
+### 3. 🏷️ Live Steam Store Pricing & Regional Discount Integration
 - **Real-Time Discount Detection:** Queries official Steam Store endpoints to display live discount percentages and regional pricing (e.g., `-%66 $2.24 USD` or `Free`).
-- **💬 1-Click Squad Invite (Nudge):** Generates a personalized, copyable invite message tailored for the missing friend, including current sale price and direct store links.
+- **Dynamic Regional Pricing:** Automatically displays MENA-USD (`cc=tr`) regional prices in Turkish mode and standard US-USD (`cc=us`) in English mode, with isolated dual-region local caching.
+- **💬 1-Click Squad Invite (Nudge):** Generates a personalized, copyable invite message tailored for missing friends, including current regional sale price, discount percentage, and direct store links.
 
 ### 4. 🎡 Interactive Decision Wheel & Veto Arena
 - **60 FPS HTML5 Canvas Roulette:** Automatically populates the spinning wheel with your filtered common games. Includes realistic pointer deceleration and Web Audio API synthesized clicking and fanfare sound effects.
@@ -90,10 +86,17 @@ Every weekend, gaming groups jump on Discord and spend **30 to 45 minutes** in e
 - Click *"Played"* on any game card to track completed games.
 - Played titles are automatically excluded from Polls, Roulette Wheels, and Veto Arenas to keep your recommendations fresh.
 
-### 7. 🏪 In-Page Steam Store Badge (Content Script)
-- **Automatic Store Detection:** While browsing any game on the official Steam Store (`store.steampowered.com/app/*`), a sleek, non-intrusive floating badge informs you if your squad owns the title.
-- **Smart Ownership Highlights:** Displays full-squad matches (`🎉 All Own`), partial ownership (`👥 3/4 Own`), and isolates missing members with avatar tooltips.
-- **Instant Game Focus in Side Panel:** Clicking the badge immediately opens the Side Panel directly to the Matches tab, auto-filtering and highlighting that specific game with an animated glow.
+### 7. 🏪 Smart In-Page Steam Store Badge (Content Script)
+- **Automatic Store Detection:** While browsing any game on the official Steam Store (`store.steampowered.com/app/*`), a sleek, non-intrusive floating badge informs you of your squad's ownership status in real time.
+- **Three Dynamic Modes:**
+  - **🎉 100% All-Own:** Glowing celebration badge when every active squad member owns the title.
+  - **👥 1-2 Players Missing:** Shows current owner avatars, isolates missing friends, and provides an **"Open Side Panel"** button that directly focuses and pulses the game card in your Side Panel.
+  - **ℹ️ 3+ Players Missing (Info-Only):** Displays a clean, informative squad preview with avatars and instant hover tooltips without cluttering side panel match tiers.
+- **Instant Hover Name Tooltips:** Hover over any player avatar to instantly reveal their persona name and library status.
+
+### 8. 🌐 Full Bilingual Localization (English & Turkish)
+- **1-Click Header Language Toggle:** Instant seamless switching between English (`EN`) and Turkish (`TR`) across all tabs, stat counters, tooltips, nudge templates, and voting poll exports.
+- **Native Chrome Manifest Localization:** Packaged with `_locales/en` and `_locales/tr` (`messages.json`) for full Chrome Web Store and browser-level internationalization.
 
 ---
 
@@ -136,8 +139,9 @@ Your squad owns 20+ common games and nobody can decide. Share your screen, head 
 - **Chrome Manifest V3:** Compliant with modern extension service workers, declarative configurations, and isolated contexts.
 - **Chrome Side Panel API:** Persistent, side-by-side browser workflow that never dismisses on outside clicks.
 - **Zero-Dependency Vanilla JavaScript (ES6+):** Pure modular JavaScript (`import`/`export`) with zero build bloat, delivering a featherlight bundle (<45 KB).
+- **Reactive Client-Side i18n Engine:** Lightweight modular localization engine (`i18n.js`) with subscriber pattern, dynamic regional price adaptation, and native Chrome `_locales` support without 3rd-party dependencies.
 - **Public Steam XML & Community Endpoints:** Fetches avatar, username, and owned game lists directly via public endpoints without authentication.
-- **Steam Store API & Queue Rate-Limiter:** Safely queries live store pricing with a 6-hour local cache and sequential request throttling to avoid 429 rate limits.
+- **Steam Store API & Queue Rate-Limiter:** Safely queries live store pricing with a 6-hour local cache, dual-region isolation (`tr` / `us`), and sequential request throttling to avoid 429 rate limits.
 - **HTML5 Canvas & Web Audio API:** Standalone 60 FPS spinning wheel physics and programmatic synthesized sound effects with zero external audio assets.
 - **Local Storage API (`chrome.storage.local`):** All squad configurations, custom teams, and played statuses remain 100% on your local machine.
 
@@ -147,12 +151,17 @@ Your squad owns 20+ common games and nobody can decide. Share your screen, head 
 
 ```text
 steam-squad/
+├── _locales/                  # Chrome Web Store internationalization
+│   ├── en/messages.json       # English extension store & UI messages
+│   └── tr/messages.json       # Turkish extension store & UI messages
 ├── manifest.json              # Manifest V3 configuration (Side Panel, Storage, Steam permissions)
 ├── CHROMEWEBSTORE.md          # Chrome Web Store listing copy and permission justifications
 ├── README.md                  # Comprehensive project documentation
 ├── LICENSE                    # MIT License (Copyright 2026 Harun Uyguç)
 ├── PRIVACY.md                 # Formal privacy policy documentation
-├── store-assets/              # High-resolution 1280x800 store & README screenshots
+├── store-assets/              # High-resolution store & README visuals
+│   ├── en/                    # English screenshots (1280x800) & promo banners (440x280, 1400x560)
+│   └── tr/                    # Turkish screenshots (1280x800) & promo banners (440x280, 1400x560)
 ├── docs/                      # Technical documentation and architecture diagrams
 ├── icons/                     # 16x16, 48x48, 128x128 high-res PNG extension icons
 └── src/
@@ -170,6 +179,7 @@ steam-squad/
     │   ├── poll-generator.js  # 1-click Discord and WhatsApp markdown poll generator
     │   └── roulette.js        # Canvas roulette wheel, audio synthesizer, and Veto arena
     └── services/
+        ├── i18n.js            # Reactive bilingual localization engine (EN/TR)
         ├── steam-service.js   # XML library parser, Store API client, and rate-limited queue
         └── game-metadata.js   # Curated multiplayer database (modes, capacities, size tiers)
 ```
