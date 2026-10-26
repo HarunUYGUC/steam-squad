@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-v1.4.4-blue?logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/ipddbahofdhagjeheeolfloklgoeppeo?utm_source=item-share-cb)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-v1.5.0-blue?logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/ipddbahofdhagjeheeolfloklgoeppeo?utm_source=item-share-cb)
 [![Version](https://img.shields.io/badge/version-1.5.0-informational.svg)](manifest.json)
 [![Manifest](https://img.shields.io/badge/Manifest-V3-success.svg)](manifest.json)
 [![Platform](https://img.shields.io/badge/Platform-Chrome_Side_Panel-orange.svg)](src/sidepanel/sidepanel.html)
