@@ -83,6 +83,11 @@ export const TRANSLATIONS = {
     promoSteamLensBtn: 'Chrome Mağazasında Gör ➔',
     promoDismissTitle: 'Bu öneriyi 7 gün gizle',
 
+    // 7-Day In-App Review Prompt
+    reviewPromptText: '🎮 1 haftadır SteamSquad ile berabersiniz! Oyun günlerinizi kolaylaştırdıysak 1 dakikanızı ayırıp puan verebilir misiniz?',
+    reviewPromptBtn: '⭐ Puan Ver',
+    reviewPromptClose: 'Kapat',
+
     // Tab 2: Matches & Overlap
     statFullTooltip: 'Kadroda seçilen herkesin kütüphanesinde olan oyunlar',
     statN1Tooltip: 'Kadroda sadece 1 kişide eksik olan oyunlar',
@@ -303,6 +308,11 @@ export const TRANSLATIONS = {
     promoSteamLensDesc: 'Stop scrolling through meme reviews! Summarize Steam player reviews with AI to see pros, cons, and performance at a glance.',
     promoSteamLensBtn: 'View on Chrome Store ➔',
     promoDismissTitle: 'Hide this suggestion for 7 days',
+
+    // 7-Day In-App Review Prompt
+    reviewPromptText: "🎮 You've been using SteamSquad for a week! If it made your game nights easier, would you mind leaving a quick review?",
+    reviewPromptBtn: '⭐ Leave a Review',
+    reviewPromptClose: 'Dismiss',
 
     // Tab 2: Matches & Overlap
     statFullTooltip: 'Games in every selected squad member\'s library',

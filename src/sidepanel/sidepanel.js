@@ -27,7 +27,7 @@ function sanitizeHttpUrl(url, fallback = '') {
     if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
       return escapeHtml(parsed.href);
     }
-  } catch {}
+  } catch { }
   return fallback;
 }
 
@@ -78,7 +78,7 @@ class SteamSquadApp {
       if (Array.isArray(stored.played_game_app_ids)) {
         this.overlapEngine.setPlayedGames(stored.played_game_app_ids);
       }
-    } catch {}
+    } catch { }
 
     this.squadManager.subscribe(() => {
       this.onSquadUpdated();
@@ -113,6 +113,35 @@ class SteamSquadApp {
       }
     } catch (e) {
       console.warn('[SteamSquad] Promo check error:', e);
+    }
+
+    // Check 7-day in-app review prompt eligibility (3s delay on launch)
+    try {
+      const reviewData = await chrome.storage.local.get([
+        'steamsquad_first_seen',
+        'steamsquad_review_dismissed'
+      ]);
+
+      let firstSeen = reviewData.steamsquad_first_seen;
+      if (!firstSeen) {
+        firstSeen = Date.now();
+        await chrome.storage.local.set({ steamsquad_first_seen: firstSeen });
+      }
+
+      const isDismissed = reviewData.steamsquad_review_dismissed === true;
+      const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+      const isEligible = (Date.now() - firstSeen) >= sevenDaysMs;
+
+      if (!isDismissed && isEligible) {
+        setTimeout(() => {
+          const banner = document.getElementById('review-prompt-banner');
+          if (banner) {
+            banner.classList.remove('hidden');
+          }
+        }, 3000);
+      }
+    } catch (e) {
+      console.warn('[SteamSquad] Review prompt check error:', e);
     }
   }
 
@@ -172,6 +201,14 @@ class SteamSquadApp {
       const activeMembers = this.squadManager ? this.squadManager.getActiveMembers() : [];
       countBadge.textContent = i18n.t('playersReady', { count: activeMembers.length });
     }
+
+    // 7-day in-app review prompt translations
+    const reviewText = document.getElementById('label-review-prompt-text');
+    if (reviewText) reviewText.textContent = i18n.t('reviewPromptText');
+    const reviewBtn = document.getElementById('label-review-prompt-btn');
+    if (reviewBtn) reviewBtn.textContent = i18n.t('reviewPromptBtn');
+    const reviewClose = document.getElementById('btn-close-review-prompt');
+    if (reviewClose) reviewClose.title = i18n.t('reviewPromptClose');
 
     document.documentElement.lang = i18n.getLanguage();
   }
@@ -617,6 +654,26 @@ class SteamSquadApp {
       }
     });
 
+    // 7-Day in-app review prompt close (permanent dismiss)
+    document.getElementById('btn-close-review-prompt')?.addEventListener('click', () => {
+      const banner = document.getElementById('review-prompt-banner');
+      if (banner) {
+        banner.classList.add('dismissing');
+        setTimeout(() => banner.classList.add('hidden'), 250);
+      }
+      chrome.storage.local.set({ steamsquad_review_dismissed: true });
+    });
+
+    // 7-Day in-app review prompt CTA click (permanent dismiss)
+    document.getElementById('btn-review-prompt-cta')?.addEventListener('click', () => {
+      const banner = document.getElementById('review-prompt-banner');
+      if (banner) {
+        banner.classList.add('dismissing');
+        setTimeout(() => banner.classList.add('hidden'), 250);
+      }
+      chrome.storage.local.set({ steamsquad_review_dismissed: true });
+    });
+
     // Filter - Match Tier Segmented control
     document.querySelectorAll('#match-tier-filter .segment-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -737,7 +794,7 @@ class SteamSquadApp {
       document.getElementById('btn-submode-roulette').classList.remove('active');
       document.getElementById('subview-veto').classList.add('active');
       document.getElementById('subview-roulette').classList.remove('active');
-      
+
       if (!this.vetoEngine || (this.vetoEngine.remainingGames.length === 0 && this.vetoEngine.eliminatedGames.length === 0)) {
         this.initVetoArena();
       } else {
@@ -1052,7 +1109,7 @@ class SteamSquadApp {
       const chip = document.createElement('div');
       const isActive = team.id === activeTeamId;
       chip.className = `preset-chip ${isActive ? 'active' : ''}`;
-      
+
       const isAllTeam = team.isDefault || team.id === 'team_all';
       const teamDisplayName = isAllTeam ? i18n.t('allSquadPreset') : escapeHtml(team.name);
 
@@ -1144,11 +1201,11 @@ class SteamSquadApp {
       const isFull = game.ownerCount === stats.activePlayerCount;
       const isN1 = game.ownerCount === stats.activePlayerCount - 1;
       const badgeClass = isFull ? 'badge-100' : (isN1 ? 'badge-n1' : 'badge-n2');
-      const badgeText = isFull 
-        ? i18n.t('badgeAllOwn') 
-        : (isN1 
-            ? i18n.t('badgeOneMissing', { count: game.ownerCount, total: stats.activePlayerCount }) 
-            : i18n.t('badgeTwoMissing', { count: game.ownerCount, total: stats.activePlayerCount }));
+      const badgeText = isFull
+        ? i18n.t('badgeAllOwn')
+        : (isN1
+          ? i18n.t('badgeOneMissing', { count: game.ownerCount, total: stats.activePlayerCount })
+          : i18n.t('badgeTwoMissing', { count: game.ownerCount, total: stats.activePlayerCount }));
 
       const matchingDetails = (game.storeDetails && (!game.storeDetails.countryCode || game.storeDetails.countryCode === countryCode))
         ? game.storeDetails
@@ -1183,25 +1240,25 @@ class SteamSquadApp {
       }
 
       const isSolo = game.metadata?.mode === 'solo' || game.metadata?.maxPlayers === 1;
-      const modeIcon = isSolo 
-        ? i18n.t('tagSingleplayer') 
-        : (game.metadata?.mode === 'coop' 
-            ? '🤝 Co-Op' 
-            : (game.metadata?.mode === 'pvp' 
-                ? '⚔️ PvP' 
-                : (game.metadata?.mode === 'party' 
-                    ? (isEn ? '🎲 Party' : '🎲 Parti') 
-                    : '🧗 Survival')));
+      const modeIcon = isSolo
+        ? i18n.t('tagSingleplayer')
+        : (game.metadata?.mode === 'coop'
+          ? '🤝 Co-Op'
+          : (game.metadata?.mode === 'pvp'
+            ? '⚔️ PvP'
+            : (game.metadata?.mode === 'party'
+              ? (isEn ? '🎲 Party' : '🎲 Parti')
+              : '🧗 Survival')));
 
-      const maxP = isSolo 
-        ? i18n.t('tagSoloCapacity') 
+      const maxP = isSolo
+        ? i18n.t('tagSoloCapacity')
         : (game.metadata?.maxPlayers ? i18n.t('tagMultiCapacity', { count: game.metadata.maxPlayers }) : i18n.t('tagMultiplayerGeneral'));
 
-      const sizeTag = game.metadata?.size === 'small' 
-        ? '⚡ <5 GB' 
-        : (game.metadata?.size === 'large' 
-            ? '📦 >20 GB' 
-            : '💾 5-20 GB');
+      const sizeTag = game.metadata?.size === 'small'
+        ? '⚡ <5 GB'
+        : (game.metadata?.size === 'large'
+          ? '📦 >20 GB'
+          : '💾 5-20 GB');
       const playedBadge = game.isPlayed ? `<span class="game-played-badge">${i18n.t('badgePlayedGame')}</span>` : '';
 
       card.innerHTML = `
@@ -1244,8 +1301,8 @@ class SteamSquadApp {
         this.initVetoArena();
         this.renderRoulette();
         if (this.activeTab === 'tab-poll') this.renderPoll();
-        this.showToast(isNowPlayed 
-          ? i18n.t('toastMarkedPlayed', { name: game.name }) 
+        this.showToast(isNowPlayed
+          ? i18n.t('toastMarkedPlayed', { name: game.name })
           : i18n.t('toastUnmarkedPlayed', { name: game.name }));
       });
 
@@ -1306,7 +1363,7 @@ class SteamSquadApp {
                 container.innerHTML = `<span class="price-pill" style="background-color: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; font-weight: 600;">${escapeHtml(details.finalFormatted)}</span>`;
               }
             }
-          }).catch(() => {});
+          }).catch(() => { });
         }
       }
     });
@@ -1359,7 +1416,7 @@ class SteamSquadApp {
       Promise.all(candidatesToFetch.map(g =>
         fetchGameStoreDetails(g.appId, pollCountryCode, pollStoreLang).then(d => {
           if (d) g.storeDetails = d;
-        }).catch(() => {})
+        }).catch(() => { })
       )).then(() => {
         if (this.activeTab === 'tab-poll') {
           const currentPreviewEl = document.getElementById('poll-preview-text');

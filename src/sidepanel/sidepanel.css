@@ -1608,3 +1608,98 @@ body {
   font-size: 11px;
 }
 
+/* 7-Day In-App Review Floating Prompt */
+.review-banner {
+  position: fixed;
+  bottom: 12px;
+  left: 10px;
+  right: 10px;
+  z-index: 9999;
+  background: linear-gradient(135deg, rgba(23, 38, 54, 0.98), rgba(16, 26, 37, 0.98));
+  border: 1px solid #66c0f4;
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 12px rgba(102, 192, 244, 0.25);
+  animation: slideUpReview 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+
+.review-banner.dismissing {
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+}
+
+@keyframes slideUpReview {
+  from {
+    transform: translateY(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.review-banner-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: #8f98a0;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.review-banner-close:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.review-banner-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 18px;
+}
+
+.review-banner-text {
+  font-size: 11.5px;
+  color: #e5f1f8;
+  line-height: 1.45;
+  margin: 0;
+  font-weight: 500;
+}
+
+.review-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-banner-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 14px;
+  font-size: 11px;
+  background: linear-gradient(90deg, #66c0f4 0%, #4196c7 100%);
+  color: #0e141b;
+  border-radius: 4px;
+  border: none;
+  transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+.review-banner-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
