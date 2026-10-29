@@ -76,6 +76,13 @@ export const TRANSLATIONS = {
     privacyAlertTitle: 'Gizli Profil Uyarısı!',
     privacyAlertText: 'Bazı oyuncuların oyun detayları gizli. Kütüphanelerinin görünmesi için Steam Gizlilik Ayarlarından "Oyun Detayları: Herkese Açık" yapılmalıdır.',
 
+    // Cross-promotion: SteamLens AI
+    promoCompanionTag: '✨ DİĞER EKLENTİME GÖZ ATIN',
+    promoSteamLensTitle: 'SteamLens AI — Steam İnceleme Özeti & Satın Alma Rehberi',
+    promoSteamLensDesc: 'Oyun incelemelerini tek tek okumakla vakit kaybetmeyin! Steam mağazasında binlerce yorumu yapay zekayla özetleyin, artı ve eksileri anında görün.',
+    promoSteamLensBtn: 'Chrome Mağazasında Gör ➔',
+    promoDismissTitle: 'Bu öneriyi 7 gün gizle',
+
     // Tab 2: Matches & Overlap
     statFullTooltip: 'Kadroda seçilen herkesin kütüphanesinde olan oyunlar',
     statN1Tooltip: 'Kadroda sadece 1 kişide eksik olan oyunlar',
@@ -289,6 +296,13 @@ export const TRANSLATIONS = {
     removeMember: 'Remove from Squad',
     privacyAlertTitle: 'Private Profile Warning!',
     privacyAlertText: 'Some players have private game details. For their libraries to appear, Steam Privacy Settings must be set to "Game Details: Public".',
+
+    // Cross-promotion: SteamLens AI
+    promoCompanionTag: '✨ CHECK OUT MY OTHER EXTENSION',
+    promoSteamLensTitle: "SteamLens AI — Steam Review Summarizer & Buyer's Guide",
+    promoSteamLensDesc: 'Stop scrolling through meme reviews! Summarize Steam player reviews with AI to see pros, cons, and performance at a glance.',
+    promoSteamLensBtn: 'View on Chrome Store ➔',
+    promoDismissTitle: 'Hide this suggestion for 7 days',
 
     // Tab 2: Matches & Overlap
     statFullTooltip: 'Games in every selected squad member\'s library',

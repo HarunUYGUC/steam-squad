@@ -99,6 +99,21 @@ class SteamSquadApp {
     } catch (e) {
       console.warn('[SteamSquad] Target app check error:', e);
     }
+
+    // Check SteamLens AI cross-promotion display eligibility
+    try {
+      const promoData = await chrome.storage.local.get([
+        'steamsquad_steamlens_snoozed_until',
+        'steamsquad_steamlens_permanent_dismiss'
+      ]);
+      const isPermanent = promoData.steamsquad_steamlens_permanent_dismiss === true;
+      const isSnoozed = promoData.steamsquad_steamlens_snoozed_until && Date.now() < promoData.steamsquad_steamlens_snoozed_until;
+      if (!isPermanent && !isSnoozed) {
+        document.getElementById('steamlens-promo-card')?.classList.remove('hidden');
+      }
+    } catch (e) {
+      console.warn('[SteamSquad] Promo check error:', e);
+    }
   }
 
   showToast(message, duration = 3000) {
@@ -222,6 +237,22 @@ class SteamSquadApp {
 
     const labelEmptySub = document.getElementById('label-empty-squad-sub');
     if (labelEmptySub) labelEmptySub.textContent = i18n.t('emptySquadSub');
+
+    // SteamLens promo card translations
+    const promoTag = document.getElementById('label-promo-companion-tag');
+    if (promoTag) promoTag.textContent = i18n.t('promoCompanionTag');
+
+    const promoTitle = document.getElementById('label-promo-steamlens-title');
+    if (promoTitle) promoTitle.textContent = i18n.t('promoSteamLensTitle');
+
+    const promoDesc = document.getElementById('label-promo-steamlens-desc');
+    if (promoDesc) promoDesc.textContent = i18n.t('promoSteamLensDesc');
+
+    const promoBtn = document.getElementById('label-promo-steamlens-btn');
+    if (promoBtn) promoBtn.textContent = i18n.t('promoSteamLensBtn');
+
+    const btnDismissPromo = document.getElementById('btn-dismiss-promo');
+    if (btnDismissPromo) btnDismissPromo.title = i18n.t('promoDismissTitle');
 
     this.renderSquadList();
     this.renderPresets();
@@ -559,6 +590,30 @@ class SteamSquadApp {
         await this.squadManager.clearAllMembers();
         this.renderSquadList();
         this.showToast(i18n.t('squadCleared'));
+      }
+    });
+
+    // SteamLens promo card dismissal (7 days snooze)
+    document.getElementById('btn-dismiss-promo')?.addEventListener('click', () => {
+      const card = document.getElementById('steamlens-promo-card');
+      if (card) {
+        card.classList.add('dismissing');
+        setTimeout(() => card.classList.add('hidden'), 250);
+      }
+      chrome.storage.local.set({
+        steamsquad_steamlens_snoozed_until: Date.now() + (7 * 24 * 60 * 60 * 1000)
+      });
+    });
+
+    // SteamLens promo card CTA click (permanent dismiss)
+    document.getElementById('btn-promo-steamlens-cta')?.addEventListener('click', () => {
+      chrome.storage.local.set({
+        steamsquad_steamlens_permanent_dismiss: true
+      });
+      const card = document.getElementById('steamlens-promo-card');
+      if (card) {
+        card.classList.add('dismissing');
+        setTimeout(() => card.classList.add('hidden'), 250);
       }
     });
 

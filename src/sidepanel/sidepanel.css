@@ -1513,3 +1513,98 @@ body {
   }
 }
 
+/* Companion Promotion Card (SteamLens AI) */
+.promo-card {
+  margin-top: 14px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, rgba(23, 38, 54, 0.95), rgba(16, 26, 37, 0.95));
+  border: 1px solid rgba(102, 192, 244, 0.35);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.promo-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(to bottom, #66c0f4, #1999d6);
+}
+
+.promo-card.dismissing {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+.promo-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.promo-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #66c0f4;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.promo-btn-close {
+  background: transparent;
+  border: none;
+  color: #8f98a0;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.promo-btn-close:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.promo-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.promo-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.promo-desc {
+  font-size: 11px;
+  color: #c7d5e0;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.promo-cta-btn {
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 14px;
+  font-size: 11px;
+}
+
