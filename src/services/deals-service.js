@@ -101,6 +101,10 @@ class DealsService {
     if (this.memoryCache.has(idStr)) {
       const cached = this.memoryCache.get(idStr);
       if (now - cached.timestamp < AFFILIATE_CONFIG.cacheDurationMs) {
+        if (cached.deal && cached.deal.dealUrl?.includes('cheapshark.com')) {
+          cached.deal.dealUrl = this.getHumbleSearchUrl(gameName);
+          cached.deal.humbleUrl = cached.deal.dealUrl;
+        }
         return cached.deal;
       }
     }
@@ -112,6 +116,11 @@ class DealsService {
         const stored = await chrome.storage.local.get(storageKey);
         if (stored[storageKey] && (now - stored[storageKey].timestamp < AFFILIATE_CONFIG.cacheDurationMs)) {
           const deal = stored[storageKey].deal;
+          if (deal && (!deal.dealUrl || deal.dealUrl.includes('cheapshark.com'))) {
+            deal.dealUrl = this.getHumbleSearchUrl(gameName);
+            deal.humbleUrl = deal.dealUrl;
+            chrome.storage.local.set({ [storageKey]: { deal, timestamp: stored[storageKey].timestamp } });
+          }
           this.memoryCache.set(idStr, { deal, timestamp: stored[storageKey].timestamp });
           return deal;
         }
@@ -299,15 +308,17 @@ class DealsService {
     const isEn = lang === 'en';
     const store = 'Humble Store';
     const priceText = deal?.price ? ` (${deal.price}${deal.savingsPercent > 0 ? ' -%' + deal.savingsPercent : ''})` : '';
-    const url = deal?.dealUrl || this.getHumbleSearchUrl(gameName);
+    const cleanUrl = (deal?.dealUrl && !deal.dealUrl.includes('cheapshark.com'))
+      ? deal.dealUrl
+      : this.getHumbleSearchUrl(gameName);
 
     if (isEn) {
       const playerText = missingPlayerName ? ` for ${missingPlayerName}` : '';
-      return `🎮 ${gameName} Steam key deal${playerText} on ${store}${priceText}: ${url}`;
+      return `🎮 ${gameName} Steam key deal${playerText} on ${store}${priceText}: ${cleanUrl}`;
     }
 
     const playerText = missingPlayerName ? ` (${missingPlayerName} eksik)` : '';
-    return `🎮 ${gameName} Steam key indirimi${playerText} — ${store}'da${priceText}: ${url}`;
+    return `🎮 ${gameName} Steam key indirimi${playerText} — ${store}'da${priceText}: ${cleanUrl}`;
   }
 }
 

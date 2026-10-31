@@ -1455,7 +1455,8 @@ class SteamSquadApp {
 
       placeholder.querySelector('.btn-deal-copy')?.addEventListener('click', async (e) => {
         e.stopPropagation();
-        const shareMsg = dealsService.getShareMessage(game.name, rawNames, deal, i18n.getLanguage());
+        const cleanDeal = { ...deal, dealUrl: humbleSearchUrl };
+        const shareMsg = dealsService.getShareMessage(game.name, rawNames, cleanDeal, i18n.getLanguage());
         const success = await PollGenerator.copyToClipboard(shareMsg);
         if (success) {
           this.showToast(i18n.t('toastDealCopied', { name: game.name }));
