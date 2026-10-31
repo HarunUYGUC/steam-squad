@@ -156,6 +156,8 @@ export const TRANSLATIONS = {
     toastDealCopied: '✅ {name} için Humble Store linki panoya kopyalandı!',
     nudgeDealAnnex: '\n🏷️ Humble Store Steam Key: {url}',
     pollDealAnnex: '   👉 {names} için Humble Store: {url}\n',
+    pollDiscordDealMask: '🔑 Humble Key',
+    pollWhatsappDealsHeader: '🔑 *İndirimli Key Fırsatları:*',
 
     toastMarkedPlayed: '✅ "{name}" oynandı olarak işaretlendi.',
     toastUnmarkedPlayed: '⬜ "{name}" oynandı listesinden çıkarıldı.',
@@ -392,6 +394,8 @@ export const TRANSLATIONS = {
     toastDealCopied: '✅ Humble Store link for {name} copied to clipboard!',
     nudgeDealAnnex: '\n🏷️ Humble Store Steam Key: {url}',
     pollDealAnnex: '   👉 Humble Store for {names}: {url}\n',
+    pollDiscordDealMask: '🔑 Humble Key',
+    pollWhatsappDealsHeader: '🔑 *Discounted Key Deals:*',
 
     toastMarkedPlayed: '✅ "{name}" marked as played.',
     toastUnmarkedPlayed: '⬜ "{name}" removed from played list.',

@@ -54,11 +54,13 @@ export class PollGenerator {
         }
       }
 
-      text += `${emoji} **${game.name}** — ${statusBadge} (${modeLabel} / ${maxP})\n`;
+      let dealMasked = '';
       if (game.dealUrl && !game.storeDetails?.isFree && game.missingMembers && game.missingMembers.length > 0) {
-        const missingNames = game.missingMembers.map(m => m.name).join(', ');
-        text += i18n.t('pollDealAnnex', { names: missingNames, url: game.dealUrl });
+        const maskLabel = i18n.t('pollDiscordDealMask');
+        dealMasked = ` ([${maskLabel}](${game.dealUrl}))`;
       }
+
+      text += `${emoji} **${game.name}** — ${statusBadge}${dealMasked} (${modeLabel} / ${maxP})\n`;
     });
 
     text += `\n${i18n.t('pollDiscordFooter')}`;
@@ -112,11 +114,17 @@ export class PollGenerator {
       }
 
       text += `${emoji} *${game.name}* — ${statusBadge} (${modeLabel} / ${maxP})\n`;
-      if (game.dealUrl && !game.storeDetails?.isFree && game.missingMembers && game.missingMembers.length > 0) {
-        const missingNames = game.missingMembers.map(m => m.name).join(', ');
-        text += i18n.t('pollDealAnnex', { names: missingNames, url: game.dealUrl });
-      }
     });
+
+    // Append clean footer block for discounted missing games in WhatsApp
+    const dealGames = selectedGames.filter(g => g.dealUrl && !g.storeDetails?.isFree && g.missingMembers?.length > 0);
+    if (dealGames.length > 0) {
+      text += `\n${i18n.t('pollWhatsappDealsHeader')}\n`;
+      dealGames.forEach(g => {
+        const priceInfo = g.storeDetails?.finalFormatted ? ` (${g.storeDetails.finalFormatted})` : '';
+        text += `• ${g.name}${priceInfo}: ${g.dealUrl}\n`;
+      });
+    }
 
     text += `\n${i18n.t('pollWhatsappFooter')}`;
     return text;

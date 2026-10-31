@@ -1529,19 +1529,24 @@ class SteamSquadApp {
       });
     }
 
-    // Enrich missing games with Humble Store search links
-    const missingCandidates = games.filter(g => g.missingMembers?.length > 0 && !g.storeDetails?.isFree && !g.dealUrl);
-    if (missingCandidates.length > 0) {
-      missingCandidates.forEach(g => {
-        g.dealUrl = dealsService.getHumbleSearchUrl(g.name);
-      });
-      if (this.activeTab === 'tab-poll') {
-        const currentPreviewEl = document.getElementById('poll-preview-text');
-        if (currentPreviewEl) {
-          currentPreviewEl.textContent = this.pollPlatform === 'discord'
-            ? PollGenerator.generateDiscordPoll(games, activeMembers.length, { limit: this.pollLimit })
-            : PollGenerator.generateWhatsAppPoll(games, activeMembers.length, { limit: this.pollLimit });
+    // Enrich missing games with Humble Store search links ONLY if they have an active discount
+    games.forEach(g => {
+      if (g.missingMembers?.length > 0 && !g.storeDetails?.isFree) {
+        const hasDiscount = Boolean(g.storeDetails?.hasDiscount || g.dealInfo?.hasDeal);
+        if (hasDiscount) {
+          g.dealUrl = dealsService.getHumbleSearchUrl(g.name);
+        } else {
+          g.dealUrl = null;
         }
+      }
+    });
+
+    if (this.activeTab === 'tab-poll') {
+      const currentPreviewEl = document.getElementById('poll-preview-text');
+      if (currentPreviewEl) {
+        currentPreviewEl.textContent = this.pollPlatform === 'discord'
+          ? PollGenerator.generateDiscordPoll(games, activeMembers.length, { limit: this.pollLimit })
+          : PollGenerator.generateWhatsAppPoll(games, activeMembers.length, { limit: this.pollLimit });
       }
     }
   }
