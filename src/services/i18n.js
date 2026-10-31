@@ -201,6 +201,8 @@ export const TRANSLATIONS = {
     pollMissingFreeBadge: '[{names} Hariç — Ücretsiz]',
     pollNoGames: '🎮 **SteamSquad**: Ortak oyun bulunamadı.',
     pollNoGamesWhatsapp: '🎮 *SteamSquad*: Ortak oyun bulunamadı.',
+    pollPlayedExclusionNote: '"Oyunlar" sekmesinde oynandı olarak işaretlenen oyunlar ankete dahil edilmez.',
+    rouletteMatchesFilterNote: 'Çark ve Veto\'daki oyunlar, "Oyunlar" sekmesindeki aktif filtrelerinize (Ortaklık, Tür vb.) göre listelenir.',
 
     // Tab 4: Roulette & Veto
     submodeRoulette: '🎡 Çarkıfelek (Roulette)',
@@ -450,6 +452,8 @@ export const TRANSLATIONS = {
     pollMissingFreeBadge: '[Except {names} — Free]',
     pollNoGames: '🎮 **SteamSquad**: No shared games found.',
     pollNoGamesWhatsapp: '🎮 *SteamSquad*: No shared games found.',
+    pollPlayedExclusionNote: 'Games marked as played in the "Matches" tab are automatically excluded from the poll.',
+    rouletteMatchesFilterNote: 'Games in Wheel & Veto reflect your active filters (Ownership, Mode, etc.) from the "Matches" tab.',
 
     // Tab 4: Roulette & Veto
     submodeRoulette: '🎡 Roulette Wheel',

@@ -1216,6 +1216,25 @@ body {
   font-weight: 600;
 }
 
+.tab-info-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(102, 192, 244, 0.05);
+  border: 1px solid rgba(102, 192, 244, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  font-size: 11px;
+  color: #8bb2d4;
+  line-height: 1.35;
+}
+
+.tab-info-note .info-icon {
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
 .poll-preview-container {
   background-color: #121820;
   border: 1px solid var(--border-color);

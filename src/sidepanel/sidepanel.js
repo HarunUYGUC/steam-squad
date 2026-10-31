@@ -443,6 +443,9 @@ class SteamSquadApp {
     const step3 = document.getElementById('label-poll-step3');
     if (step3) step3.innerHTML = i18n.t('pollStep3');
 
+    const labelPollPlayedNote = document.getElementById('label-poll-played-note');
+    if (labelPollPlayedNote) labelPollPlayedNote.textContent = i18n.t('pollPlayedExclusionNote');
+
     this.renderPoll();
   }
 
@@ -452,6 +455,9 @@ class SteamSquadApp {
 
     const labelSubmodeVeto = document.getElementById('label-submode-veto');
     if (labelSubmodeVeto) labelSubmodeVeto.textContent = i18n.t('submodeVeto');
+
+    const labelRouletteFilterNote = document.getElementById('label-roulette-filter-note');
+    if (labelRouletteFilterNote) labelRouletteFilterNote.textContent = i18n.t('rouletteMatchesFilterNote');
 
     const labelBtnRestore = document.getElementById('label-btn-restore-wheel');
     if (labelBtnRestore) labelBtnRestore.textContent = i18n.t('btnRestoreWheel');
@@ -1503,56 +1509,69 @@ class SteamSquadApp {
         badgeEl.textContent = 'DISCORD';
         badgeEl.style.backgroundColor = '#5865F2';
       }
-      previewEl.textContent = PollGenerator.generateDiscordPoll(games, activeMembers.length, { limit: this.pollLimit });
     } else {
       if (badgeEl) {
         badgeEl.textContent = 'WHATSAPP';
         badgeEl.style.backgroundColor = '#25D366';
       }
-      previewEl.textContent = PollGenerator.generateWhatsAppPoll(games, activeMembers.length, { limit: this.pollLimit });
     }
 
-    // Asynchronously enrich missing games storeDetails if needed for current region
-    const currentPollLang = i18n.getLanguage();
-    const pollCountryCode = currentPollLang === 'en' ? 'us' : 'tr';
-    const pollStoreLang = currentPollLang === 'en' ? 'english' : 'turkish';
-    const candidatesToFetch = games.filter(g => g.missingMembers?.length > 0 && (!g.storeDetails || g.storeDetails.countryCode !== pollCountryCode));
-    if (candidatesToFetch.length > 0) {
-      Promise.all(candidatesToFetch.map(g =>
-        fetchGameStoreDetails(g.appId, pollCountryCode, pollStoreLang).then(d => {
-          if (d) g.storeDetails = d;
-        }).catch(() => { })
-      )).then(() => {
-        if (this.activeTab === 'tab-poll') {
-          const currentPreviewEl = document.getElementById('poll-preview-text');
-          if (currentPreviewEl) {
-            currentPreviewEl.textContent = this.pollPlatform === 'discord'
-              ? PollGenerator.generateDiscordPoll(games, activeMembers.length, { limit: this.pollLimit })
-              : PollGenerator.generateWhatsAppPoll(games, activeMembers.length, { limit: this.pollLimit });
+    // Function to synchronize deal URLs and update preview in real-time
+    const updatePreview = () => {
+      if (this.activeTab !== 'tab-poll') return;
+
+      games.forEach(g => {
+        if (g.missingMembers?.length > 0 && !g.storeDetails?.isFree) {
+          const hasDiscount = Boolean(g.storeDetails?.hasDiscount || g.dealInfo?.hasDeal);
+          if (hasDiscount) {
+            g.dealUrl = dealsService.getHumbleSearchUrl(g.name);
+          } else {
+            g.dealUrl = null;
           }
         }
       });
-    }
 
-    // Enrich missing games with Humble Store search links ONLY if they have an active discount
-    games.forEach(g => {
-      if (g.missingMembers?.length > 0 && !g.storeDetails?.isFree) {
-        const hasDiscount = Boolean(g.storeDetails?.hasDiscount || g.dealInfo?.hasDeal);
-        if (hasDiscount) {
-          g.dealUrl = dealsService.getHumbleSearchUrl(g.name);
-        } else {
-          g.dealUrl = null;
-        }
-      }
-    });
-
-    if (this.activeTab === 'tab-poll') {
       const currentPreviewEl = document.getElementById('poll-preview-text');
       if (currentPreviewEl) {
         currentPreviewEl.textContent = this.pollPlatform === 'discord'
           ? PollGenerator.generateDiscordPoll(games, activeMembers.length, { limit: this.pollLimit })
           : PollGenerator.generateWhatsAppPoll(games, activeMembers.length, { limit: this.pollLimit });
       }
+    };
+
+    // Immediate initial render (renders cached data if available)
+    updatePreview();
+
+    // Asynchronously fetch missing Steam prices and Humble deals for top candidate games
+    const topCandidates = games.slice(0, Math.max(this.pollLimit, 10));
+    const currentPollLang = i18n.getLanguage();
+    const pollCountryCode = currentPollLang === 'en' ? 'us' : 'tr';
+    const pollStoreLang = currentPollLang === 'en' ? 'english' : 'turkish';
+
+    const fetchPromises = [];
+
+    topCandidates.forEach(g => {
+      // 1. Steam Store details (prices & discounts)
+      if (g.missingMembers?.length > 0 && (!g.storeDetails || g.storeDetails.countryCode !== pollCountryCode)) {
+        const storePromise = fetchGameStoreDetails(g.appId, pollCountryCode, pollStoreLang)
+          .then(d => { if (d) g.storeDetails = d; })
+          .catch(() => {});
+        fetchPromises.push(storePromise);
+      }
+
+      // 2. Humble Store deals (via CheapShark batch)
+      if (g.missingMembers?.length > 0 && !g.dealInfo) {
+        const dealPromise = dealsService.getBestDeal(g.appId, g.name)
+          .then(deal => { if (deal) g.dealInfo = deal; })
+          .catch(() => {});
+        fetchPromises.push(dealPromise);
+      }
+    });
+
+    if (fetchPromises.length > 0) {
+      Promise.all(fetchPromises).then(() => {
+        updatePreview();
+      });
     }
   }
 
