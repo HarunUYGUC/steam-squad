@@ -4,6 +4,7 @@
  */
 
 import { i18n } from '../services/i18n.js';
+import { dealsService } from '../services/deals-service.js';
 
 const NUMBER_EMOJIS = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'];
 
@@ -128,6 +129,62 @@ export class PollGenerator {
 
     text += `\n${i18n.t('pollWhatsappFooter')}`;
     return text;
+  }
+
+  /**
+   * Generates a rich Discord / WhatsApp share message for a winning game (Wheel or Veto)
+   * Enriches with discount, missing players, and Humble Partner affiliate link.
+   * @param {object} game - Winning game object
+   * @param {'roulette'|'veto'} source - Game decision origin
+   * @returns {string}
+   */
+  static generateWinnerShareText(game, source = 'roulette') {
+    if (!game) return '';
+
+    const mode = game.metadata?.mode?.toUpperCase() || 'COOP';
+    const isSolo = game.metadata?.mode === 'solo' || game.metadata?.maxPlayers === 1;
+    const players = isSolo
+      ? i18n.t('tagSoloCapacity')
+      : (game.metadata?.maxPlayers ? i18n.t('tagMultiCapacity', { count: game.metadata.maxPlayers }) : i18n.t('tagMultiplayerGeneral'));
+
+    const header = source === 'veto'
+      ? i18n.t('winnerShareVetoHeader')
+      : i18n.t('winnerShareWheelHeader');
+
+    const lines = [
+      header,
+      i18n.t('winnerShareGameLine', { name: game.name }),
+      i18n.t('winnerShareModeLine', { mode, players })
+    ];
+
+    const hasMissing = game.missingMembers && game.missingMembers.length > 0;
+    const hasDiscount = Boolean(game.storeDetails?.hasDiscount || game.dealInfo?.hasDeal);
+    const dealPrice = game.dealInfo?.price || (game.storeDetails?.finalFormatted || '');
+    const discountPercent = game.dealInfo?.savingsPercent || (game.storeDetails?.discountPercent || 0);
+
+    if (hasMissing) {
+      const missingNames = game.missingMembers.map(m => m.name || m.personaName).join(', ');
+      if (hasDiscount && discountPercent > 0) {
+        lines.push(i18n.t('winnerShareMissingWithDiscount', { names: missingNames, discount: discountPercent, price: dealPrice }));
+      } else {
+        lines.push(i18n.t('winnerShareMissing', { names: missingNames }));
+      }
+    } else if (hasDiscount && discountPercent > 0) {
+      lines.push(i18n.t('winnerShareDiscountActive', { discount: discountPercent, price: dealPrice }));
+    }
+
+    // Attach Humble Store affiliate link if missing players or active discount
+    if ((hasMissing || hasDiscount) && !game.storeDetails?.isFree) {
+      const humbleUrl = game.dealUrl || dealsService.getHumbleSearchUrl(game.name);
+      if (humbleUrl) {
+        lines.push(i18n.t('winnerShareHumbleLink', { url: humbleUrl }));
+      }
+    }
+
+    // Direct Steam store link
+    lines.push(i18n.t('winnerShareSteamLink', { link: `https://store.steampowered.com/app/${game.appId}` }));
+
+    return lines.join('\n');
   }
 
   /**

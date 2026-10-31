@@ -49,6 +49,7 @@ class SteamSquadApp {
     this.rouletteEngine = null;
     this.vetoEngine = null;
     this.lastRouletteWinner = null;
+    this.lastVetoWinner = null;
 
     this.init();
   }
@@ -473,6 +474,9 @@ class SteamSquadApp {
     const labelBtnShareWinner = document.getElementById('label-btn-share-winner');
     if (labelBtnShareWinner) labelBtnShareWinner.textContent = i18n.t('btnShareWinner');
 
+    const labelBtnShareVeto = document.getElementById('label-btn-share-veto');
+    if (labelBtnShareVeto) labelBtnShareVeto.textContent = i18n.t('btnShareVeto');
+
     const labelBtnResetVeto = document.getElementById('label-btn-reset-veto');
     if (labelBtnResetVeto) labelBtnResetVeto.textContent = i18n.t('btnResetVeto');
 
@@ -830,21 +834,22 @@ class SteamSquadApp {
     // Winner card share event
     document.getElementById('btn-share-winner')?.addEventListener('click', async () => {
       if (!this.lastRouletteWinner) return;
-      const w = this.lastRouletteWinner;
-      const mode = w.metadata?.mode?.toUpperCase() || 'COOP';
-      const isSolo = w.metadata?.mode === 'solo' || w.metadata?.maxPlayers === 1;
-      const p = isSolo
-        ? i18n.t('tagSoloCapacity')
-        : (w.metadata?.maxPlayers ? i18n.t('tagMultiCapacity', { count: w.metadata.maxPlayers }) : i18n.t('tagMultiplayerGeneral'));
-      const text = i18n.t('winnerShareTemplate', {
-        name: w.name,
-        mode: mode,
-        players: p,
-        link: `https://store.steampowered.com/app/${w.appId}`
-      });
+      const text = PollGenerator.generateWinnerShareText(this.lastRouletteWinner, 'roulette');
       const success = await PollGenerator.copyToClipboard(text);
       if (success) {
         this.showToast(i18n.t('winnerShareToast'));
+      } else {
+        this.showToast(i18n.t('pollCopyFailed'));
+      }
+    });
+
+    // Veto champion share event
+    document.getElementById('btn-share-veto')?.addEventListener('click', async () => {
+      if (!this.lastVetoWinner) return;
+      const text = PollGenerator.generateWinnerShareText(this.lastVetoWinner, 'veto');
+      const success = await PollGenerator.copyToClipboard(text);
+      if (success) {
+        this.showToast(i18n.t('vetoShareToast'));
       } else {
         this.showToast(i18n.t('pollCopyFailed'));
       }
@@ -1616,6 +1621,7 @@ class SteamSquadApp {
   }
 
   initVetoArena() {
+    this.lastVetoWinner = null;
     const activeMembers = this.squadManager.getActiveMembers();
     let games = (this.currentMatches?.filteredResults || []);
 
@@ -1698,6 +1704,7 @@ class SteamSquadApp {
 
   onVetoWinner(winner) {
     if (!winner) return;
+    this.lastVetoWinner = winner;
 
     const championCard = document.getElementById('veto-champion-card');
     const championTitle = document.getElementById('veto-champion-title');
