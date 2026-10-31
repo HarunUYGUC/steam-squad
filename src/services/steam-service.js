@@ -332,7 +332,9 @@ export async function fetchGameStoreDetails(appId, countryCode = 'tr', language 
     hasDiscount: false,
     headerImage: (!isNaN(safeAppId) && safeAppId > 0) ? `https://cdn.akamai.steamstatic.com/steam/apps/${safeAppId}/header.jpg` : '',
     countryCode: cleanCc,
-    language: cleanLang
+    language: cleanLang,
+    finalPriceCents: 0,
+    currency: 'USD'
   };
 
   if (isNaN(safeAppId) || safeAppId <= 0) {
@@ -387,7 +389,9 @@ export async function fetchGameStoreDetails(appId, countryCode = 'tr', language 
           hasDiscount: (priceOverview?.discount_percent || 0) > 0,
           headerImage: data.header_image || `https://cdn.akamai.steamstatic.com/steam/apps/${safeAppId}/header.jpg`,
           countryCode: cleanCc,
-          language: cleanLang
+          language: cleanLang,
+          finalPriceCents: priceOverview?.final || 0,
+          currency: priceOverview?.currency || 'USD'
         };
 
         memoryStoreCache.set(cacheKey, result);

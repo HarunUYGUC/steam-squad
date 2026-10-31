@@ -147,6 +147,16 @@ export const TRANSLATIONS = {
     btnShareNudgeTitle: '{names} için özel davet mesajı kopyala',
     badgeFree: 'Ücretsiz',
 
+    // Game Key Deals & Affiliate
+    btnHumbleSearch: '🔑 Humble Store\'da Ara',
+    btnKeyDeal: '🔑 {store} Key',
+    btnKeyDealDiscount: '🔑 {store}: {price} (-%{discount})',
+    btnCopyDeal: '📋 İndirim Linki',
+    btnCopyDealTitle: 'Arkadaşına göndermek için Humble Store Steam key linkini kopyala',
+    toastDealCopied: '✅ {name} için Humble Store linki panoya kopyalandı!',
+    nudgeDealAnnex: '\n🏷️ Humble Store Steam Key: {url}',
+    pollDealAnnex: '   👉 {names} için Humble Store: {url}\n',
+
     toastMarkedPlayed: '✅ "{name}" oynandı olarak işaretlendi.',
     toastUnmarkedPlayed: '⬜ "{name}" oynandı listesinden çıkarıldı.',
     toastNudgeCopied: '💬 {names} için davet mesajı panoya kopyalandı!',
@@ -372,6 +382,16 @@ export const TRANSLATIONS = {
     btnShareNudge: '💬 Share',
     btnShareNudgeTitle: 'Copy custom invite message for {names}',
     badgeFree: 'Free',
+
+    // Game Key Deals & Affiliate
+    btnHumbleSearch: '🔑 Search on Humble',
+    btnKeyDeal: '🔑 {store} Key',
+    btnKeyDealDiscount: '🔑 {store}: {price} (-{discount}%)',
+    btnCopyDeal: '📋 Copy Deal',
+    btnCopyDealTitle: 'Copy Humble Store Steam key link for your friend',
+    toastDealCopied: '✅ Humble Store link for {name} copied to clipboard!',
+    nudgeDealAnnex: '\n🏷️ Humble Store Steam Key: {url}',
+    pollDealAnnex: '   👉 Humble Store for {names}: {url}\n',
 
     toastMarkedPlayed: '✅ "{name}" marked as played.',
     toastUnmarkedPlayed: '⬜ "{name}" removed from played list.',

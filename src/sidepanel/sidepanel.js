@@ -8,6 +8,7 @@ import { OverlapEngine } from './overlap-engine.js';
 import { PollGenerator } from './poll-generator.js';
 import { RouletteEngine, VetoArenaEngine } from './roulette.js';
 import { fetchGameStoreDetails } from '../services/steam-service.js';
+import { dealsService } from '../services/deals-service.js';
 import { i18n } from '../services/i18n.js';
 
 function escapeHtml(str) {
@@ -1278,6 +1279,7 @@ class SteamSquadApp {
             <span class="pill-tag">${sizeTag}</span>
           </div>
           ${missingHtml}
+          <div class="deal-placeholder" data-deal-app-id="${safeAppId}"></div>
           <div class="game-footer-actions">
             <button class="btn btn-sm ${game.isPlayed ? 'btn-success' : 'btn-secondary'} game-played-btn" data-app-id="${safeAppId}" title="${escapeHtml(i18n.t('btnPlayedTitle'))}" style="flex: 1.1;">
               ${game.isPlayed ? i18n.t('btnPlayedChecked') : i18n.t('btnPlayedUnchecked')}
@@ -1329,13 +1331,18 @@ class SteamSquadApp {
           : i18n.t('nudgeCtaSingle');
 
         const storeLink = game.storeLink || `https://store.steampowered.com/app/${game.appId}`;
-        const msg = i18n.t('nudgeTemplate', {
+        let msg = i18n.t('nudgeTemplate', {
           names,
           name: game.name,
           priceContext,
           cta: callToAction,
           link: storeLink
         });
+
+        // Append deal link if present and game is not free
+        if (game.dealUrl && !game.storeDetails?.isFree) {
+          msg += i18n.t('nudgeDealAnnex', { url: game.dealUrl });
+        }
 
         const success = await PollGenerator.copyToClipboard(msg);
         if (success) {
@@ -1347,12 +1354,16 @@ class SteamSquadApp {
 
       listContainer.appendChild(card);
 
-      // Asynchronously fetch and display live price & discount from Steam Store API
+      // Render Humble Store key deal button immediately for missing games
       if (!isFull && game.missingMembers.length > 0) {
+        this.updateDealBanner(card, game);
+
+        // Asynchronously fetch and display live price & discount from Steam Store API
         if (!game.storeDetails || game.storeDetails.countryCode !== countryCode) {
           fetchGameStoreDetails(game.appId, countryCode, storeLang).then(details => {
             if (!details) return;
             game.storeDetails = details;
+
             const container = card.querySelector(`.discount-container[data-app-id="${game.appId}"]`);
             if (container) {
               if (details.hasDiscount) {
@@ -1363,10 +1374,99 @@ class SteamSquadApp {
                 container.innerHTML = `<span class="price-pill" style="background-color: rgba(255,255,255,0.12); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 4px; font-weight: 600;">${escapeHtml(details.finalFormatted)}</span>`;
               }
             }
+
+            this.updateDealBanner(card, game);
           }).catch(() => { });
         }
+
+        // Asynchronously fetch live Humble key deals via batch queue
+        dealsService.getBestDeal(game.appId, game.name).then(deal => {
+          if (!deal) return;
+          game.dealInfo = deal;
+          this.updateDealBanner(card, game);
+        }).catch(() => { });
       }
     });
+  }
+
+  updateDealBanner(card, game) {
+    if (!card || !game) return;
+    const safeAppId = escapeHtml(String(game.appId));
+    const placeholder = card.querySelector(`.deal-placeholder[data-deal-app-id="${game.appId}"]`);
+    if (!placeholder) return;
+
+    // 1. Never show deal banner for free games
+    if (game.storeDetails?.isFree) {
+      placeholder.innerHTML = '';
+      game.dealUrl = null;
+      return;
+    }
+
+    const rawNames = (game.missingMembers || []).map(m => m.name).join(', ');
+    const humbleSearchUrl = dealsService.getHumbleSearchUrl(game.name);
+    game.dealUrl = humbleSearchUrl;
+
+    const deal = game.dealInfo;
+    const steamPriceCents = game.storeDetails?.finalPriceCents || 0;
+    const steamPrice = steamPriceCents / 100;
+
+    // Check if Humble deal is ACTUALLY cheaper than Steam
+    const isCheaperThanSteam = Boolean(
+      deal?.hasDeal &&
+      deal?.priceNumeric > 0 &&
+      steamPrice > 0 &&
+      deal.priceNumeric < steamPrice
+    );
+
+    if (isCheaperThanSteam) {
+      // Highlighted deal banner with price, savings percent, and copy button
+      const priceDisplay = `${escapeHtml(deal.price)} USD`;
+      const savingsDisplay = deal.savingsPercent > 0 ? `<span class="deal-savings-badge">-%${deal.savingsPercent}</span>` : '';
+      const ctaLabel = `Humble: ${escapeHtml(deal.price)}`;
+
+      placeholder.innerHTML = `
+        <div class="game-deal-banner">
+          <div class="deal-banner-left">
+            <span class="deal-store-tag">🔑 Humble</span>
+            <span class="deal-price-text">${priceDisplay}</span>
+            ${savingsDisplay}
+          </div>
+          <div class="deal-banner-actions">
+            <a href="${escapeHtml(humbleSearchUrl)}" target="_blank" rel="noopener noreferrer" class="btn-deal-cta" title="${escapeHtml(i18n.t('btnStore'))}">
+              ${ctaLabel} ➔
+            </a>
+            <button class="btn-deal-copy" data-app-id="${safeAppId}" title="${escapeHtml(i18n.t('btnCopyDealTitle'))}">
+              📋
+            </button>
+          </div>
+        </div>
+      `;
+
+      placeholder.querySelector('.btn-deal-copy')?.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const shareMsg = dealsService.getShareMessage(game.name, rawNames, deal, i18n.getLanguage());
+        const success = await PollGenerator.copyToClipboard(shareMsg);
+        if (success) {
+          this.showToast(i18n.t('toastDealCopied', { name: game.name }));
+        }
+      });
+    } else {
+      // Quiet fallback link when there is no cheaper deal
+      const searchLabel = escapeHtml(i18n.t('btnHumbleSearch'));
+
+      placeholder.innerHTML = `
+        <div class="game-deal-banner game-deal-banner-quiet">
+          <div class="deal-banner-left">
+            <span class="deal-store-tag">🔑 Humble</span>
+          </div>
+          <div class="deal-banner-actions">
+            <a href="${escapeHtml(humbleSearchUrl)}" target="_blank" rel="noopener noreferrer" class="btn-deal-cta btn-deal-quiet" title="${searchLabel}">
+              ${searchLabel} ➔
+            </a>
+          </div>
+        </div>
+      `;
+    }
   }
 
   renderPoll() {
@@ -1427,6 +1527,22 @@ class SteamSquadApp {
           }
         }
       });
+    }
+
+    // Enrich missing games with Humble Store search links
+    const missingCandidates = games.filter(g => g.missingMembers?.length > 0 && !g.storeDetails?.isFree && !g.dealUrl);
+    if (missingCandidates.length > 0) {
+      missingCandidates.forEach(g => {
+        g.dealUrl = dealsService.getHumbleSearchUrl(g.name);
+      });
+      if (this.activeTab === 'tab-poll') {
+        const currentPreviewEl = document.getElementById('poll-preview-text');
+        if (currentPreviewEl) {
+          currentPreviewEl.textContent = this.pollPlatform === 'discord'
+            ? PollGenerator.generateDiscordPoll(games, activeMembers.length, { limit: this.pollLimit })
+            : PollGenerator.generateWhatsAppPoll(games, activeMembers.length, { limit: this.pollLimit });
+        }
+      }
     }
   }
 

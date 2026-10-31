@@ -174,6 +174,7 @@ Google Chrome Web Store inceleme ekibi için kopyalayıp yapıştırabileceğini
 | **`https://steamcommunity.com/*`** | `Required to fetch public Steam profile game libraries in XML format without requiring account login or credentials.` |
 | **`https://store.steampowered.com/*`** | `Required to fetch public game prices, discounts, and store banners from the Steam Store API for missing game suggestions.` |
 | **`https://api.steampowered.com/*`** | `Required to fetch game lists via Steam Web API if the user optionally enters a free Steam API key for large 100+ game libraries.` |
+| **`https://www.cheapshark.com/*`** | `Required to query public game discount pricing across authorized digital stores (Humble Store) to compare against Steam prices for unowned squad games.` |
 
 ---
 

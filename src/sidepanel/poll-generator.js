@@ -55,6 +55,10 @@ export class PollGenerator {
       }
 
       text += `${emoji} **${game.name}** — ${statusBadge} (${modeLabel} / ${maxP})\n`;
+      if (game.dealUrl && !game.storeDetails?.isFree && game.missingMembers && game.missingMembers.length > 0) {
+        const missingNames = game.missingMembers.map(m => m.name).join(', ');
+        text += i18n.t('pollDealAnnex', { names: missingNames, url: game.dealUrl });
+      }
     });
 
     text += `\n${i18n.t('pollDiscordFooter')}`;
@@ -108,6 +112,10 @@ export class PollGenerator {
       }
 
       text += `${emoji} *${game.name}* — ${statusBadge} (${modeLabel} / ${maxP})\n`;
+      if (game.dealUrl && !game.storeDetails?.isFree && game.missingMembers && game.missingMembers.length > 0) {
+        const missingNames = game.missingMembers.map(m => m.name).join(', ');
+        text += i18n.t('pollDealAnnex', { names: missingNames, url: game.dealUrl });
+      }
     });
 
     text += `\n${i18n.t('pollWhatsappFooter')}`;

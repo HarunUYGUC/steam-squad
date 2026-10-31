@@ -2,8 +2,8 @@
 
 <div align="center">
 
-[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-v1.5.1-blue?logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/ipddbahofdhagjeheeolfloklgoeppeo?utm_source=item-share-cb)
-[![Version](https://img.shields.io/badge/version-1.5.1-informational.svg)](manifest.json)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-v1.6.0-blue?logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/ipddbahofdhagjeheeolfloklgoeppeo?utm_source=item-share-cb)
+[![Version](https://img.shields.io/badge/version-1.6.0-informational.svg)](manifest.json)
 [![Manifest](https://img.shields.io/badge/Manifest-V3-success.svg)](manifest.json)
 [![Platform](https://img.shields.io/badge/Platform-Chrome_Side_Panel-orange.svg)](src/sidepanel/sidepanel.html)
 [![Privacy](https://img.shields.io/badge/Privacy-Zero_Password_%7C_Local--Only-a4d007.svg)](PRIVACY.md)
@@ -97,6 +97,12 @@ Every weekend, gaming groups jump on Discord and spend **30 to 45 minutes** in e
 ### 8. 🌐 Full Bilingual Localization (English & Turkish)
 - **1-Click Header Language Toggle:** Instant seamless switching between English (`EN`) and Turkish (`TR`) across all tabs, stat counters, tooltips, nudge templates, and voting poll exports.
 - **Native Chrome Manifest Localization:** Packaged with `_locales/en` and `_locales/tr` (`messages.json`) for full Chrome Web Store and browser-level internationalization.
+
+### 9. 🔑 Authorized Steam Key Deals & Humble Partner Integration
+- **Real-Time Key Discounts:** Scans authorized digital storefronts (Humble Bundle) via high-performance batch endpoints to find Steam key deals cheaper than Steam itself (e.g., `-%85 $3.74 USD`).
+- **Smart Price Comparison:** Intelligently compares external key prices against Steam's regional store price—highlighting deals only when an authorized seller is genuinely cheaper.
+- **Title Sanitization & Direct Affiliate Search:** Automatically strips trademarks (`™`, `®`) and verbose edition suffixes for accurate Humble Store search results with direct affiliate tracking (`?partner=steamsquad`).
+- **1-Click Share Deal:** Allows squad leaders to copy customized deal messages and attaches deal links to Discord/WhatsApp voting polls for missing players.
 
 ---
 
