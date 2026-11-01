@@ -114,6 +114,7 @@ export const TRANSLATIONS = {
 
     searchPlaceholder: 'Oyun ara...',
     sortMostPlayed: '⏱️ En Çok Oynanan',
+    sortDiscount: '🔥 En Yüksek İndirim',
     sortNameAZ: '🔤 İsim (A-Z)',
     sortPlayerCapacity: '👥 Oyuncu Kapasitesi',
 
@@ -365,6 +366,7 @@ export const TRANSLATIONS = {
 
     searchPlaceholder: 'Search games...',
     sortMostPlayed: '⏱️ Most Played',
+    sortDiscount: '🔥 Highest Discount',
     sortNameAZ: '🔤 Name (A-Z)',
     sortPlayerCapacity: '👥 Player Capacity',
 

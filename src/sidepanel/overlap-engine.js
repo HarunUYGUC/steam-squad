@@ -8,14 +8,29 @@ import { SIZE_TIERS } from '../services/game-metadata.js';
 export class OverlapEngine {
   constructor() {
     this.playedGames = new Set();
+    this.enrichedDataMap = new Map();
     this.filters = {
       matchTier: 'all_100',     // 'all_100', 'all_with_n1', 'all_with_n2'
       gameMode: 'all',          // 'all', 'coop', 'pvp', 'party', 'survival'
       sizeTier: 'all',          // 'all', 'small' (<5GB)
       hidePlayed: false,        // hide games marked as played
       searchQuery: '',
-      sortBy: 'hours'           // 'hours', 'name', 'maxPlayers'
+      sortBy: 'hours'           // 'hours', 'discount', 'name', 'maxPlayers'
     };
+  }
+
+  /**
+   * Store enriched metadata (storeDetails, dealInfo) for an appId
+   * @param {number|string} appId 
+   * @param {{ storeDetails?: any, dealInfo?: any }} data 
+   */
+  setEnrichedData(appId, data) {
+    if (!appId || !data) return;
+    const key = Number(appId);
+    const existing = this.enrichedDataMap.get(key) || {};
+    if (data.storeDetails !== undefined) existing.storeDetails = data.storeDetails;
+    if (data.dealInfo !== undefined) existing.dealInfo = data.dealInfo;
+    this.enrichedDataMap.set(key, existing);
   }
 
   /**
@@ -120,7 +135,9 @@ export class OverlapEngine {
       game.ownerCount = game.owners.length;
       game.matchPercentage = Math.round((game.ownerCount / totalActive) * 100);
       game.averageHours = game.ownerCount > 0 ? (game.totalHours / game.ownerCount).toFixed(1) : 0;
-      game.storeDetails = null; // Enriched on-demand in UI
+      const enriched = this.enrichedDataMap.get(Number(appId)) || {};
+      game.storeDetails = enriched.storeDetails || null;
+      game.dealInfo = enriched.dealInfo || null;
       game.isPlayed = this.playedGames.has(Number(appId));
 
       processedGames.push(game);
@@ -165,19 +182,32 @@ export class OverlapEngine {
       pool = pool.filter(g => g.name.toLowerCase().includes(q));
     }
 
-    // Sort results
-    pool.sort((a, b) => {
-      if (this.filters.sortBy === 'hours') {
+    // Sort game lists according to current active sort mode
+    const sortGamesList = (list) => {
+      list.sort((a, b) => {
+        if (this.filters.sortBy === 'discount') {
+          const discA = Math.max(a.dealInfo?.savingsPercent || 0, a.storeDetails?.discountPercent || 0);
+          const discB = Math.max(b.dealInfo?.savingsPercent || 0, b.storeDetails?.discountPercent || 0);
+          if (discB !== discA) {
+            return discB - discA;
+          }
+          return b.totalHours - a.totalHours;
+        }
+        if (this.filters.sortBy === 'name') {
+          return a.name.localeCompare(b.name);
+        }
+        if (this.filters.sortBy === 'maxPlayers') {
+          return (b.metadata?.maxPlayers || 0) - (a.metadata?.maxPlayers || 0);
+        }
+        // Default: 'hours' (most played)
         return b.totalHours - a.totalHours;
-      }
-      if (this.filters.sortBy === 'name') {
-        return a.name.localeCompare(b.name);
-      }
-      if (this.filters.sortBy === 'maxPlayers') {
-        return (b.metadata?.maxPlayers || 0) - (a.metadata?.maxPlayers || 0);
-      }
-      return 0;
-    });
+      });
+    };
+
+    sortGamesList(fullMatches);
+    sortGamesList(n1Matches);
+    sortGamesList(n2Matches);
+    sortGamesList(pool);
 
     return {
       fullMatches,

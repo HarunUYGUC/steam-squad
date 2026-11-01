@@ -361,6 +361,8 @@ class SteamSquadApp {
     // Sort options
     const optHours = document.getElementById('opt-sort-hours');
     if (optHours) optHours.textContent = i18n.t('sortMostPlayed');
+    const optDiscount = document.getElementById('opt-sort-discount');
+    if (optDiscount) optDiscount.textContent = i18n.t('sortDiscount');
     const optName = document.getElementById('opt-sort-name');
     if (optName) optName.textContent = i18n.t('sortNameAZ');
     const optMaxPlayers = document.getElementById('opt-sort-maxplayers');
@@ -1374,6 +1376,7 @@ class SteamSquadApp {
           fetchGameStoreDetails(game.appId, countryCode, storeLang).then(details => {
             if (!details) return;
             game.storeDetails = details;
+            this.overlapEngine.setEnrichedData(game.appId, { storeDetails: details });
 
             const container = card.querySelector(`.discount-container[data-app-id="${game.appId}"]`);
             if (container) {
@@ -1387,17 +1390,43 @@ class SteamSquadApp {
             }
 
             this.updateDealBanner(card, game);
+            this.checkDiscountSortReorder();
           }).catch(() => { });
         }
 
         // Asynchronously fetch live Humble key deals via batch queue
-        dealsService.getBestDeal(game.appId, game.name).then(deal => {
-          if (!deal) return;
-          game.dealInfo = deal;
-          this.updateDealBanner(card, game);
-        }).catch(() => { });
+        if (!game.dealInfo) {
+          dealsService.getBestDeal(game.appId, game.name).then(deal => {
+            if (!deal) return;
+            game.dealInfo = deal;
+            this.overlapEngine.setEnrichedData(game.appId, { dealInfo: deal });
+            this.updateDealBanner(card, game);
+            this.checkDiscountSortReorder();
+          }).catch(() => { });
+        }
       }
     });
+  }
+
+  /**
+   * Re-evaluates matches sort order when games are sorted by discount and new discount data arrives
+   */
+  checkDiscountSortReorder() {
+    if (this.overlapEngine.filters.sortBy !== 'discount' || this.activeTab !== 'tab-matches') return;
+    if (this._discountReorderTimer) clearTimeout(this._discountReorderTimer);
+    this._discountReorderTimer = setTimeout(async () => {
+      this._discountReorderTimer = null;
+      if (this.overlapEngine.filters.sortBy !== 'discount' || this.activeTab !== 'tab-matches') return;
+
+      const activeMembers = this.squadManager.getActiveMembers();
+      const nextMatches = await this.overlapEngine.computeOverlap(activeMembers);
+      const currentIds = (this.currentMatches?.filteredResults || []).map(g => g.appId).join(',');
+      const nextIds = (nextMatches?.filteredResults || []).map(g => g.appId).join(',');
+
+      if (currentIds !== nextIds) {
+        await this.renderMatches();
+      }
+    }, 400);
   }
 
   updateDealBanner(card, game) {
@@ -1555,7 +1584,12 @@ class SteamSquadApp {
       // 1. Steam Store details (prices & discounts)
       if (g.missingMembers?.length > 0 && (!g.storeDetails || g.storeDetails.countryCode !== pollCountryCode)) {
         const storePromise = fetchGameStoreDetails(g.appId, pollCountryCode, pollStoreLang)
-          .then(d => { if (d) g.storeDetails = d; })
+          .then(d => {
+            if (d) {
+              g.storeDetails = d;
+              this.overlapEngine.setEnrichedData(g.appId, { storeDetails: d });
+            }
+          })
           .catch(() => {});
         fetchPromises.push(storePromise);
       }
@@ -1563,7 +1597,12 @@ class SteamSquadApp {
       // 2. Humble Store deals (via CheapShark batch)
       if (g.missingMembers?.length > 0 && !g.dealInfo) {
         const dealPromise = dealsService.getBestDeal(g.appId, g.name)
-          .then(deal => { if (deal) g.dealInfo = deal; })
+          .then(deal => {
+            if (deal) {
+              g.dealInfo = deal;
+              this.overlapEngine.setEnrichedData(g.appId, { dealInfo: deal });
+            }
+          })
           .catch(() => {});
         fetchPromises.push(dealPromise);
       }
