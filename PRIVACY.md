@@ -1,7 +1,7 @@
 # 🔒 Privacy Policy — SteamSquad
 
 **Effective Date:** September 1, 2026  
-**Last Updated:** September 1, 2026
+**Last Updated:** November 1, 2026
 
 SteamSquad ("we", "our", or "the Extension") is committed to protecting your privacy. This Privacy Policy describes how SteamSquad handles data and information.
 
@@ -26,16 +26,26 @@ SteamSquad operates entirely client-side within your browser:
 ---
 
 ## 3. Third-Party Services
-The Extension interacts only with the following official Valve / Steam endpoints:
+The Extension interacts only with the following external endpoints strictly for public game and profile data:
 - `https://steamcommunity.com` (Public XML Profile Data)
 - `https://store.steampowered.com` (Public Game Pricing & Discount Data)
 - `https://api.steampowered.com` (Steam Web API, if user provides an API key)
+- `https://www.cheapshark.com` (Public pricing and discount rates across authorized digital PC storefronts; zero personal data transmitted)
 
-These interactions are subject to Valve Corporation's Privacy Policy.
+These interactions are subject to the respective privacy policies of Valve Corporation and CheapShark.
 
 ---
 
-## 4. User Rights & Data Deletion
+## 4. Affiliate & Commercial Disclosures
+SteamSquad believes in complete transparency regarding external links:
+- **Affiliate Links:** SteamSquad may display direct links to authorized digital game storefronts (such as Humble Bundle). When you click these links and make a purchase, the developer may earn a small affiliate commission at no additional cost to you.
+- **Authorized Retailers Only:** We only feature and link to 100% legitimate, publisher-authorized digital PC storefronts (e.g., Humble Store). We never promote or integrate unauthorized gray-market key resellers.
+- **Editorial & Algorithm Independence:** Game recommendations, match results, and decision roulette outcomes are calculated purely algorithmically based on your squad's ownership and play history. Commercial partnerships never influence match results.
+- **Disclaimer:** SteamSquad is an independent open-source tool and is not directly affiliated with, endorsed, or sponsored by Valve Corporation or Humble Bundle Inc.
+
+---
+
+## 5. User Rights & Data Deletion
 You have full control over all stored data:
 - You can remove individual squad members or teams at any time.
 - Clicking the **"Tümünü Temizle" / "Clear All"** button instantly deletes all stored squad members and teams.
@@ -43,6 +53,6 @@ You have full control over all stored data:
 
 ---
 
-## 5. Contact & Open Source
+## 6. Contact & Open Source
 SteamSquad is an open-source project. If you have questions or inquiries regarding this policy, please contact us via our GitHub repository:  
 👉 [https://github.com/HarunUYGUC/steam-squad](https://github.com/HarunUYGUC/steam-squad)

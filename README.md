@@ -227,7 +227,8 @@ SteamSquad adheres strictly to a zero-login, privacy-first model:
 - **Zero Passwords or Credentials:** SteamSquad never asks for your Steam account password or OAuth login.
 - **100% Client-Side Storage:** All squad member names, avatars, custom teams, and settings are stored locally in your browser's private `chrome.storage.local`.
 - **No Telemetry / No Tracking:** We do not operate remote tracking servers, collect personal data, or sell your information.
-- **Direct Official Communication:** All network requests are made directly from your browser to official Valve endpoints (`steamcommunity.com` and `store.steampowered.com`).
+- **Official & Public APIs Only:** Network requests are made strictly to official Valve endpoints (`steamcommunity.com` and `store.steampowered.com`) and CheapShark for public deal data. No personal data is transmitted.
+- **Transparent Affiliate Disclosure:** Store links to authorized retailers (e.g., Humble Store) may earn a small affiliate commission at no extra cost to users.
 - Read our full [Privacy Policy](PRIVACY.md) for complete details.
 
 ---
