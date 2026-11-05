@@ -1445,8 +1445,6 @@ class SteamSquadApp {
     const rawNames = (game.missingMembers || []).map(m => m.name).join(', ');
     const deal = game.dealInfo;
     const storeName = deal?.storeName || 'GameBillet';
-    const activeDealUrl = deal?.dealUrl || dealsService.getGameBilletSearchUrl(game.name);
-    game.dealUrl = activeDealUrl;
 
     const steamPriceCents = game.storeDetails?.finalPriceCents || 0;
     const steamPrice = steamPriceCents / 100;
@@ -1455,11 +1453,13 @@ class SteamSquadApp {
     const isCheaperThanSteam = Boolean(
       deal?.hasDeal &&
       deal?.priceNumeric > 0 &&
-      steamPrice > 0 &&
-      deal.priceNumeric < steamPrice
+      (steamPrice <= 0 ? deal?.savingsPercent > 0 : deal.priceNumeric < steamPrice)
     );
 
     if (isCheaperThanSteam) {
+      const activeDealUrl = deal.dealUrl || dealsService.getGameBilletSearchUrl(game.name);
+      game.dealUrl = activeDealUrl;
+
       // Highlighted deal banner with price, savings percent, and copy button
       const priceDisplay = `${escapeHtml(deal.price)} USD`;
       const savingsDisplay = deal.savingsPercent > 0 ? `<span class="deal-savings-badge">-%${deal.savingsPercent}</span>` : '';
@@ -1493,21 +1493,9 @@ class SteamSquadApp {
         }
       });
     } else {
-      // Quiet fallback link when there is no cheaper deal
-      const searchLabel = escapeHtml(i18n.t('btnStoreSearch', { store: storeName }));
-
-      placeholder.innerHTML = `
-        <div class="game-deal-banner game-deal-banner-quiet">
-          <div class="deal-banner-left">
-            <span class="deal-store-tag">🔑 ${escapeHtml(storeName)}</span>
-          </div>
-          <div class="deal-banner-actions">
-            <a href="${escapeHtml(activeDealUrl)}" target="_blank" rel="noopener noreferrer" class="btn-deal-cta btn-deal-quiet" title="${searchLabel}">
-              ${searchLabel} ➔
-            </a>
-          </div>
-        </div>
-      `;
+      // If external store has no discount or is not cheaper than Steam, do not show any button
+      placeholder.innerHTML = '';
+      game.dealUrl = null;
     }
   }
 

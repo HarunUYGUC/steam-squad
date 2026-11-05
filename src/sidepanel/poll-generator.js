@@ -181,20 +181,7 @@ export class PollGenerator {
 
     if (hasMissing) {
       const missingNames = game.missingMembers.map(m => m.name || m.personaName).join(', ');
-      if (hasSteamDiscount && steamDiscountPercent > 0 && steamFormatted) {
-        lines.push(i18n.t('winnerShareMissingWithDiscount', {
-          names: missingNames,
-          discount: steamDiscountPercent,
-          price: steamFormatted
-        }));
-      } else {
-        lines.push(i18n.t('winnerShareMissing', { names: missingNames }));
-      }
-    } else if (hasSteamDiscount && steamDiscountPercent > 0 && steamFormatted) {
-      lines.push(i18n.t('winnerShareDiscountActive', {
-        discount: steamDiscountPercent,
-        price: steamFormatted
-      }));
+      lines.push(i18n.t('winnerShareMissing', { names: missingNames }));
     }
 
     // ONLY attach external key store link if it is GENUINELY cheaper than Steam!
@@ -208,8 +195,19 @@ export class PollGenerator {
       }));
     }
 
-    // Direct Steam store link
-    lines.push(i18n.t('winnerShareSteamLink', { link: `https://store.steampowered.com/app/${game.appId}` }));
+    // Direct Steam store link with discount/price info in front
+    const steamLink = `https://store.steampowered.com/app/${game.appId}`;
+    if (hasSteamDiscount && steamDiscountPercent > 0 && steamFormatted) {
+      lines.push(i18n.t('winnerShareSteamLinkWithDiscount', {
+        discount: steamDiscountPercent,
+        price: steamFormatted,
+        link: steamLink
+      }));
+    } else if (steamDetails?.isFree) {
+      lines.push(i18n.t('winnerShareSteamLinkFree', { link: steamLink }));
+    } else {
+      lines.push(i18n.t('winnerShareSteamLink', { link: steamLink }));
+    }
 
     return lines.join('\n');
   }
