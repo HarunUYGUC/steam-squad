@@ -1553,12 +1553,22 @@ class SteamSquadApp {
 
       games.forEach(g => {
         if (g.missingMembers?.length > 0 && !g.storeDetails?.isFree) {
-          const hasDiscount = Boolean(g.storeDetails?.hasDiscount || g.dealInfo?.hasDeal);
-          if (hasDiscount) {
-            g.dealUrl = g.dealInfo?.dealUrl || dealsService.getGameBilletSearchUrl(g.name);
+          const steamPriceCents = g.storeDetails?.finalPriceCents || 0;
+          const steamPrice = steamPriceCents / 100;
+          const deal = g.dealInfo;
+          const isKeyDealCheaperThanSteam = Boolean(
+            deal?.hasDeal &&
+            deal?.priceNumeric > 0 &&
+            (steamPrice <= 0 || deal.priceNumeric < steamPrice)
+          );
+
+          if (isKeyDealCheaperThanSteam && deal?.dealUrl) {
+            g.dealUrl = deal.dealUrl;
           } else {
             g.dealUrl = null;
           }
+        } else {
+          g.dealUrl = null;
         }
       });
 

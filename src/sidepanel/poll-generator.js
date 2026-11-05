@@ -58,7 +58,10 @@ export class PollGenerator {
       let dealMasked = '';
       if (game.dealUrl && !game.storeDetails?.isFree && game.missingMembers && game.missingMembers.length > 0) {
         const storeName = game.dealInfo?.storeName || 'Key';
-        const maskLabel = i18n.t('pollDiscordDealMask', { store: storeName });
+        const dealPrice = game.dealInfo?.price || '';
+        const maskLabel = dealPrice
+          ? i18n.t('pollDiscordDealMask', { store: storeName, price: dealPrice })
+          : `🔑 ${storeName} Key`;
         dealMasked = ` ([${maskLabel}](${game.dealUrl}))`;
       }
 
@@ -118,13 +121,14 @@ export class PollGenerator {
       text += `${emoji} *${game.name}* — ${statusBadge} (${modeLabel} / ${maxP})\n`;
     });
 
-    // Append clean footer block for discounted missing games in WhatsApp
+    // Append clean footer block for discounted missing games in WhatsApp (ONLY when external key is cheaper)
     const dealGames = selectedGames.filter(g => g.dealUrl && !g.storeDetails?.isFree && g.missingMembers?.length > 0);
     if (dealGames.length > 0) {
       text += `\n${i18n.t('pollWhatsappDealsHeader')}\n`;
       dealGames.forEach(g => {
-        const priceInfo = g.storeDetails?.finalFormatted ? ` (${g.storeDetails.finalFormatted})` : '';
-        text += `• ${g.name}${priceInfo}: ${g.dealUrl}\n`;
+        const storeName = g.dealInfo?.storeName || 'Key';
+        const dealPrice = g.dealInfo?.price ? ` (${g.dealInfo.price})` : '';
+        text += `• ${g.name} — ${storeName}${dealPrice}: ${g.dealUrl}\n`;
       });
     }
 
@@ -159,28 +163,49 @@ export class PollGenerator {
     ];
 
     const hasMissing = game.missingMembers && game.missingMembers.length > 0;
-    const hasDiscount = Boolean(game.storeDetails?.hasDiscount || game.dealInfo?.hasDeal);
-    const dealPrice = game.dealInfo?.price || (game.storeDetails?.finalFormatted || '');
-    const discountPercent = game.dealInfo?.savingsPercent || (game.storeDetails?.discountPercent || 0);
+    const steamDetails = game.storeDetails;
+    const steamPriceCents = steamDetails?.finalPriceCents || 0;
+    const steamPrice = steamPriceCents / 100;
+    const hasSteamDiscount = Boolean(steamDetails?.hasDiscount);
+    const steamDiscountPercent = steamDetails?.discountPercent || 0;
+    const steamFormatted = steamDetails?.finalFormatted || '';
+
+    // Calculate if authorized external key deal is ACTUALLY cheaper than Steam
+    const deal = game.dealInfo;
+    const isKeyDealCheaperThanSteam = Boolean(
+      !steamDetails?.isFree &&
+      deal?.hasDeal &&
+      deal?.priceNumeric > 0 &&
+      (steamPrice <= 0 || deal.priceNumeric < steamPrice)
+    );
 
     if (hasMissing) {
       const missingNames = game.missingMembers.map(m => m.name || m.personaName).join(', ');
-      if (hasDiscount && discountPercent > 0) {
-        lines.push(i18n.t('winnerShareMissingWithDiscount', { names: missingNames, discount: discountPercent, price: dealPrice }));
+      if (hasSteamDiscount && steamDiscountPercent > 0 && steamFormatted) {
+        lines.push(i18n.t('winnerShareMissingWithDiscount', {
+          names: missingNames,
+          discount: steamDiscountPercent,
+          price: steamFormatted
+        }));
       } else {
         lines.push(i18n.t('winnerShareMissing', { names: missingNames }));
       }
-    } else if (hasDiscount && discountPercent > 0) {
-      lines.push(i18n.t('winnerShareDiscountActive', { discount: discountPercent, price: dealPrice }));
+    } else if (hasSteamDiscount && steamDiscountPercent > 0 && steamFormatted) {
+      lines.push(i18n.t('winnerShareDiscountActive', {
+        discount: steamDiscountPercent,
+        price: steamFormatted
+      }));
     }
 
-    // Attach authorized key store affiliate link if missing players or active discount
-    if ((hasMissing || hasDiscount) && !game.storeDetails?.isFree) {
-      const dealUrl = game.dealUrl || game.dealInfo?.dealUrl || dealsService.getGameBilletSearchUrl(game.name);
-      const storeName = game.dealInfo?.storeName || 'GameBillet';
-      if (dealUrl) {
-        lines.push(i18n.t('winnerShareKeyLink', { store: storeName, url: dealUrl }));
-      }
+    // ONLY attach external key store link if it is GENUINELY cheaper than Steam!
+    if (isKeyDealCheaperThanSteam && deal?.dealUrl) {
+      const storeName = deal.storeName || 'GameBillet';
+      const dealPrice = deal.price || '';
+      lines.push(i18n.t('winnerShareKeyDealCheaper', {
+        store: storeName,
+        price: dealPrice,
+        url: deal.dealUrl
+      }));
     }
 
     // Direct Steam store link
