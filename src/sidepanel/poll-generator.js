@@ -57,7 +57,8 @@ export class PollGenerator {
 
       let dealMasked = '';
       if (game.dealUrl && !game.storeDetails?.isFree && game.missingMembers && game.missingMembers.length > 0) {
-        const maskLabel = i18n.t('pollDiscordDealMask');
+        const storeName = game.dealInfo?.storeName || 'Key';
+        const maskLabel = i18n.t('pollDiscordDealMask', { store: storeName });
         dealMasked = ` ([${maskLabel}](${game.dealUrl}))`;
       }
 
@@ -173,11 +174,12 @@ export class PollGenerator {
       lines.push(i18n.t('winnerShareDiscountActive', { discount: discountPercent, price: dealPrice }));
     }
 
-    // Attach Humble Store affiliate link if missing players or active discount
+    // Attach authorized key store affiliate link if missing players or active discount
     if ((hasMissing || hasDiscount) && !game.storeDetails?.isFree) {
-      const humbleUrl = game.dealUrl || dealsService.getHumbleSearchUrl(game.name);
-      if (humbleUrl) {
-        lines.push(i18n.t('winnerShareHumbleLink', { url: humbleUrl }));
+      const dealUrl = game.dealUrl || game.dealInfo?.dealUrl || dealsService.getGameBilletSearchUrl(game.name);
+      const storeName = game.dealInfo?.storeName || 'GameBillet';
+      if (dealUrl) {
+        lines.push(i18n.t('winnerShareKeyLink', { store: storeName, url: dealUrl }));
       }
     }
 

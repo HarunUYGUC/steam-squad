@@ -1,19 +1,23 @@
 /**
  * Deals & Affiliate Service for SteamSquad
- * Fetches real-time Steam key deals exclusively from Humble Store via CheapShark API
- * using Batch requests (micro-debounced chunks of up to 50 AppIDs) and caches for 24 hours.
- * Links ALWAYS point directly to Humble Store with official affiliate tracking (?partner=steamsquad),
- * ensuring 100% of commissions go directly to your Impact.com partner account.
+ * Fetches real-time Steam key deals across authorized digital storefronts (GameBillet & Humble Store)
+ * via CheapShark API using Batch requests (micro-debounced chunks of up to 50 AppIDs) and caches for 24 hours.
+ * Links ALWAYS point directly to authorized stores with official affiliate tracking:
+ * - GameBillet: ?affiliate=cfbc4fed-8524-422f-b987-b99a3bc536ed (5% commission)
+ * - Humble Store: ?partner=steamsquad (partnership not yet approved, but links still forward users when Humble has the best price)
+ * Best Price Wins (Seçenek A): Compares live prices between authorized retailers and surfaces the cheapest key.
  */
 
 export const AFFILIATE_CONFIG = {
-  humblePartnerTag: 'steamsquad',
+  gamebilletAffiliateId: 'cfbc4fed-8524-422f-b987-b99a3bc536ed',
+  humblePartnerTag: 'steamsquad', // Partnership not yet approved, but redirected to provide users the best available price
   enableAffiliate: true,
   cacheDurationMs: 24 * 60 * 60 * 1000 // 24 hours persistent cache
 };
 
 export const AUTHORIZED_STORES = {
-  '11': { name: 'Humble Store', shortName: 'Humble' }
+  gamebillet: { name: 'GameBillet', shortName: 'GameBillet', defaultId: '30' },
+  humble: { name: 'Humble Store', shortName: 'Humble', defaultId: '11' }
 };
 
 class DealsService {
@@ -23,6 +27,12 @@ class DealsService {
     this.batchTimer = null;
     this.rateLimitBackoffUntil = 0;
     this.isFlushing = false;
+    this._storesInitialized = false;
+
+    this.storeIds = {
+      gamebillet: AUTHORIZED_STORES.gamebillet.defaultId,
+      humble: AUTHORIZED_STORES.humble.defaultId
+    };
 
     // Load persisted backoff timestamp if any
     try {
@@ -34,10 +44,57 @@ class DealsService {
         }).catch(() => {});
       }
     } catch {}
+
+    this.initStores().catch(() => {});
   }
 
   /**
-   * Sanitizes raw Steam game titles for accurate Humble Store search results.
+   * Initializes dynamic store IDs from CheapShark /stores or local storage cache
+   */
+  async initStores() {
+    if (this._storesInitialized) return;
+
+    try {
+      if (typeof chrome !== 'undefined' && chrome.storage?.local) {
+        const cached = await chrome.storage.local.get('steamsquad_stores_map');
+        if (cached?.steamsquad_stores_map && (Date.now() - cached.steamsquad_stores_map.timestamp < 7 * 24 * 60 * 60 * 1000)) {
+          this.storeIds = { ...this.storeIds, ...cached.steamsquad_stores_map.data };
+          this._storesInitialized = true;
+          return;
+        }
+      }
+    } catch {}
+
+    try {
+      const response = await fetch('https://www.cheapshark.com/api/1.0/stores');
+      if (response.ok) {
+        const stores = await response.json();
+        if (Array.isArray(stores)) {
+          const map = {};
+          for (const s of stores) {
+            const nameLower = (s.storeName || '').toLowerCase();
+            if (nameLower.includes('gamebillet')) {
+              map.gamebillet = String(s.storeID);
+            } else if (nameLower.includes('humble')) {
+              map.humble = String(s.storeID);
+            }
+          }
+          if (map.gamebillet) this.storeIds.gamebillet = map.gamebillet;
+          if (map.humble) this.storeIds.humble = map.humble;
+          this._storesInitialized = true;
+
+          if (typeof chrome !== 'undefined' && chrome.storage?.local) {
+            chrome.storage.local.set({
+              steamsquad_stores_map: { data: this.storeIds, timestamp: Date.now() }
+            });
+          }
+        }
+      }
+    } catch {}
+  }
+
+  /**
+   * Sanitizes raw Steam game titles for accurate Store search results.
    * Strips trademarks (™, ®, ©), bracketed region/platform tags, and verbose edition/remaster suffixes.
    */
   sanitizeGameTitle(rawTitle) {
@@ -60,6 +117,16 @@ class DealsService {
   }
 
   /**
+   * Generates a clean search URL on GameBillet with the affiliate partner tag
+   */
+  getGameBilletSearchUrl(gameName) {
+    const cleanName = this.sanitizeGameTitle(gameName);
+    const encoded = encodeURIComponent(cleanName);
+    const affiliateId = AFFILIATE_CONFIG.gamebilletAffiliateId;
+    return `https://www.gamebillet.com/search?q=${encoded}&affiliate=${affiliateId}`;
+  }
+
+  /**
    * Generates a clean search URL on Humble Store with the affiliate partner tag
    */
   getHumbleSearchUrl(gameName) {
@@ -70,14 +137,25 @@ class DealsService {
   }
 
   /**
-   * Creates a default fallback object (Seçenek 2: quiet Humble Store search link)
+   * Generates default fallback search URL (defaults to GameBillet as active affiliate)
    */
-  createFallback(gameName) {
-    const searchUrl = this.getHumbleSearchUrl(gameName);
+  getDefaultSearchUrl(gameName) {
+    return this.getGameBilletSearchUrl(gameName);
+  }
+
+  /**
+   * Creates a default fallback object (quiet GameBillet search link)
+   */
+  createFallback(gameName, storeKey = 'gamebillet') {
+    const isHb = storeKey === 'humble';
+    const storeName = isHb ? 'Humble' : 'GameBillet';
+    const storeId = isHb ? this.storeIds.humble : this.storeIds.gamebillet;
+    const searchUrl = isHb ? this.getHumbleSearchUrl(gameName) : this.getGameBilletSearchUrl(gameName);
+
     return {
       hasDeal: false,
-      storeId: '11',
-      storeName: 'Humble',
+      storeId,
+      storeName,
       price: null,
       normalPrice: null,
       priceNumeric: null,
@@ -89,7 +167,7 @@ class DealsService {
   }
 
   /**
-   * Fetches the best Humble deal for a Steam AppID with batch grouping and persistent caching
+   * Fetches the best deal (GameBillet vs Humble) for a Steam AppID with batch grouping and persistent caching
    */
   async getBestDeal(appId, gameName) {
     if (!appId) return null;
@@ -102,7 +180,7 @@ class DealsService {
       const cached = this.memoryCache.get(idStr);
       if (now - cached.timestamp < AFFILIATE_CONFIG.cacheDurationMs) {
         if (cached.deal && cached.deal.dealUrl?.includes('cheapshark.com')) {
-          cached.deal.dealUrl = this.getHumbleSearchUrl(gameName);
+          cached.deal.dealUrl = this.getGameBilletSearchUrl(gameName);
           cached.deal.humbleUrl = cached.deal.dealUrl;
         }
         return cached.deal;
@@ -117,7 +195,7 @@ class DealsService {
         if (stored[storageKey] && (now - stored[storageKey].timestamp < AFFILIATE_CONFIG.cacheDurationMs)) {
           const deal = stored[storageKey].deal;
           if (deal && (!deal.dealUrl || deal.dealUrl.includes('cheapshark.com'))) {
-            deal.dealUrl = this.getHumbleSearchUrl(gameName);
+            deal.dealUrl = this.getGameBilletSearchUrl(gameName);
             deal.humbleUrl = deal.dealUrl;
             chrome.storage.local.set({ [storageKey]: { deal, timestamp: stored[storageKey].timestamp } });
           }
@@ -127,7 +205,7 @@ class DealsService {
       }
     } catch {}
 
-    const fallback = this.createFallback(gameName);
+    const fallback = this.createFallback(gameName, 'gamebillet');
 
     // 3. If currently in rate-limit backoff, return fallback silently without requesting CheapShark
     if (now < this.rateLimitBackoffUntil) {
@@ -153,11 +231,13 @@ class DealsService {
   }
 
   /**
-   * Flushes the queued batch by requesting multiple AppIDs in chunks of up to 50 per HTTP call
+   * Flushes the queued batch by requesting multiple AppIDs across authorized stores
    */
   async flushBatch() {
     if (this.isFlushing || this.pendingBatch.length === 0) return;
     this.isFlushing = true;
+
+    await this.initStores();
 
     const currentBatch = [...this.pendingBatch];
     this.pendingBatch = [];
@@ -183,11 +263,14 @@ class DealsService {
     const uniqueAppIds = Array.from(appMap.keys());
     const CHUNK_SIZE = 50;
 
+    // Both GameBillet and Humble queried together
+    const storeIdsList = Array.from(new Set([this.storeIds.gamebillet, this.storeIds.humble])).filter(Boolean).join(',');
+
     for (let i = 0; i < uniqueAppIds.length; i += CHUNK_SIZE) {
       const chunkIds = uniqueAppIds.slice(i, i + CHUNK_SIZE);
 
       try {
-        const url = `https://www.cheapshark.com/api/1.0/deals?steamAppID=${chunkIds.join(',')}&storeID=11&pageSize=60`;
+        const url = `https://www.cheapshark.com/api/1.0/deals?steamAppID=${chunkIds.join(',')}&storeID=${storeIdsList}&pageSize=60`;
         const response = await fetch(url);
 
         if (response.status === 429) {
@@ -225,14 +308,18 @@ class DealsService {
           continue;
         }
 
+        // Group deals by steamAppID across authorized stores
         const returnedDealsMap = new Map();
         if (Array.isArray(data)) {
           for (const d of data) {
-            if (String(d.storeID) === '11' && d.steamAppID) {
-              const prev = returnedDealsMap.get(d.steamAppID);
-              if (!prev || parseFloat(d.salePrice) < parseFloat(prev.salePrice)) {
-                returnedDealsMap.set(d.steamAppID, d);
+            const sid = String(d.storeID);
+            const isGb = sid === this.storeIds.gamebillet;
+            const isHb = sid === this.storeIds.humble;
+            if ((isGb || isHb) && d.steamAppID) {
+              if (!returnedDealsMap.has(d.steamAppID)) {
+                returnedDealsMap.set(d.steamAppID, []);
               }
+              returnedDealsMap.get(d.steamAppID).push(d);
             }
           }
         }
@@ -242,7 +329,29 @@ class DealsService {
         for (const appId of chunkIds) {
           const items = appMap.get(appId) || [];
           const gameTitle = items[0]?.gameName || '';
-          const matched = returnedDealsMap.get(appId);
+          const dealsForApp = returnedDealsMap.get(appId) || [];
+
+          let matched = null;
+          let matchedStore = 'gamebillet';
+
+          if (dealsForApp.length > 0) {
+            // "Seçenek A" Best Deal Selection:
+            // 1. Sort by lowest salePrice
+            // 2. Tie-break: prefer GameBillet (commission active)
+            dealsForApp.sort((a, b) => {
+              const priceA = parseFloat(a.salePrice || '99999');
+              const priceB = parseFloat(b.salePrice || '99999');
+              if (priceA !== priceB) {
+                return priceA - priceB;
+              }
+              if (String(a.storeID) === this.storeIds.gamebillet) return -1;
+              if (String(b.storeID) === this.storeIds.gamebillet) return 1;
+              return 0;
+            });
+
+            matched = dealsForApp[0];
+            matchedStore = String(matched.storeID) === this.storeIds.humble ? 'humble' : 'gamebillet';
+          }
 
           let resolvedDeal;
           if (matched) {
@@ -250,24 +359,27 @@ class DealsService {
             const price = parseFloat(matched.salePrice).toFixed(2);
             const normalPrice = parseFloat(matched.normalPrice || matched.salePrice).toFixed(2);
 
-            // DIRECT HUMBLE STORE SEARCH URL with partner tag and sanitized title
-            // (Never uses cheapshark.com/redirect to ensure 100% affiliate commission goes to you)
-            const directHumbleUrl = this.getHumbleSearchUrl(gameTitle);
+            const isGb = matchedStore === 'gamebillet';
+            const storeName = isGb ? 'GameBillet' : 'Humble';
+            const storeId = isGb ? this.storeIds.gamebillet : this.storeIds.humble;
+            const directUrl = isGb
+              ? this.getGameBilletSearchUrl(gameTitle)
+              : this.getHumbleSearchUrl(gameTitle);
 
             resolvedDeal = {
               hasDeal: savings > 0,
-              storeId: '11',
-              storeName: 'Humble',
+              storeId,
+              storeName,
               price: `$${price}`,
               normalPrice: `$${normalPrice}`,
               priceNumeric: parseFloat(matched.salePrice),
               normalPriceNumeric: parseFloat(matched.normalPrice || matched.salePrice),
               savingsPercent: savings,
-              dealUrl: directHumbleUrl,
-              humbleUrl: directHumbleUrl
+              dealUrl: directUrl,
+              humbleUrl: directUrl
             };
           } else {
-            resolvedDeal = items[0]?.fallback || this.createFallback(gameTitle);
+            resolvedDeal = items[0]?.fallback || this.createFallback(gameTitle, 'gamebillet');
           }
 
           this.memoryCache.set(appId, { deal: resolvedDeal, timestamp: now });
@@ -306,11 +418,11 @@ class DealsService {
    */
   getShareMessage(gameName, missingPlayerName, deal, lang = 'tr') {
     const isEn = lang === 'en';
-    const store = 'Humble Store';
+    const store = deal?.storeName || 'GameBillet';
     const priceText = deal?.price ? ` (${deal.price}${deal.savingsPercent > 0 ? ' -%' + deal.savingsPercent : ''})` : '';
     const cleanUrl = (deal?.dealUrl && !deal.dealUrl.includes('cheapshark.com'))
       ? deal.dealUrl
-      : this.getHumbleSearchUrl(gameName);
+      : this.getGameBilletSearchUrl(gameName);
 
     if (isEn) {
       const playerText = missingPlayerName ? ` for ${missingPlayerName}` : '';

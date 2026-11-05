@@ -98,10 +98,10 @@ Every weekend, gaming groups jump on Discord and spend **30 to 45 minutes** in e
 - **1-Click Header Language Toggle:** Instant seamless switching between English (`EN`) and Turkish (`TR`) across all tabs, stat counters, tooltips, nudge templates, and voting poll exports.
 - **Native Chrome Manifest Localization:** Packaged with `_locales/en` and `_locales/tr` (`messages.json`) for full Chrome Web Store and browser-level internationalization.
 
-### 9. 🔑 Authorized Steam Key Deals & Humble Partner Integration
-- **Real-Time Key Discounts:** Scans authorized digital storefronts (Humble Bundle) via high-performance batch endpoints to find Steam key deals cheaper than Steam itself (e.g., `-%85 $3.74 USD`).
-- **Smart Price Comparison:** Intelligently compares external key prices against Steam's regional store price—highlighting deals only when an authorized seller is genuinely cheaper.
-- **Title Sanitization & Direct Affiliate Search:** Automatically strips trademarks (`™`, `®`) and verbose edition suffixes for accurate Humble Store search results with direct affiliate tracking (`?partner=steamsquad`).
+### 9. 🔑 Authorized Steam Key Deals (GameBillet & Humble)
+- **Real-Time Key Discounts:** Scans authorized digital storefronts (GameBillet & Humble Bundle) via high-performance batch endpoints to find Steam key deals cheaper than Steam itself (e.g., `-%85 $3.74 USD`).
+- **Best Price Wins Algorithm:** Intelligently compares live prices across authorized key retailers and Steam itself—surfacing the single cheapest legitimate offer.
+- **Title Sanitization & Direct Affiliate Search:** Automatically strips trademarks (`™`, `®`) and verbose edition suffixes for accurate GameBillet and Humble search results with direct affiliate tracking.
 - **1-Click Share Deal:** Allows squad leaders to copy customized deal messages and attaches deal links to Discord/WhatsApp voting polls for missing players.
 
 ---
@@ -228,7 +228,7 @@ SteamSquad adheres strictly to a zero-login, privacy-first model:
 - **100% Client-Side Storage:** All squad member names, avatars, custom teams, and settings are stored locally in your browser's private `chrome.storage.local`.
 - **No Telemetry / No Tracking:** We do not operate remote tracking servers, collect personal data, or sell your information.
 - **Official & Public APIs Only:** Network requests are made strictly to official Valve endpoints (`steamcommunity.com` and `store.steampowered.com`) and CheapShark for public deal data. No personal data is transmitted.
-- **Transparent Affiliate Disclosure:** Store links to authorized retailers (e.g., Humble Store) may earn a small affiliate commission at no extra cost to users.
+- **Transparent Affiliate Disclosure:** Store links to authorized retailers (e.g., GameBillet, Humble Store) may earn a small affiliate commission at no extra cost to users.
 - Read our full [Privacy Policy](PRIVACY.md) for complete details.
 
 ---

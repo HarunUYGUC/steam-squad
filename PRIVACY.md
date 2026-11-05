@@ -38,10 +38,10 @@ These interactions are subject to the respective privacy policies of Valve Corpo
 
 ## 4. Affiliate & Commercial Disclosures
 SteamSquad believes in complete transparency regarding external links:
-- **Affiliate Links:** SteamSquad may display direct links to authorized digital game storefronts (such as Humble Bundle). When you click these links and make a purchase, the developer may earn a small affiliate commission at no additional cost to you.
-- **Authorized Retailers Only:** We only feature and link to 100% legitimate, publisher-authorized digital PC storefronts (e.g., Humble Store). We never promote or integrate unauthorized gray-market key resellers.
+- **Affiliate Links:** SteamSquad may display direct links to authorized digital game storefronts (such as GameBillet and Humble Bundle). When you click these links and make a purchase, the developer may earn a small affiliate commission at no additional cost to you.
+- **Authorized Retailers Only:** We only feature and link to 100% legitimate, publisher-authorized digital PC storefronts (e.g., GameBillet, Humble Store). We never promote or integrate unauthorized gray-market key resellers.
 - **Editorial & Algorithm Independence:** Game recommendations, match results, and decision roulette outcomes are calculated purely algorithmically based on your squad's ownership and play history. Commercial partnerships never influence match results.
-- **Disclaimer:** SteamSquad is an independent open-source tool and is not directly affiliated with, endorsed, or sponsored by Valve Corporation or Humble Bundle Inc.
+- **Disclaimer:** SteamSquad is an independent open-source tool and is not directly affiliated with, endorsed, or sponsored by Valve Corporation, GameBillet, or Humble Bundle Inc.
 
 ---
 

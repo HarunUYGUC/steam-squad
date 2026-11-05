@@ -1443,14 +1443,15 @@ class SteamSquadApp {
     }
 
     const rawNames = (game.missingMembers || []).map(m => m.name).join(', ');
-    const humbleSearchUrl = dealsService.getHumbleSearchUrl(game.name);
-    game.dealUrl = humbleSearchUrl;
-
     const deal = game.dealInfo;
+    const storeName = deal?.storeName || 'GameBillet';
+    const activeDealUrl = deal?.dealUrl || dealsService.getGameBilletSearchUrl(game.name);
+    game.dealUrl = activeDealUrl;
+
     const steamPriceCents = game.storeDetails?.finalPriceCents || 0;
     const steamPrice = steamPriceCents / 100;
 
-    // Check if Humble deal is ACTUALLY cheaper than Steam
+    // Check if authorized key store deal is ACTUALLY cheaper than Steam
     const isCheaperThanSteam = Boolean(
       deal?.hasDeal &&
       deal?.priceNumeric > 0 &&
@@ -1462,20 +1463,20 @@ class SteamSquadApp {
       // Highlighted deal banner with price, savings percent, and copy button
       const priceDisplay = `${escapeHtml(deal.price)} USD`;
       const savingsDisplay = deal.savingsPercent > 0 ? `<span class="deal-savings-badge">-%${deal.savingsPercent}</span>` : '';
-      const ctaLabel = `Humble: ${escapeHtml(deal.price)}`;
+      const ctaLabel = `${storeName}: ${escapeHtml(deal.price)}`;
 
       placeholder.innerHTML = `
         <div class="game-deal-banner">
           <div class="deal-banner-left">
-            <span class="deal-store-tag">🔑 Humble</span>
+            <span class="deal-store-tag">🔑 ${escapeHtml(storeName)}</span>
             <span class="deal-price-text">${priceDisplay}</span>
             ${savingsDisplay}
           </div>
           <div class="deal-banner-actions">
-            <a href="${escapeHtml(humbleSearchUrl)}" target="_blank" rel="noopener noreferrer" class="btn-deal-cta" title="${escapeHtml(i18n.t('btnStore'))}">
+            <a href="${escapeHtml(activeDealUrl)}" target="_blank" rel="noopener noreferrer" class="btn-deal-cta" title="${escapeHtml(i18n.t('btnStore'))}">
               ${ctaLabel} ➔
             </a>
-            <button class="btn-deal-copy" data-app-id="${safeAppId}" title="${escapeHtml(i18n.t('btnCopyDealTitle'))}">
+            <button class="btn-deal-copy" data-app-id="${safeAppId}" title="${escapeHtml(i18n.t('btnCopyDealTitle', { store: storeName }))}">
               📋
             </button>
           </div>
@@ -1484,24 +1485,24 @@ class SteamSquadApp {
 
       placeholder.querySelector('.btn-deal-copy')?.addEventListener('click', async (e) => {
         e.stopPropagation();
-        const cleanDeal = { ...deal, dealUrl: humbleSearchUrl };
+        const cleanDeal = { ...deal, dealUrl: activeDealUrl, storeName };
         const shareMsg = dealsService.getShareMessage(game.name, rawNames, cleanDeal, i18n.getLanguage());
         const success = await PollGenerator.copyToClipboard(shareMsg);
         if (success) {
-          this.showToast(i18n.t('toastDealCopied', { name: game.name }));
+          this.showToast(i18n.t('toastDealCopied', { name: game.name, store: storeName }));
         }
       });
     } else {
       // Quiet fallback link when there is no cheaper deal
-      const searchLabel = escapeHtml(i18n.t('btnHumbleSearch'));
+      const searchLabel = escapeHtml(i18n.t('btnStoreSearch', { store: storeName }));
 
       placeholder.innerHTML = `
         <div class="game-deal-banner game-deal-banner-quiet">
           <div class="deal-banner-left">
-            <span class="deal-store-tag">🔑 Humble</span>
+            <span class="deal-store-tag">🔑 ${escapeHtml(storeName)}</span>
           </div>
           <div class="deal-banner-actions">
-            <a href="${escapeHtml(humbleSearchUrl)}" target="_blank" rel="noopener noreferrer" class="btn-deal-cta btn-deal-quiet" title="${searchLabel}">
+            <a href="${escapeHtml(activeDealUrl)}" target="_blank" rel="noopener noreferrer" class="btn-deal-cta btn-deal-quiet" title="${searchLabel}">
               ${searchLabel} ➔
             </a>
           </div>
@@ -1554,7 +1555,7 @@ class SteamSquadApp {
         if (g.missingMembers?.length > 0 && !g.storeDetails?.isFree) {
           const hasDiscount = Boolean(g.storeDetails?.hasDiscount || g.dealInfo?.hasDeal);
           if (hasDiscount) {
-            g.dealUrl = dealsService.getHumbleSearchUrl(g.name);
+            g.dealUrl = g.dealInfo?.dealUrl || dealsService.getGameBilletSearchUrl(g.name);
           } else {
             g.dealUrl = null;
           }

@@ -51,7 +51,7 @@ Arkadaşlarınızın hiçbir şey yüklemesine gerek yok! Yalnızca Steam profil
 • %100 Herkeste Var: Kadrodaki herkesin kütüphanesinde olan ortak oyunları tek bakışta görün.
 • 1 Kişide & 2 Kişide Yok: Sadece 1 veya 2 kişide eksik olan oyunları tespit edin.
 • Canlı Bölgesel Fiyat & İndirim: Eksik oyunların güncel Steam indirim oranını ve fiyatını (MENA-USD / US-USD) anında görün.
-• 🔑 Yetkili Steam Key Fırsatları: Eksik oyunlar için yetkili dijital mağazalardaki (Humble Store vb.) yasal indirimleri keşfedin; Steam'den daha ucuz anahtar fırsatlarını anında yakalayın.
+• 🔑 Yetkili Steam Key Fırsatları: Eksik oyunlar için yetkili dijital mağazalardaki (GameBillet, Humble Store vb.) yasal indirimleri keşfedin; Steam'den daha ucuz anahtar fırsatlarını anında yakalayın.
 • 💬 1-Tıkla Arkadaşı Dürt (Nudge): Eksik oyunu olan arkadaşınıza indirimli key fırsatını ve mağaza linkini içeren kişiselleştirilmiş hazır mesaj kopyalayın.
 
 🏷️ STEAM MAĞAZASINDA CANLI ROZET
@@ -119,7 +119,7 @@ Your friends don't need to install anything! Simply paste their public Steam pro
 • 100% All Squad Owns: Instantly view games that everyone in your active squad already owns.
 • Missing 1 & Missing 2 Players: Discover games where only 1 or 2 friends need a copy.
 • Live Regional Prices & Discounts: See real-time Steam sale discounts and prices (MENA-USD & US-USD).
-• 🔑 Authorized Steam Key Deals: Discover legitimate Steam key deals across authorized digital storefronts (such as Humble Store and partner key retailers); highlights genuine savings whenever an official seller beats Steam's price!
+• 🔑 Authorized Steam Key Deals: Discover legitimate Steam key deals across authorized digital storefronts (such as GameBillet, Humble Store, and partner key retailers); highlights genuine savings whenever an official seller beats Steam's price!
 • 💬 1-Click Friend Nudge: Copy personalized invitation messages with direct store and deal links for friends missing the game.
 
 🏷️ IN-PAGE STEAM STORE SQUAD BADGE
